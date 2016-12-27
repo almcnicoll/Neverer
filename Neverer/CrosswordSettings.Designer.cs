@@ -28,25 +28,27 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(CrosswordSettings));
             this.cmdCancel = new System.Windows.Forms.Button();
             this.cmdOK = new System.Windows.Forms.Button();
             this.tlpAllSettings = new System.Windows.Forms.TableLayoutPanel();
-            this.lblCols = new System.Windows.Forms.Label();
-            this.nudCols = new System.Windows.Forms.NumericUpDown();
-            this.lblRows = new System.Windows.Forms.Label();
-            this.nudRows = new System.Windows.Forms.NumericUpDown();
-            this.lblTitle = new System.Windows.Forms.Label();
             this.txtTitle = new System.Windows.Forms.TextBox();
+            this.nudRows = new System.Windows.Forms.NumericUpDown();
+            this.nudCols = new System.Windows.Forms.NumericUpDown();
+            this.lblTitle = new System.Windows.Forms.Label();
+            this.lblRows = new System.Windows.Forms.Label();
             this.comboRotationalSymmetry = new System.Windows.Forms.ComboBox();
+            this.lblCols = new System.Windows.Forms.Label();
             this.lblRotationalSymmetry = new System.Windows.Forms.Label();
             this.tlpAllSettings.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudCols)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRows)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudCols)).BeginInit();
             this.SuspendLayout();
             // 
             // cmdCancel
             // 
             this.cmdCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
             this.cmdCancel.Location = new System.Drawing.Point(12, 226);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(75, 23);
@@ -93,30 +95,15 @@
             this.tlpAllSettings.Size = new System.Drawing.Size(389, 208);
             this.tlpAllSettings.TabIndex = 2;
             // 
-            // lblCols
+            // txtTitle
             // 
-            this.lblCols.AutoSize = true;
-            this.lblCols.Location = new System.Drawing.Point(3, 27);
-            this.lblCols.Name = "lblCols";
-            this.lblCols.Size = new System.Drawing.Size(47, 13);
-            this.lblCols.TabIndex = 0;
-            this.lblCols.Text = "Columns";
-            // 
-            // nudCols
-            // 
-            this.nudCols.Location = new System.Drawing.Point(112, 30);
-            this.nudCols.Name = "nudCols";
-            this.nudCols.Size = new System.Drawing.Size(40, 20);
-            this.nudCols.TabIndex = 1;
-            // 
-            // lblRows
-            // 
-            this.lblRows.AutoSize = true;
-            this.lblRows.Location = new System.Drawing.Point(3, 53);
-            this.lblRows.Name = "lblRows";
-            this.lblRows.Size = new System.Drawing.Size(34, 13);
-            this.lblRows.TabIndex = 2;
-            this.lblRows.Text = "Rows";
+            this.txtTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.txtTitle.Location = new System.Drawing.Point(112, 82);
+            this.txtTitle.Name = "txtTitle";
+            this.txtTitle.Size = new System.Drawing.Size(274, 20);
+            this.txtTitle.TabIndex = 5;
+            this.txtTitle.Text = "[Untitled Crossword]";
             // 
             // nudRows
             // 
@@ -124,6 +111,13 @@
             this.nudRows.Name = "nudRows";
             this.nudRows.Size = new System.Drawing.Size(40, 20);
             this.nudRows.TabIndex = 3;
+            // 
+            // nudCols
+            // 
+            this.nudCols.Location = new System.Drawing.Point(112, 30);
+            this.nudCols.Name = "nudCols";
+            this.nudCols.Size = new System.Drawing.Size(40, 20);
+            this.nudCols.TabIndex = 1;
             // 
             // lblTitle
             // 
@@ -134,15 +128,14 @@
             this.lblTitle.TabIndex = 4;
             this.lblTitle.Text = "Title";
             // 
-            // txtTitle
+            // lblRows
             // 
-            this.txtTitle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtTitle.Location = new System.Drawing.Point(112, 82);
-            this.txtTitle.Name = "txtTitle";
-            this.txtTitle.Size = new System.Drawing.Size(274, 20);
-            this.txtTitle.TabIndex = 5;
-            this.txtTitle.Text = "[Untitled Crossword]";
+            this.lblRows.AutoSize = true;
+            this.lblRows.Location = new System.Drawing.Point(3, 53);
+            this.lblRows.Name = "lblRows";
+            this.lblRows.Size = new System.Drawing.Size(34, 13);
+            this.lblRows.TabIndex = 2;
+            this.lblRows.Text = "Rows";
             // 
             // comboRotationalSymmetry
             // 
@@ -155,6 +148,15 @@
             this.comboRotationalSymmetry.Name = "comboRotationalSymmetry";
             this.comboRotationalSymmetry.Size = new System.Drawing.Size(121, 21);
             this.comboRotationalSymmetry.TabIndex = 6;
+            // 
+            // lblCols
+            // 
+            this.lblCols.AutoSize = true;
+            this.lblCols.Location = new System.Drawing.Point(3, 27);
+            this.lblCols.Name = "lblCols";
+            this.lblCols.Size = new System.Drawing.Size(47, 13);
+            this.lblCols.TabIndex = 0;
+            this.lblCols.Text = "Columns";
             // 
             // lblRotationalSymmetry
             // 
@@ -175,12 +177,13 @@
             this.Controls.Add(this.tlpAllSettings);
             this.Controls.Add(this.cmdOK);
             this.Controls.Add(this.cmdCancel);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "CrosswordSettings";
             this.Text = "Crossword Settings";
             this.tlpAllSettings.ResumeLayout(false);
             this.tlpAllSettings.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.nudCols)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRows)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.nudCols)).EndInit();
             this.ResumeLayout(false);
 
         }

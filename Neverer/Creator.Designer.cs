@@ -28,16 +28,24 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Creator));
             this.msMain = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.newToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exportExcelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportPDFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.recentFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.dictionaryManagementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.quickImportDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgvClues = new System.Windows.Forms.DataGridView();
             this.dgvPuzzle = new System.Windows.Forms.DataGridView();
@@ -49,6 +57,9 @@
             this.dlgSave = new System.Windows.Forms.SaveFileDialog();
             this.cmdEdit = new System.Windows.Forms.Button();
             this.lblPuzzleTitle = new System.Windows.Forms.Label();
+            this.dlgDictOpen = new System.Windows.Forms.OpenFileDialog();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
@@ -58,7 +69,8 @@
             // 
             this.msMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
-            this.toolsToolStripMenuItem});
+            this.toolsToolStripMenuItem,
+            this.aboutToolStripMenuItem});
             this.msMain.Location = new System.Drawing.Point(0, 0);
             this.msMain.Name = "msMain";
             this.msMain.Size = new System.Drawing.Size(716, 24);
@@ -72,8 +84,12 @@
             this.openToolStripMenuItem,
             this.saveToolStripMenuItem,
             this.saveAsToolStripMenuItem,
+            this.toolStripSeparator1,
             this.exportExcelToolStripMenuItem,
             this.exportPDFToolStripMenuItem,
+            this.toolStripSeparator2,
+            this.recentFilesToolStripMenuItem,
+            this.toolStripSeparator3,
             this.exitToolStripMenuItem});
             this.fileToolStripMenuItem.Name = "fileToolStripMenuItem";
             this.fileToolStripMenuItem.Size = new System.Drawing.Size(37, 20);
@@ -110,6 +126,11 @@
             this.saveAsToolStripMenuItem.Text = "Save &As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
+            // 
             // exportExcelToolStripMenuItem
             // 
             this.exportExcelToolStripMenuItem.Name = "exportExcelToolStripMenuItem";
@@ -125,6 +146,22 @@
             this.exportPDFToolStripMenuItem.Visible = false;
             this.exportPDFToolStripMenuItem.Click += new System.EventHandler(this.exportPDFToolStripMenuItem_Click);
             // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(152, 6);
+            // 
+            // recentFilesToolStripMenuItem
+            // 
+            this.recentFilesToolStripMenuItem.Name = "recentFilesToolStripMenuItem";
+            this.recentFilesToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.recentFilesToolStripMenuItem.Text = "Recent &Files";
+            // 
+            // toolStripSeparator3
+            // 
+            this.toolStripSeparator3.Name = "toolStripSeparator3";
+            this.toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
+            // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
@@ -136,15 +173,37 @@
             // toolsToolStripMenuItem
             // 
             this.toolsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.dictionaryToolStripMenuItem,
+            this.dictionaryManagementToolStripMenuItem,
+            this.quickImportDictionaryToolStripMenuItem,
             this.optionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
             // 
+            // dictionaryToolStripMenuItem
+            // 
+            this.dictionaryToolStripMenuItem.Name = "dictionaryToolStripMenuItem";
+            this.dictionaryToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.dictionaryToolStripMenuItem.Text = "&Dictionary...";
+            // 
+            // dictionaryManagementToolStripMenuItem
+            // 
+            this.dictionaryManagementToolStripMenuItem.Name = "dictionaryManagementToolStripMenuItem";
+            this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.dictionaryManagementToolStripMenuItem.Text = "Dictionary &Management";
+            // 
+            // quickImportDictionaryToolStripMenuItem
+            // 
+            this.quickImportDictionaryToolStripMenuItem.Name = "quickImportDictionaryToolStripMenuItem";
+            this.quickImportDictionaryToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.quickImportDictionaryToolStripMenuItem.Text = "&Quick Import Dictionary";
+            this.quickImportDictionaryToolStripMenuItem.Click += new System.EventHandler(this.quickImportDictionaryToolStripMenuItem_Click);
+            // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.optionsToolStripMenuItem.Text = "&Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -263,6 +322,27 @@
             this.lblPuzzleTitle.TabIndex = 8;
             this.lblPuzzleTitle.Text = "[title]";
             // 
+            // dlgDictOpen
+            // 
+            this.dlgDictOpen.DefaultExt = "*.nev.dic";
+            this.dlgDictOpen.Filter = "Neverer Dictionaries|*.nev.dic|Plain text|*.*";
+            this.dlgDictOpen.Title = "Open Crossword";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem1});
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.aboutToolStripMenuItem.Text = "&Help";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // aboutToolStripMenuItem1
+            // 
+            this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
+            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
+            this.aboutToolStripMenuItem1.Text = "&About";
+            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -277,9 +357,11 @@
             this.Controls.Add(this.dgvPuzzle);
             this.Controls.Add(this.dgvClues);
             this.Controls.Add(this.msMain);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.msMain;
             this.Name = "Creator";
             this.Text = "Neverer Creator";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Creator_FormClosing);
             this.msMain.ResumeLayout(false);
             this.msMain.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).EndInit();
@@ -312,6 +394,17 @@
         private System.Windows.Forms.ToolStripMenuItem exportPDFToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem exportExcelToolStripMenuItem;
         private System.Windows.Forms.Label lblPuzzleTitle;
+        private System.Windows.Forms.OpenFileDialog dlgDictOpen;
+        private System.Windows.Forms.ToolStripMenuItem dictionaryToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem dictionaryManagementToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem quickImportDictionaryToolStripMenuItem;
+        //private Community.Windows.Forms.MenuStripMRUManager menuStripManagerFiles;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
+        private System.Windows.Forms.ToolStripMenuItem recentFilesToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem1;
     }
 }
 

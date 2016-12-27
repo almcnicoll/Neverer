@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ClueEntry));
             this.lblAnswer = new System.Windows.Forms.Label();
             this.lblQuestion = new System.Windows.Forms.Label();
             this.txtAnswer = new System.Windows.Forms.TextBox();
@@ -186,6 +187,7 @@
             this.Controls.Add(this.txtAnswer);
             this.Controls.Add(this.lblQuestion);
             this.Controls.Add(this.lblAnswer);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ClueEntry";
             this.Text = "ClueEntry";
             ((System.ComponentModel.ISupportInitialize)(this.nudCol)).EndInit();

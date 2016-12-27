@@ -75,7 +75,7 @@ namespace Neverer
             {
                 MessageBox.Show("The y value was too large for the clue to fit on the crossword. Please check the clue length and orientation.", "Y position corrected", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
-            if ((maxX > 1) && (maxY > 1))
+            if ((maxX >= 1) && (maxY >= 1))
             {
                 nudCol.Maximum = maxX;
                 nudRow.Maximum = maxY;

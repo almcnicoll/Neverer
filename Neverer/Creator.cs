@@ -12,6 +12,8 @@ using Serial = System.Xml.Serialization;
 using System.IO;
 using Neverer.UtilityClass;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Reflection;
+
 /*using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;*/
 
@@ -23,6 +25,13 @@ namespace Neverer
         private bool __unsavedChanges = false;
         private String __currentFilename = null;
 
+        public Settings currentSettings = new Settings();
+
+        private CrosswordDictionaryCollection Dict = new CrosswordDictionaryCollection();
+
+        /*private CrosswordDictionary DefaultWords = new CrosswordDictionary();
+        private CrosswordDictionary CustomWords = new CrosswordDictionary();*/
+
         public Creator()
         {
             InitializeComponent();
@@ -32,7 +41,17 @@ namespace Neverer
             dlgSave.InitialDirectory = Application.StartupPath;
 #endif
 
+            // Get settings
+            currentSettings = Settings.Load();
+            currentSettings.FileListChanged += RepopulateRecentFiles; // Redo menu if list of recent files changes
+            currentSettings.Set("Version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            currentSettings.Save();
+
+            // Repopulate Recent Files
+            RepopulateRecentFiles();
+
             PopulateForm();
+            LoadDictionaries();
         }
 
         public List<String> previewErrors = new List<String>();
@@ -208,7 +227,7 @@ namespace Neverer
             foreach (DataGridViewRow dgvr in dgvPuzzle.Rows) { dgvr.Height = __minDimension; }
         }
 
-        private void UpdateClueGrid()
+        private void UpdateClueGrid(PlacedClue LastClue = null)
         {
             dgvClues.AutoGenerateColumns = false;
             dgvClues.Columns.Clear();
@@ -225,6 +244,18 @@ namespace Neverer
             dgvClues.Columns.Add(dgvcClueText);
             dgvClues.RowHeadersWidth = 20;
             dgvClues.DataSource = crossword.sortedClueList;
+
+            if (LastClue != null)
+            {
+                foreach (DataGridViewRow dgvrLoop in dgvClues.Rows)
+                {
+                    PlacedClue pcLoop = (PlacedClue)dgvrLoop.DataBoundItem;
+                    if (pcLoop.UniqueID == LastClue.UniqueID)
+                    {
+                        dgvrLoop.Selected = true;
+                    }
+                }
+            }
         }
         private void UpdatePreview()
         {
@@ -416,6 +447,7 @@ namespace Neverer
                     stream.Close();
                 }
                 unsavedChanges = false;
+                currentSettings.AddToFileList(currentFilename);
                 return true;
             }
             catch (Exception ex)
@@ -452,12 +484,53 @@ namespace Neverer
                     read.Close();
                 }
                 unsavedChanges = false;
+                currentSettings.AddToFileList(fileName);
                 return true;
             }
             catch (Exception ex)
             {
                 MessageBox.Show(String.Format("Error opening crossword: {0}", ex.Message));
                 return false;
+            }
+        }
+
+        private void RecentFileClickHandler(object sender, EventArgs e)
+        {
+            ToolStripItem tsi = (ToolStripItem)sender;
+            String fileName = tsi.Tag.ToString();
+
+            if (unsavedChanges)
+            {
+                DialogResult dr = MessageBox.Show("You have unsaved changes. Are you sure that you want to open another crossword?", "New Crossword", MessageBoxButtons.OKCancel, MessageBoxIcon.Exclamation);
+                if (dr == DialogResult.Cancel)
+                {
+                    return;
+                }
+            }
+
+            if (open(fileName))
+            {
+                PopulateForm();
+                currentFilename = fileName;
+                currentSettings.AddToFileList(fileName);
+            }
+            return;
+        }
+
+        private void RepopulateRecentFiles(object sender = null, EventArgs e = null)
+        {
+            recentFilesToolStripMenuItem.DropDownItems.Clear();
+            int counter = 0;
+            foreach (String filePath in currentSettings.RecentFiles)
+            {
+                counter++;
+                ToolStripItem tsi = new ToolStripMenuItem();
+                tsi.Text = String.Format("&{0}: {1}", counter.ToString(),
+                            Path.GetFileNameWithoutExtension(filePath));
+                tsi.Tag = filePath;
+                tsi.ToolTipText = filePath;
+                tsi.Click += RecentFileClickHandler;
+                recentFilesToolStripMenuItem.DropDownItems.Add(tsi);
             }
         }
 
@@ -583,7 +656,7 @@ namespace Neverer
                         pcTmp.CopyTo(pcLoop);
                     }
                 }
-                UpdateClueGrid();
+                UpdateClueGrid(pcTmp);
                 UpdatePreview();
                 unsavedChanges = true;
             }
@@ -844,6 +917,111 @@ namespace Neverer
         private void optionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             ShowSettings();
+        }
+
+        private bool LoadDictionaries(List<String> builtInFileNames = null, List<String> customFileNames = null)
+        {
+            String dictionaryPath = currentSettings.DefaultFolder;
+            if (builtInFileNames == null)
+            {
+                builtInFileNames = new List<String>();
+                String defaultDictPath = Path.Combine(dictionaryPath, "default.nev.dic");
+                if (File.Exists(defaultDictPath))
+                {
+                    builtInFileNames.Add(defaultDictPath);
+                }
+            }
+            if (customFileNames == null)
+            {
+                customFileNames = new List<String>();
+                String customDictPath = Path.Combine(dictionaryPath, "custom.nev.dic");
+                if (File.Exists(customDictPath))
+                {
+                    builtInFileNames.Add(customDictPath);
+                }
+            }
+            // Built-in
+            if (builtInFileNames.Count == 0)
+            {
+                Dict.Add(DictType.Default, new List<CrosswordDictionary> { new CrosswordDictionary(Path.Combine(dictionaryPath, "default.nev.dic")) });
+            }
+            else
+            {
+                Dict.Add(DictType.Default, new List<CrosswordDictionary>());
+                foreach (String fileName in builtInFileNames)
+                {
+                    String ext = Path.GetExtension(fileName);
+                    switch (ext)
+                    {
+                        case ".dic":
+                            Dict[DictType.Default].Add(CrosswordDictionary.Load(fileName, DictFileType.XML));
+                            break;
+                        default:
+                            Dict[DictType.Default].Add(CrosswordDictionary.Load(fileName, DictFileType.Plaintext));
+                            break;
+                    }
+
+                }
+            }
+            // Custom
+            if (customFileNames.Count == 0)
+            {
+                Dict.Add(DictType.Custom, new List<CrosswordDictionary> { new CrosswordDictionary(Path.Combine(dictionaryPath, "custom.nev.dic")) });
+            }
+            else
+            {
+                Dict.Add(DictType.Custom, new List<CrosswordDictionary>());
+                foreach (String fileName in builtInFileNames)
+                {
+                    String ext = Path.GetExtension(fileName);
+                    switch (ext)
+                    {
+                        case ".dic":
+                            Dict[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.XML));
+                            break;
+                        default:
+                            Dict[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.Plaintext));
+                            break;
+                    }
+
+                }
+            }
+
+            return true;
+        }
+
+        private void quickImportDictionaryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DialogResult dr = dlgDictOpen.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                switch (Path.GetExtension(dlgDictOpen.FileName))
+                {
+                    case ".dic":
+                        Dict[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.XML));
+                        break;
+                    default:
+                        Dict[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.Plaintext));
+                        break;
+                }
+            }
+        }
+
+        private void mruManagerFiles_RecentFileMenuItemClick(string file)
+        {
+            open(file);
+        }
+
+        private void Creator_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (currentSettings != null) { currentSettings.Save(); }
+        }
+
+        private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AboutBox about = new AboutBox();
+            about.ShowDialog();
+            about.Dispose();
         }
     }
 }

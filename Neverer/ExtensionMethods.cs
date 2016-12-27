@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Xml;
+using System.Xml.Serialization;
+using System.IO;
 
 namespace Neverer
 {
@@ -38,6 +41,97 @@ namespace Neverer
             }
 
             return columnName;
+        }
+
+        public static string SerializeObject<T>(this T toSerialize)
+        {
+            XmlSerializer xmlSerializer = new XmlSerializer(toSerialize.GetType());
+
+            using (StringWriter textWriter = new StringWriter())
+            {
+                xmlSerializer.Serialize(textWriter, toSerialize);
+                return textWriter.ToString();
+            }
+        }
+
+        public static T DeserializeObject<T>(this String source)
+        {
+            T returnObject;
+            using (StringReader read = new StringReader(source))
+            {
+                Type outType = typeof(T);
+
+                XmlSerializer serializer = new XmlSerializer(outType);
+                using (XmlReader reader = new XmlTextReader(read))
+                {
+                    returnObject = (T)serializer.Deserialize(reader);
+                    reader.Close();
+                }
+
+                read.Close();
+            }
+            return returnObject;
+        }
+
+        public static T LoadFromXML<T>(String filePath)
+        {
+            if (string.IsNullOrEmpty(filePath))
+            {
+                Exception ex = new Exception(String.Format("Error opening file {0}: file is empty or missing.", filePath));
+                throw ex;
+            }
+
+            T returnObject;
+
+            try
+            {
+                XmlDocument xmlDoc = new XmlDocument();
+                xmlDoc.Load(filePath);
+                string xmlString = xmlDoc.OuterXml;
+
+                using (StringReader read = new StringReader(xmlString))
+                {
+                    Type outType = typeof(T);
+
+                    XmlSerializer serializer = new XmlSerializer(outType);
+                    using (XmlReader reader = new XmlTextReader(read))
+                    {
+                        returnObject = (T)serializer.Deserialize(reader);
+                        reader.Close();
+                    }
+
+                    read.Close();
+                }
+                return returnObject;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(String.Format("Error opening file: {0}", ex.Message), ex);
+            }
+        }
+
+        public static void SaveToXML<T>(this T sourceObject, String filePath)
+        {
+            try
+            {
+                String pathOnly = Path.GetDirectoryName(filePath);
+                Directory.CreateDirectory(pathOnly);
+                XmlSerializer serial = new System.Xml.Serialization.XmlSerializer(typeof(T));
+                XmlDocument xmlDoc = new XmlDocument();
+                using (MemoryStream stream = new MemoryStream())
+                {
+                    serial.Serialize(stream, sourceObject);
+                    stream.Position = 0;
+                    xmlDoc.Load(stream);
+                    xmlDoc.Save(filePath);
+                    stream.Close();
+                }
+                return;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(String.Format("Error saving: {0}", ex.Message), ex);
+            }
         }
     }
 }
