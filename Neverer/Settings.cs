@@ -8,6 +8,7 @@ using Serial = System.Xml.Serialization;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Reflection;
+using Neverer.UtilityClass;
 
 namespace Neverer
 {
@@ -105,6 +106,8 @@ namespace Neverer
 
         public Settings()
         {
+            this.DictionaryFiles = new SerializableDictionary<DictType, List<String>>();
+            this.DictionaryFiles.Add(DictType.Default, new List<String>());
             this.Set(Settings.keyRecentFiles, new FlexStack<String>());
         }
 
@@ -151,6 +154,9 @@ namespace Neverer
             }
             return this[key];
         }
+
+        [Serial.XmlElement("DictionaryFiles")]
+        public SerializableDictionary<DictType,List<String>> DictionaryFiles { get; set; }
 
         public FlexStack<String> RecentFiles
         {
@@ -221,12 +227,12 @@ namespace Neverer
             rfTmp.Push(path);
             RecentFiles = rfTmp;
             this.Save();
+            FileListChanged(this, new EventArgs());
             // First argument is a UINT flag from "SHARD enumeration"
             // Value 2 indicates null-terminated ANSI string of full path incl filename
             SHAddToRecentDocs(2, path);
         }
 
-        // TODO - add event of RecentFilesChanged which will be watched by UI to update "recent files" menu
         // TODO - autosave of currently edited crossword, populated on timer and removed every time crossword is saved, autoloaded on load when present
     }
 }

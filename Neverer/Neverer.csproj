@@ -73,6 +73,18 @@
     <Compile Include="Creator.Designer.cs">
       <DependentUpon>Creator.cs</DependentUpon>
     </Compile>
+    <Compile Include="DictionaryClueList.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DictionaryClueList.Designer.cs">
+      <DependentUpon>DictionaryClueList.cs</DependentUpon>
+    </Compile>
+    <Compile Include="DictionaryManagement.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="DictionaryManagement.Designer.cs">
+      <DependentUpon>DictionaryManagement.cs</DependentUpon>
+    </Compile>
     <Compile Include="Settings.cs" />
     <Compile Include="UtilityClass\CrosswordDictionary.cs" />
     <Compile Include="CrosswordSettings.cs">
@@ -105,6 +117,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="CrosswordSettings.resx">
       <DependentUpon>CrosswordSettings.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DictionaryClueList.resx">
+      <DependentUpon>DictionaryClueList.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="DictionaryManagement.resx">
+      <DependentUpon>DictionaryManagement.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

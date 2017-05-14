@@ -16,6 +16,7 @@ namespace System.Collections.Generic
     // This code copyright (c) Dacris Software Inc. under MIT license
 
     [Serializable()]
+    //[XmlInclude(typeof(Neverer.UtilityClass.CrosswordDictionary))]
     public class SerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, IXmlSerializable, ISerializable
     {
         #region Constants

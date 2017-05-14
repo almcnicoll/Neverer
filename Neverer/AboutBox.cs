@@ -106,10 +106,10 @@ namespace Neverer
         {
             string url = "";
 
-            string business = "paypal@almcnicoll.co.uk";  // your paypal email
-            string description = "Neverer%20Donation";            // '%20' represents a space. remember HTML!
-            string country = "UK";                  // AU, US, etc.
-            string currency = "GBP";                 // AUD, USD, etc.
+            string business = "paypal@almcnicoll.co.uk";    // your paypal email
+            string description = "Neverer%20Donation";      // '%20' represents a space. remember HTML!
+            string country = "UK";                          // AU, US, etc.
+            string currency = "GBP";                        // AUD, USD, etc.
 
             url += "https://www.paypal.com/cgi-bin/webscr" +
                 "?cmd=" + "_donations" +

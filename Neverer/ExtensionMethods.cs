@@ -7,6 +7,7 @@ using Excel = Microsoft.Office.Interop.Excel;
 using System.Xml;
 using System.Xml.Serialization;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace Neverer
 {
@@ -41,6 +42,26 @@ namespace Neverer
             }
 
             return columnName;
+        }
+
+        public static void AddIfNotExists<T, U>(this SerializableDictionary<T, U> dict, T key, U valueIfNotExists) where U : class
+        {
+            if (dict.ContainsKey(key))
+            {
+                return;
+            }
+            dict.Add(key, valueIfNotExists);
+        }
+        public static U RetrieveIfKeyExists<T, U>(this SerializableDictionary<T, U> dict, T key, U valueIfNotExists = null) where U : class
+        {
+            if (dict.ContainsKey(key))
+            {
+                return dict[key];
+            }
+            else
+            {
+                return valueIfNotExists;
+            }
         }
 
         public static string SerializeObject<T>(this T toSerialize)
@@ -132,6 +153,19 @@ namespace Neverer
             {
                 throw new Exception(String.Format("Error saving: {0}", ex.Message), ex);
             }
+        }
+
+        public static bool MatchesRegex(this String haystack, Regex needle)
+        {
+            return needle.IsMatch(haystack);
+        }
+        public static bool MatchesRegex(this String haystack, String needle)
+        {
+            return needle.MatchesRegex(new Regex(haystack));
+        }
+        public static bool MatchesRegex(this String haystack, String needle, RegexOptions options)
+        {
+            return needle.MatchesRegex(new Regex(haystack, options));
         }
     }
 }

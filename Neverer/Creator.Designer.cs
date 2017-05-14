@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Creator));
             this.msMain = new System.Windows.Forms.MenuStrip();
             this.fileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +48,9 @@
             this.dictionaryManagementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quickImportDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.donateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgvClues = new System.Windows.Forms.DataGridView();
             this.dgvPuzzle = new System.Windows.Forms.DataGridView();
             this.lblClues = new System.Windows.Forms.Label();
@@ -58,11 +62,12 @@
             this.cmdEdit = new System.Windows.Forms.Button();
             this.lblPuzzleTitle = new System.Windows.Forms.Label();
             this.dlgDictOpen = new System.Windows.Forms.OpenFileDialog();
-            this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.aboutToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.cmsClueClick = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.addToDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
+            this.cmsClueClick.SuspendLayout();
             this.SuspendLayout();
             // 
             // msMain
@@ -70,7 +75,8 @@
             this.msMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.toolsToolStripMenuItem,
-            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem,
+            this.donateToolStripMenuItem});
             this.msMain.Location = new System.Drawing.Point(0, 0);
             this.msMain.Name = "msMain";
             this.msMain.Size = new System.Drawing.Size(716, 24);
@@ -192,6 +198,7 @@
             this.dictionaryManagementToolStripMenuItem.Name = "dictionaryManagementToolStripMenuItem";
             this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.dictionaryManagementToolStripMenuItem.Text = "Dictionary &Management";
+            this.dictionaryManagementToolStripMenuItem.Click += new System.EventHandler(this.dictionaryManagementToolStripMenuItem_Click);
             // 
             // quickImportDictionaryToolStripMenuItem
             // 
@@ -206,6 +213,28 @@
             this.optionsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
             this.optionsToolStripMenuItem.Text = "&Options";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.aboutToolStripMenuItem});
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.helpToolStripMenuItem.Text = "&Help";
+            // 
+            // aboutToolStripMenuItem
+            // 
+            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Text = "&About";
+            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            // 
+            // donateToolStripMenuItem
+            // 
+            this.donateToolStripMenuItem.Name = "donateToolStripMenuItem";
+            this.donateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
+            this.donateToolStripMenuItem.Text = "&Donate";
+            this.donateToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // dgvClues
             // 
@@ -328,20 +357,19 @@
             this.dlgDictOpen.Filter = "Neverer Dictionaries|*.nev.dic|Plain text|*.*";
             this.dlgDictOpen.Title = "Open Crossword";
             // 
-            // aboutToolStripMenuItem
+            // cmsClueClick
             // 
-            this.aboutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.aboutToolStripMenuItem1});
-            this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
-            this.aboutToolStripMenuItem.Text = "&Help";
-            this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
+            this.cmsClueClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.addToDictionaryToolStripMenuItem});
+            this.cmsClueClick.Name = "cmsClueClick";
+            this.cmsClueClick.Size = new System.Drawing.Size(168, 48);
             // 
-            // aboutToolStripMenuItem1
+            // addToDictionaryToolStripMenuItem
             // 
-            this.aboutToolStripMenuItem1.Name = "aboutToolStripMenuItem1";
-            this.aboutToolStripMenuItem1.Size = new System.Drawing.Size(152, 22);
-            this.aboutToolStripMenuItem1.Text = "&About";
+            this.addToDictionaryToolStripMenuItem.Name = "addToDictionaryToolStripMenuItem";
+            this.addToDictionaryToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
+            this.addToDictionaryToolStripMenuItem.Text = "&Add to Dictionary";
+            this.addToDictionaryToolStripMenuItem.Click += new System.EventHandler(this.addToDictionaryToolStripMenuItem_Click);
             // 
             // Creator
             // 
@@ -366,6 +394,7 @@
             this.msMain.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).EndInit();
+            this.cmsClueClick.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -403,8 +432,11 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem recentFilesToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem donateToolStripMenuItem;
+        private System.Windows.Forms.ContextMenuStrip cmsClueClick;
+        private System.Windows.Forms.ToolStripMenuItem addToDictionaryToolStripMenuItem;
     }
 }
 

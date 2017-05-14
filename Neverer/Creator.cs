@@ -27,7 +27,7 @@ namespace Neverer
 
         public Settings currentSettings = new Settings();
 
-        private CrosswordDictionaryCollection Dict = new CrosswordDictionaryCollection();
+        public CrosswordDictionaryCollection AllDictionaries = new CrosswordDictionaryCollection();
 
         /*private CrosswordDictionary DefaultWords = new CrosswordDictionary();
         private CrosswordDictionary CustomWords = new CrosswordDictionary();*/
@@ -919,68 +919,79 @@ namespace Neverer
             ShowSettings();
         }
 
-        private bool LoadDictionaries(List<String> builtInFileNames = null, List<String> customFileNames = null)
+        private bool LoadDictionaries() //List<String> builtInFileNames = null, List<String> customFileNames = null)
         {
             String dictionaryPath = currentSettings.DefaultFolder;
-            if (builtInFileNames == null)
+            if (currentSettings.DictionaryFiles.RetrieveIfKeyExists(DictType.Default, new List<String>()).Count == 0)
             {
-                builtInFileNames = new List<String>();
+                currentSettings.DictionaryFiles.AddIfNotExists(DictType.Default, new List<String>());
                 String defaultDictPath = Path.Combine(dictionaryPath, "default.nev.dic");
                 if (File.Exists(defaultDictPath))
                 {
-                    builtInFileNames.Add(defaultDictPath);
+                    currentSettings.DictionaryFiles[DictType.Default].Add(defaultDictPath);
+                    currentSettings.Save();
                 }
             }
-            if (customFileNames == null)
+            if (currentSettings.DictionaryFiles.RetrieveIfKeyExists(DictType.Custom, new List<String>()).Count == 0)
             {
-                customFileNames = new List<String>();
+                currentSettings.DictionaryFiles.AddIfNotExists(DictType.Custom, new List<String>());
                 String customDictPath = Path.Combine(dictionaryPath, "custom.nev.dic");
                 if (File.Exists(customDictPath))
                 {
-                    builtInFileNames.Add(customDictPath);
+                    currentSettings.DictionaryFiles[DictType.Custom].Add(customDictPath);
+                    currentSettings.Save();
                 }
             }
             // Built-in
-            if (builtInFileNames.Count == 0)
+            if (currentSettings.DictionaryFiles[DictType.Default].Count == 0)
             {
-                Dict.Add(DictType.Default, new List<CrosswordDictionary> { new CrosswordDictionary(Path.Combine(dictionaryPath, "default.nev.dic")) });
+                CrosswordDictionary cd = new CrosswordDictionary(Path.Combine(dictionaryPath, "default.nev.dic"));
+                cd.Save();
+                AllDictionaries.Add(DictType.Default, new List<CrosswordDictionary> { cd });
             }
             else
             {
-                Dict.Add(DictType.Default, new List<CrosswordDictionary>());
-                foreach (String fileName in builtInFileNames)
+                AllDictionaries.Add(DictType.Default, new List<CrosswordDictionary>());
+                CrosswordDictionary cdTmp;
+                foreach (String fileName in currentSettings.DictionaryFiles[DictType.Default])
                 {
                     String ext = Path.GetExtension(fileName);
                     switch (ext)
                     {
                         case ".dic":
-                            Dict[DictType.Default].Add(CrosswordDictionary.Load(fileName, DictFileType.XML));
+                            cdTmp = null;
+                            cdTmp = CrosswordDictionary.Load(fileName, DictFileType.XML);
+                            AllDictionaries[DictType.Default].Add(cdTmp);
                             break;
                         default:
-                            Dict[DictType.Default].Add(CrosswordDictionary.Load(fileName, DictFileType.Plaintext));
+                            cdTmp = null;
+                            cdTmp = CrosswordDictionary.Load(fileName, DictFileType.Plaintext);
+                            AllDictionaries[DictType.Default].Add(cdTmp);
                             break;
                     }
 
                 }
             }
             // Custom
-            if (customFileNames.Count == 0)
+            if (currentSettings.DictionaryFiles[DictType.Custom].Count == 0)
             {
-                Dict.Add(DictType.Custom, new List<CrosswordDictionary> { new CrosswordDictionary(Path.Combine(dictionaryPath, "custom.nev.dic")) });
+                CrosswordDictionary cd = new CrosswordDictionary(Path.Combine(dictionaryPath, "custom.nev.dic"));
+                cd.Save();
+                AllDictionaries.Add(DictType.Custom, new List<CrosswordDictionary> { cd });
             }
             else
             {
-                Dict.Add(DictType.Custom, new List<CrosswordDictionary>());
-                foreach (String fileName in builtInFileNames)
+                AllDictionaries.Add(DictType.Custom, new List<CrosswordDictionary>());
+                foreach (String fileName in currentSettings.DictionaryFiles[DictType.Custom])
                 {
                     String ext = Path.GetExtension(fileName);
                     switch (ext)
                     {
                         case ".dic":
-                            Dict[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.XML));
+                            AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.XML));
                             break;
                         default:
-                            Dict[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.Plaintext));
+                            AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.Plaintext));
                             break;
                     }
 
@@ -998,10 +1009,12 @@ namespace Neverer
                 switch (Path.GetExtension(dlgDictOpen.FileName))
                 {
                     case ".dic":
-                        Dict[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.XML));
+                        AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.XML));
+                        currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
                         break;
                     default:
-                        Dict[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.Plaintext));
+                        AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.Plaintext));
+                        currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
                         break;
                 }
             }
@@ -1022,6 +1035,55 @@ namespace Neverer
             AboutBox about = new AboutBox();
             about.ShowDialog();
             about.Dispose();
+        }
+
+        private void dictionaryManagementToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            DictionaryManagement dm = new DictionaryManagement(this);
+            dm.ShowDialog();
+            dm.Dispose();
+        }
+
+        private void addToDictionaryToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            // Check if the clue is valid to be added
+            int row = dgvClues.SelectedCells[0].RowIndex;
+            PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
+            String word = pc.clue.answer;
+            if ((word == null) | (word.Length == 0))
+            {
+                MessageBox.Show("This clue is blank, and cannot be added.");
+                return;
+            }
+            if ( word.IndexOf("?") > -1)
+            {
+                MessageBox.Show("This clue still contains blanks, so cannot be added.");
+                return;
+            }
+
+            // Retrieve user dictionary (1st custom)
+            CrosswordDictionary cd = AllDictionaries[DictType.Custom][0];
+            
+            // See if there is a matching entry already
+            if (cd.entries.ContainsKey(word))
+            {
+                // See if there's a definition already
+                if (cd.entries[word].Count == 0)
+                {
+                    cd.entries[word].Add(pc.clue.question);
+                } else
+                {
+                    // TODO - prompt for add/replace within custom dictionary
+                    DictionaryClueList dclPrompt = new DictionaryClueList();
+                    dclPrompt.ClueChoice = new List<Clue>();
+                    foreach (String )
+                    dclPrompt.ShowDialog();
+                }
+            } else
+            {
+                // Just add it!
+                cd.entries.Add(word, new List<String>(){ pc.clue.answer });
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using regex = System.Text.RegularExpressions;
+using System.Xml.Serialization;
 
 namespace Neverer.UtilityClass
 {
@@ -67,6 +68,9 @@ namespace Neverer.UtilityClass
             return String.Format("{0} ({1})", __question, String.Join(",", pattern));
         }
 
+        [XmlIgnore()]
+        public Guid id { get; set; }
+
         public Clue blankClone()
         {
             Clue c = new Clue();
@@ -84,12 +88,14 @@ namespace Neverer.UtilityClass
 
         public Clue()
         {
+            id = Guid.NewGuid();
             question = "";
             answer = "";
         }
 
         public Clue(String q,String a)
         {
+            id = Guid.NewGuid();
             question = q;
             answer = a;
         }
