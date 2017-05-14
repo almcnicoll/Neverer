@@ -1055,7 +1055,7 @@ namespace Neverer
                 MessageBox.Show("This clue is blank, and cannot be added.");
                 return;
             }
-            if ( word.IndexOf("?") > -1)
+            if (word.IndexOf("?") > -1)
             {
                 MessageBox.Show("This clue still contains blanks, so cannot be added.");
                 return;
@@ -1063,7 +1063,7 @@ namespace Neverer
 
             // Retrieve user dictionary (1st custom)
             CrosswordDictionary cd = AllDictionaries[DictType.Custom][0];
-            
+
             // See if there is a matching entry already
             if (cd.entries.ContainsKey(word))
             {
@@ -1071,19 +1071,56 @@ namespace Neverer
                 if (cd.entries[word].Count == 0)
                 {
                     cd.entries[word].Add(pc.clue.question);
-                } else
+                }
+                else
                 {
-                    // TODO - prompt for add/replace within custom dictionary
                     DictionaryClueList dclPrompt = new DictionaryClueList();
                     dclPrompt.ClueChoice = new List<Clue>();
-                    foreach (String )
+                    foreach (String clueOption in cd.entries[word])
+                    {
+                        dclPrompt.ClueChoice.Add(new Clue(clueOption, word));
+                    }
+                    dclPrompt.Populate();
                     dclPrompt.ShowDialog();
+                    if (dclPrompt.CreateNew.HasValue)
+                    {
+                        if (dclPrompt.CreateNew.Value == true)
+                        {
+                            // Add new clue entry to dictionary
+                            cd.entries[word].Add(pc.clue.question);
+                        }
+                        else
+                        {
+                            // Update the selected clue
+                            for (int i = 0; i < cd.entries[word].Count; i++)
+                            {
+                                if (cd.entries[word][i] == dclPrompt.SelectedClue.question) { cd.entries[word][i] = pc.clue.question; }
+                            }
+                        }
+                        cd.Save();
+                    }
+                    else
+                    {
+                        // They cancelled out
+                        return;
+                    }
                 }
-            } else
+            }
+            else
             {
                 // Just add it!
-                cd.entries.Add(word, new List<String>(){ pc.clue.answer });
+                cd.entries.Add(word, new List<String>() { pc.clue.question });
             }
+            tsslMessage.Text = String.Format("Saved clue for {0}", word);
+
+            timerMessageReset.Enabled = false;
+            timerMessageReset.Interval = 5000;
+            timerMessageReset.Enabled = true;
+        }
+
+        private void timerMessageReset_Tick(object sender, EventArgs e)
+        {
+            tsslMessage.Text = "";
         }
     }
 }

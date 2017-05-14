@@ -13,6 +13,8 @@ namespace Neverer
     public partial class DictionaryClueList : Form
     {
         public List<UtilityClass.Clue> ClueChoice { get; set; }
+        public bool? CreateNew { get; set; }
+        public UtilityClass.Clue SelectedClue { get; set; }
 
         public DictionaryClueList()
         {
@@ -24,6 +26,20 @@ namespace Neverer
             listAllClues.DisplayMember = "clueText";
             listAllClues.ValueMember = "id";
             listAllClues.DataSource = ClueChoice;
+            CreateNew = null;
+        }
+
+        private void cmdAddNew_Click(object sender, EventArgs e)
+        {
+            CreateNew = true;
+            this.Hide();
+        }
+
+        private void cmdReplace_Click(object sender, EventArgs e)
+        {
+            CreateNew = false;
+            SelectedClue = (UtilityClass.Clue)listAllClues.SelectedItem;
+            this.Hide();
         }
     }
 }

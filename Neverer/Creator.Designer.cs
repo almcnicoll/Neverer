@@ -64,10 +64,14 @@
             this.dlgDictOpen = new System.Windows.Forms.OpenFileDialog();
             this.cmsClueClick = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addToDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.statusStrip1 = new System.Windows.Forms.StatusStrip();
+            this.tsslMessage = new System.Windows.Forms.ToolStripStatusLabel();
+            this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
             this.cmsClueClick.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // msMain
@@ -241,11 +245,12 @@
             this.dgvClues.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
             this.dgvClues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvClues.ContextMenuStrip = this.cmsClueClick;
             this.dgvClues.Location = new System.Drawing.Point(12, 43);
             this.dgvClues.MultiSelect = false;
             this.dgvClues.Name = "dgvClues";
             this.dgvClues.ReadOnly = true;
-            this.dgvClues.Size = new System.Drawing.Size(262, 295);
+            this.dgvClues.Size = new System.Drawing.Size(262, 293);
             this.dgvClues.TabIndex = 1;
             this.dgvClues.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvClues_CellMouseDoubleClick);
             this.dgvClues.SelectionChanged += new System.EventHandler(this.dgvClues_SelectionChanged);
@@ -270,7 +275,7 @@
             this.dgvPuzzle.ShowCellErrors = false;
             this.dgvPuzzle.ShowEditingIcon = false;
             this.dgvPuzzle.ShowRowErrors = false;
-            this.dgvPuzzle.Size = new System.Drawing.Size(424, 324);
+            this.dgvPuzzle.Size = new System.Drawing.Size(424, 322);
             this.dgvPuzzle.TabIndex = 2;
             this.dgvPuzzle.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellClick);
             this.dgvPuzzle.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellDoubleClick);
@@ -297,7 +302,7 @@
             // cmdAddClue
             // 
             this.cmdAddClue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cmdAddClue.Location = new System.Drawing.Point(12, 344);
+            this.cmdAddClue.Location = new System.Drawing.Point(12, 342);
             this.cmdAddClue.Name = "cmdAddClue";
             this.cmdAddClue.Size = new System.Drawing.Size(75, 23);
             this.cmdAddClue.TabIndex = 5;
@@ -308,7 +313,7 @@
             // cmdRemoveClue
             // 
             this.cmdRemoveClue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cmdRemoveClue.Location = new System.Drawing.Point(199, 344);
+            this.cmdRemoveClue.Location = new System.Drawing.Point(199, 342);
             this.cmdRemoveClue.Name = "cmdRemoveClue";
             this.cmdRemoveClue.Size = new System.Drawing.Size(75, 23);
             this.cmdRemoveClue.TabIndex = 6;
@@ -333,7 +338,7 @@
             // cmdEdit
             // 
             this.cmdEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cmdEdit.Location = new System.Drawing.Point(106, 344);
+            this.cmdEdit.Location = new System.Drawing.Point(105, 342);
             this.cmdEdit.Name = "cmdEdit";
             this.cmdEdit.Size = new System.Drawing.Size(75, 23);
             this.cmdEdit.TabIndex = 7;
@@ -362,7 +367,7 @@
             this.cmsClueClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.addToDictionaryToolStripMenuItem});
             this.cmsClueClick.Name = "cmsClueClick";
-            this.cmsClueClick.Size = new System.Drawing.Size(168, 48);
+            this.cmsClueClick.Size = new System.Drawing.Size(168, 26);
             // 
             // addToDictionaryToolStripMenuItem
             // 
@@ -371,11 +376,32 @@
             this.addToDictionaryToolStripMenuItem.Text = "&Add to Dictionary";
             this.addToDictionaryToolStripMenuItem.Click += new System.EventHandler(this.addToDictionaryToolStripMenuItem_Click);
             // 
+            // statusStrip1
+            // 
+            this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsslMessage});
+            this.statusStrip1.Location = new System.Drawing.Point(0, 368);
+            this.statusStrip1.Name = "statusStrip1";
+            this.statusStrip1.Size = new System.Drawing.Size(716, 22);
+            this.statusStrip1.TabIndex = 9;
+            this.statusStrip1.Text = "statusStrip1";
+            // 
+            // tsslMessage
+            // 
+            this.tsslMessage.Name = "tsslMessage";
+            this.tsslMessage.Size = new System.Drawing.Size(0, 17);
+            // 
+            // timerMessageReset
+            // 
+            this.timerMessageReset.Interval = 5000;
+            this.timerMessageReset.Tick += new System.EventHandler(this.timerMessageReset_Tick);
+            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(716, 379);
+            this.ClientSize = new System.Drawing.Size(716, 390);
+            this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.lblPuzzleTitle);
             this.Controls.Add(this.cmdEdit);
             this.Controls.Add(this.cmdRemoveClue);
@@ -388,13 +414,17 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.msMain;
             this.Name = "Creator";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Neverer Creator";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.Creator_FormClosing);
             this.msMain.ResumeLayout(false);
             this.msMain.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).EndInit();
             this.cmsClueClick.ResumeLayout(false);
+            this.statusStrip1.ResumeLayout(false);
+            this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -437,6 +467,9 @@
         private System.Windows.Forms.ToolStripMenuItem donateToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip cmsClueClick;
         private System.Windows.Forms.ToolStripMenuItem addToDictionaryToolStripMenuItem;
+        private System.Windows.Forms.StatusStrip statusStrip1;
+        private System.Windows.Forms.ToolStripStatusLabel tsslMessage;
+        private System.Windows.Forms.Timer timerMessageReset;
     }
 }
 
