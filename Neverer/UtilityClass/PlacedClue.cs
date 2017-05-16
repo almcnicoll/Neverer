@@ -17,6 +17,25 @@ namespace Neverer.UtilityClass
     [Serializable]
     public class PlacedClue
     {
+        // Declarations
+        public enum ClueStatus
+        {
+            Unknown = 0,
+            NoMatchingWord = 1,
+            MatchingWordNoQuestion = 2,
+            MatchingWordWithQuestion = 3
+        }
+        public class ClueStatusChangedArgs : EventArgs
+        {
+            public ClueStatus NewStatus { get; set; }
+
+            public ClueStatusChangedArgs(ClueStatus NewStatus)
+            {
+                this.NewStatus = NewStatus;
+            }
+        }
+
+        // Member variables
         public Clue clue = new Clue();
         public int x = -1;
         public int y = -1;
@@ -24,7 +43,10 @@ namespace Neverer.UtilityClass
         private String __placeDescriptor = ""; // This property is not updated by this class, but is for storage by calling routines
         private int __placeNumber = 0; // This property is not updated by this class, but is for storage by calling routines
         private Guid __UniqueID;
+        private ClueStatus __status = ClueStatus.Unknown;
+        private SerializableDictionary<String, List<String>> __matches = new SerializableDictionary<String, List<String>>();
 
+        // Properties
         public int order
         {
             get
@@ -33,17 +55,6 @@ namespace Neverer.UtilityClass
             }
         }
 
-        public PlacedClue()
-        {
-            __UniqueID = Guid.NewGuid();
-        }
-        public Guid UniqueID
-        {
-            get
-            {
-                return __UniqueID;
-            }
-        }
         public String placeDescriptor
         {
             get
@@ -74,6 +85,42 @@ namespace Neverer.UtilityClass
             }
         }
 
+        public ClueStatus status
+        {
+            get
+            {
+                return __status;
+            }
+            set
+            {
+                __status = value;
+                ClueStatusChanged(this, new ClueStatusChangedArgs(value));
+            }
+        }
+
+        public SerializableDictionary<String, List<String>> Matches
+        {
+            get
+            {
+                return __matches;
+            }
+        }
+
+        // Events
+        public event EventHandler<ClueStatusChangedArgs> ClueStatusChanged;
+
+        // Functions
+        public PlacedClue()
+        {
+            __UniqueID = Guid.NewGuid();
+        }
+        public Guid UniqueID
+        {
+            get
+            {
+                return __UniqueID;
+            }
+        }
         public void CopyTo(PlacedClue pcDest)
         {
             pcDest.orientation = orientation;
@@ -81,6 +128,7 @@ namespace Neverer.UtilityClass
             pcDest.__placeDescriptor = __placeDescriptor;
             pcDest.x = x;
             pcDest.y = y;
+            pcDest.status = status;
             clue.CopyTo(pcDest.clue);
         }
 
@@ -130,6 +178,28 @@ namespace Neverer.UtilityClass
                 if (this.Overlaps(x1, y1)) { return new System.Drawing.Point(x1, y1); }
             }
             return null;
+        }
+
+        public void clearMatches()
+        {
+            __matches = null;
+            __matches = new SerializableDictionary<String, List<String>>();
+            status = ClueStatus.Unknown;
+        }
+        public void addMatch(String answer, String question = "")
+        {
+            // Ensure there's an entry
+            if (!__matches.ContainsKey(answer)) {
+                __matches.Add(answer, new List<String>());
+                if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
+            }
+            // No duplicate questions (including blank question, which means "answer only")
+            if (!__matches[answer].Contains(question))
+            {
+                __matches[answer].Add(question);
+                if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
+                if (question !="") { status = ClueStatus.MatchingWordWithQuestion; }
+            }
         }
     }
 }

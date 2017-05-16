@@ -5,6 +5,7 @@ using System.Data;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Xml;
@@ -24,6 +25,7 @@ namespace Neverer
         public Crossword crossword = new Crossword();
         private bool __unsavedChanges = false;
         private String __currentFilename = null;
+        private bool __cluesToCheck = false;
 
         public Settings currentSettings = new Settings();
 
@@ -52,11 +54,28 @@ namespace Neverer
 
             PopulateForm();
             LoadDictionaries();
+
+            // Handle background worker updates
+            bwDictionaryChecker.ProgressChanged += BwDictionaryChecker_ProgressChanged;
         }
 
+        private void BwDictionaryChecker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            tspbClueUpdate.Value = e.ProgressPercentage;
+            if (e.ProgressPercentage == 100)
+            {
+                UpdateClueGrid();
+            }
+        }
+
+        // Variables
         public List<String> previewErrors = new List<String>();
         private int __minDimension = 10000;
 
+        // Events
+        public event EventHandler ClueChanged;
+
+        // Functions & Properties
         private void UpdateTitleText()
         {
             String unsavedMarker = "";
@@ -256,6 +275,8 @@ namespace Neverer
                     }
                 }
             }
+
+            // TODO - colouring of cells by clue status
         }
         private void UpdatePreview()
         {
@@ -345,6 +366,7 @@ namespace Neverer
 
             return ce.AcceptedClue;
         }
+
 
         private void cmdAddClue_Click(object sender, EventArgs e)
         {
@@ -485,6 +507,7 @@ namespace Neverer
                 }
                 unsavedChanges = false;
                 currentSettings.AddToFileList(fileName);
+                runClueCheck();
                 return true;
             }
             catch (Exception ex)
@@ -635,6 +658,7 @@ namespace Neverer
                 UpdatePreview();
             }
             UpdateClueGrid();
+            runClueCheck();
         }
 
         private void TryClueEdit()
@@ -659,6 +683,7 @@ namespace Neverer
                 UpdateClueGrid(pcTmp);
                 UpdatePreview();
                 unsavedChanges = true;
+                runClueCheck();
             }
         }
 
@@ -1121,6 +1146,62 @@ namespace Neverer
         private void timerMessageReset_Tick(object sender, EventArgs e)
         {
             tsslMessage.Text = "";
+        }
+
+        private void runClueCheck()
+        {
+            __cluesToCheck = true;
+            if (!bwDictionaryChecker.IsBusy)
+            {
+                bwDictionaryChecker.RunWorkerAsync();
+            }
+        }
+        private void bwDictionaryChecker_DoWork(object sender, DoWorkEventArgs e)
+        {
+            while (__cluesToCheck) // Stays in loop so long as we keep changing stuff in the UI
+            {
+                bwDictionaryChecker.ReportProgress(0);
+                int cluesChecked = 0;
+                // Loop through each clue, seeing if it's solvable
+                foreach (PlacedClue pc in crossword.placedClues)
+                {
+                    String word = pc.clue.answer;
+                    if ((word == null) | (word.Length == 0)) { continue; }
+                    //if (word.IndexOf("?") == -1) { pc.status = PlacedClue.ClueStatus.MatchingWordNoQuestion; continue; }
+
+                    // Create regular expression
+                    Regex reWord = new Regex(pc.clue.answer.Replace("?", "."), RegexOptions.IgnoreCase);
+
+                    for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
+                    {
+                        List<CrosswordDictionary> dicts = AllDictionaries[dt];
+                        foreach (CrosswordDictionary dict in dicts)
+                        {
+                            List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.entries
+                                                                                  where reWord.IsMatch(kvp.Key)
+                                                                                  select kvp).ToList();
+                            foreach (KeyValuePair<String, List<String>> kvp in possibles)
+                            {
+                                if (kvp.Value == null)
+                                {
+                                    // Word without definition
+                                    pc.addMatch(kvp.Key);
+                                }
+                                else
+                                {
+                                    // Add word with multiple definitions
+                                    foreach (String question in kvp.Value)
+                                    {
+                                        pc.addMatch(kvp.Key, question);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    bwDictionaryChecker.ReportProgress((int)Math.Round((Decimal)cluesChecked / (Decimal)crossword.placedClues.Count));
+                }
+                bwDictionaryChecker.ReportProgress(100);
+            }
         }
     }
 }
