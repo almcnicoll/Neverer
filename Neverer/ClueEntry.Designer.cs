@@ -41,8 +41,10 @@
             this.nudCol = new System.Windows.Forms.NumericUpDown();
             this.nudRow = new System.Windows.Forms.NumericUpDown();
             this.comboOrientation = new System.Windows.Forms.ComboBox();
+            this.dgvPossibleClues = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this.nudCol)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRow)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPossibleClues)).BeginInit();
             this.SuspendLayout();
             // 
             // lblAnswer
@@ -100,7 +102,7 @@
             // 
             this.cmdCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.cmdCancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.cmdCancel.Location = new System.Drawing.Point(15, 111);
+            this.cmdCancel.Location = new System.Drawing.Point(15, 269);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(75, 23);
             this.cmdCancel.TabIndex = 11;
@@ -111,7 +113,7 @@
             // cmdOK
             // 
             this.cmdOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdOK.Location = new System.Drawing.Point(373, 111);
+            this.cmdOK.Location = new System.Drawing.Point(373, 269);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(75, 23);
             this.cmdOK.TabIndex = 10;
@@ -168,13 +170,26 @@
             this.comboOrientation.SelectedIndexChanged += new System.EventHandler(this.comboOrientation_SelectedIndexChanged);
             this.comboOrientation.TextUpdate += new System.EventHandler(this.comboOrientation_TextUpdate);
             // 
+            // dgvPossibleClues
+            // 
+            this.dgvPossibleClues.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvPossibleClues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvPossibleClues.Location = new System.Drawing.Point(15, 111);
+            this.dgvPossibleClues.Name = "dgvPossibleClues";
+            this.dgvPossibleClues.RowHeadersVisible = false;
+            this.dgvPossibleClues.Size = new System.Drawing.Size(433, 152);
+            this.dgvPossibleClues.TabIndex = 12;
+            // 
             // ClueEntry
             // 
             this.AcceptButton = this.cmdOK;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.CancelButton = this.cmdCancel;
-            this.ClientSize = new System.Drawing.Size(460, 146);
+            this.ClientSize = new System.Drawing.Size(460, 304);
+            this.Controls.Add(this.dgvPossibleClues);
             this.Controls.Add(this.comboOrientation);
             this.Controls.Add(this.nudRow);
             this.Controls.Add(this.nudCol);
@@ -192,6 +207,7 @@
             this.Text = "ClueEntry";
             ((System.ComponentModel.ISupportInitialize)(this.nudCol)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRow)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.dgvPossibleClues)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -211,5 +227,6 @@
         private System.Windows.Forms.NumericUpDown nudCol;
         private System.Windows.Forms.NumericUpDown nudRow;
         private System.Windows.Forms.ComboBox comboOrientation;
+        private System.Windows.Forms.DataGridView dgvPossibleClues;
     }
 }

@@ -33,6 +33,7 @@ namespace Neverer
 
             foreach (DictType dt in Enum.GetValues(typeof(DictType)))
             {
+                if (!caller.AllDictionaries.ContainsKey(dt)) { caller.AllDictionaries.Add(dt, new List<CrosswordDictionary>()); }
                 foreach (CrosswordDictionary cd in caller.AllDictionaries[dt])
                 {
                     int i = clbDictionaries.Items.Add(cd);

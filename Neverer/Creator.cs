@@ -57,6 +57,21 @@ namespace Neverer
 
             // Handle background worker updates
             bwDictionaryChecker.ProgressChanged += BwDictionaryChecker_ProgressChanged;
+            this.ClueChanged += Creator_ClueChanged;
+        }
+
+        private void Creator_ClueChanged(Object sender, EventArgs e)
+        {
+            if (sender is PlacedClue)
+            {
+                UpdateClueGrid(sender as PlacedClue);
+            }
+            else
+            {
+                UpdateClueGrid();
+            }
+            UpdatePreview();
+            runClueCheck();
         }
 
         private void BwDictionaryChecker_ProgressChanged(object sender, ProgressChangedEventArgs e)
@@ -215,8 +230,7 @@ namespace Neverer
 
             SetBoxSize();
 
-            UpdateClueGrid();
-            UpdatePreview();
+            if (ClueChanged != null) { ClueChanged("", new EventArgs()); }
             DisplayCrosswordTitle();
 
             cmdAddClue.Focus();
@@ -272,6 +286,21 @@ namespace Neverer
                     if (pcLoop.UniqueID == LastClue.UniqueID)
                     {
                         dgvrLoop.Selected = true;
+                    }
+                    switch (pcLoop.status)
+                    {
+                        case PlacedClue.ClueStatus.NoMatchingWord:
+                            dgvrLoop.DefaultCellStyle.BackColor = Color.Red;
+                            break;
+                        case PlacedClue.ClueStatus.MatchingWordNoQuestion:
+                            dgvrLoop.DefaultCellStyle.BackColor = Color.LightYellow;
+                            break;
+                        case PlacedClue.ClueStatus.MatchingWordWithQuestion:
+                            dgvrLoop.DefaultCellStyle.BackColor = Color.CornflowerBlue;
+                            break;
+                        default:
+                            dgvrLoop.DefaultCellStyle.BackColor = Color.Transparent;
+                            break;
                     }
                 }
             }
@@ -657,8 +686,7 @@ namespace Neverer
                 }
                 UpdatePreview();
             }
-            UpdateClueGrid();
-            runClueCheck();
+            ClueChanged("", new EventArgs());
         }
 
         private void TryClueEdit()
@@ -680,10 +708,8 @@ namespace Neverer
                         pcTmp.CopyTo(pcLoop);
                     }
                 }
-                UpdateClueGrid(pcTmp);
-                UpdatePreview();
                 unsavedChanges = true;
-                runClueCheck();
+                ClueChanged(pcTmp, new EventArgs());
             }
         }
 
@@ -711,9 +737,8 @@ namespace Neverer
                     crossword.placedClues.RemoveAt(i);
                 }
             }
-            UpdateClueGrid();
-            UpdatePreview();
             unsavedChanges = true;
+            ClueChanged("", new EventArgs());
         }
 
         private void dgvClues_SelectionChanged(object sender, EventArgs e)
@@ -1160,6 +1185,7 @@ namespace Neverer
         {
             while (__cluesToCheck) // Stays in loop so long as we keep changing stuff in the UI
             {
+                __cluesToCheck = false;
                 bwDictionaryChecker.ReportProgress(0);
                 int cluesChecked = 0;
                 // Loop through each clue, seeing if it's solvable

@@ -17,6 +17,7 @@ namespace Neverer
         PlacedClue pc = new PlacedClue();
         DialogResult result = DialogResult.Retry;
         private bool __loaded = false;
+        private List<KeyValuePair<String, String>> possibilities = new List<KeyValuePair<String, String>>();
 
         public ClueEntry(Creator callingInstance)
         {
@@ -45,6 +46,25 @@ namespace Neverer
                     comboOrientation.Text = "Down";
                 }
                 getIntersectionPattern();
+                possibilities.Clear();
+                foreach (KeyValuePair<String, List<String>> kvp in template.Matches)
+                {
+                    foreach (String s in kvp.Value)
+                    {
+                        possibilities.Add(new KeyValuePair<String, String>(kvp.Key, s));
+                    }
+                }
+                DataGridViewColumn dgvcClueSolution = new DataGridViewTextBoxColumn();
+                dgvcClueSolution.DataPropertyName = "key";
+                dgvcClueSolution.HeaderText = "Solution";
+                dgvcClueSolution.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgvPossibleClues.Columns.Add(dgvcClueSolution);
+                DataGridViewColumn dgvcClueText = new DataGridViewTextBoxColumn();
+                dgvcClueText.DataPropertyName = "value";
+                dgvcClueText.HeaderText = "Clue";
+                dgvcClueText.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
+                dgvPossibleClues.Columns.Add(dgvcClueText);
+                dgvPossibleClues.DataSource = possibilities;
                 UpdatePreview();
             }
             __loaded = true;

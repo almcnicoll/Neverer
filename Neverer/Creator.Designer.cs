@@ -66,9 +66,9 @@
             this.dlgDictOpen = new System.Windows.Forms.OpenFileDialog();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
             this.tsslMessage = new System.Windows.Forms.ToolStripStatusLabel();
+            this.tspbClueUpdate = new System.Windows.Forms.ToolStripProgressBar();
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
-            this.tspbClueUpdate = new System.Windows.Forms.ToolStripProgressBar();
             this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             this.cmsClueClick.SuspendLayout();
@@ -85,7 +85,7 @@
             this.donateToolStripMenuItem});
             this.msMain.Location = new System.Drawing.Point(0, 0);
             this.msMain.Name = "msMain";
-            this.msMain.Size = new System.Drawing.Size(716, 24);
+            this.msMain.Size = new System.Drawing.Size(636, 24);
             this.msMain.TabIndex = 0;
             this.msMain.Text = "Primary Menu Strip";
             // 
@@ -291,7 +291,7 @@
             this.dgvPuzzle.ShowCellErrors = false;
             this.dgvPuzzle.ShowEditingIcon = false;
             this.dgvPuzzle.ShowRowErrors = false;
-            this.dgvPuzzle.Size = new System.Drawing.Size(424, 322);
+            this.dgvPuzzle.Size = new System.Drawing.Size(344, 322);
             this.dgvPuzzle.TabIndex = 2;
             this.dgvPuzzle.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellClick);
             this.dgvPuzzle.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellDoubleClick);
@@ -385,7 +385,7 @@
             this.tspbClueUpdate});
             this.statusStrip1.Location = new System.Drawing.Point(0, 368);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(716, 22);
+            this.statusStrip1.Size = new System.Drawing.Size(636, 22);
             this.statusStrip1.TabIndex = 9;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -394,6 +394,11 @@
             this.tsslMessage.Name = "tsslMessage";
             this.tsslMessage.Size = new System.Drawing.Size(0, 17);
             // 
+            // tspbClueUpdate
+            // 
+            this.tspbClueUpdate.Name = "tspbClueUpdate";
+            this.tspbClueUpdate.Size = new System.Drawing.Size(100, 16);
+            // 
             // timerMessageReset
             // 
             this.timerMessageReset.Interval = 5000;
@@ -401,18 +406,15 @@
             // 
             // bwDictionaryChecker
             // 
+            this.bwDictionaryChecker.WorkerReportsProgress = true;
+            this.bwDictionaryChecker.WorkerSupportsCancellation = true;
             this.bwDictionaryChecker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwDictionaryChecker_DoWork);
-            // 
-            // tspbClueUpdate
-            // 
-            this.tspbClueUpdate.Name = "tspbClueUpdate";
-            this.tspbClueUpdate.Size = new System.Drawing.Size(100, 16);
             // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(716, 390);
+            this.ClientSize = new System.Drawing.Size(636, 390);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.lblPuzzleTitle);
             this.Controls.Add(this.cmdEdit);

@@ -94,7 +94,8 @@ namespace Neverer.UtilityClass
             set
             {
                 __status = value;
-                ClueStatusChanged(this, new ClueStatusChangedArgs(value));
+                EventHandler<ClueStatusChangedArgs> evt = ClueStatusChanged;
+                if (evt != null) { evt(this, new ClueStatusChangedArgs(value)); }
             }
         }
 
@@ -189,7 +190,8 @@ namespace Neverer.UtilityClass
         public void addMatch(String answer, String question = "")
         {
             // Ensure there's an entry
-            if (!__matches.ContainsKey(answer)) {
+            if (!__matches.ContainsKey(answer))
+            {
                 __matches.Add(answer, new List<String>());
                 if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
             }
@@ -198,7 +200,7 @@ namespace Neverer.UtilityClass
             {
                 __matches[answer].Add(question);
                 if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
-                if (question !="") { status = ClueStatus.MatchingWordWithQuestion; }
+                if (question != "") { status = ClueStatus.MatchingWordWithQuestion; }
             }
         }
     }
