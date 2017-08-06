@@ -103,6 +103,7 @@ namespace Neverer
         /*[System.Xml.Serialization.XmlElement]
         public FlexStack<String> RecentFiles { get; set; }*/
         public const String keyRecentFiles = "RecentFiles";
+        public const String keyDictionaryFiles = "DictionaryFiles";
 
         public Settings()
         {
@@ -156,7 +157,28 @@ namespace Neverer
         }
 
         [Serial.XmlElement("DictionaryFiles")]
-        public SerializableDictionary<DictType,List<String>> DictionaryFiles { get; set; }
+        public SerializableDictionary<DictType, List<String>> DictionaryFiles
+        {
+            get
+            {
+                return this.Get<SerializableDictionary<DictType, List<String>>>(Settings.keyDictionaryFiles);
+            }
+            set
+            {
+                this.Set(Settings.keyDictionaryFiles, value);
+            }
+        }
+
+        public void AddDictionaryFile(DictType dictionaryType, String name)
+        {
+            SerializableDictionary<DictType, List<String>> dict = this.DictionaryFiles;
+            dict.AddIfNotExists(dictionaryType, new List<String>());
+            if (!dict[dictionaryType].Contains(name))
+            {
+                dict[dictionaryType].Add(name);
+                this.DictionaryFiles = dict;
+            }
+        }
 
         public FlexStack<String> RecentFiles
         {

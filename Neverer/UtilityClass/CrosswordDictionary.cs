@@ -10,7 +10,7 @@ using System.Xml.Serialization;
 
 namespace Neverer.UtilityClass
 {
-    [Serializable]
+    [Serializable()]
     public enum DictType
     {
         Default = 0,
@@ -28,6 +28,8 @@ namespace Neverer.UtilityClass
     //[XmlType(TypeName = "Neverer.UtilityClass.CrosswordDictionary")]
     public class CrosswordDictionary //: SerializableDictionary<String, List<String>>
     {
+        public const String importSuffix = ".imported.dic";
+
         public String fileName { get; set; }
         public bool enabled { get; set; }
         public SerializableDictionary<String, List<String>> entries { get; set; }
@@ -91,7 +93,7 @@ namespace Neverer.UtilityClass
 
         private static CrosswordDictionary LoadText(String fileName)
         {
-            CrosswordDictionary cd = new CrosswordDictionary(fileName);
+            CrosswordDictionary cd = new CrosswordDictionary(fileName + CrosswordDictionary.importSuffix);
             try
             {
                 String[] allWords = File.ReadAllLines(fileName);
@@ -99,6 +101,7 @@ namespace Neverer.UtilityClass
                 {
                     cd.entries.Add(word, new List<String>());
                 }
+                cd.Save();
                 return cd;
             }
             catch (Exception ex)

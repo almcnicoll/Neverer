@@ -972,28 +972,31 @@ namespace Neverer
         private bool LoadDictionaries() //List<String> builtInFileNames = null, List<String> customFileNames = null)
         {
             String dictionaryPath = currentSettings.DefaultFolder;
-            if (currentSettings.DictionaryFiles.RetrieveIfKeyExists(DictType.Default, new List<String>()).Count == 0)
+            SerializableDictionary<DictType, List<String>> dictFiles = currentSettings.DictionaryFiles;
+            if (dictFiles.RetrieveIfKeyExists(DictType.Default, new List<String>()).Count == 0)
             {
-                currentSettings.DictionaryFiles.AddIfNotExists(DictType.Default, new List<String>());
+                dictFiles.AddIfNotExists(DictType.Default, new List<String>());
                 String defaultDictPath = Path.Combine(dictionaryPath, "default.nev.dic");
                 if (File.Exists(defaultDictPath))
                 {
-                    currentSettings.DictionaryFiles[DictType.Default].Add(defaultDictPath);
+                    dictFiles[DictType.Default].Add(defaultDictPath);
+                    currentSettings.DictionaryFiles = dictFiles;
                     currentSettings.Save();
                 }
             }
-            if (currentSettings.DictionaryFiles.RetrieveIfKeyExists(DictType.Custom, new List<String>()).Count == 0)
+            if (dictFiles.RetrieveIfKeyExists(DictType.Custom, new List<String>()).Count == 0)
             {
-                currentSettings.DictionaryFiles.AddIfNotExists(DictType.Custom, new List<String>());
+                dictFiles.AddIfNotExists(DictType.Custom, new List<String>());
                 String customDictPath = Path.Combine(dictionaryPath, "custom.nev.dic");
                 if (File.Exists(customDictPath))
                 {
-                    currentSettings.DictionaryFiles[DictType.Custom].Add(customDictPath);
+                    dictFiles[DictType.Custom].Add(customDictPath);
+                    currentSettings.DictionaryFiles = dictFiles;
                     currentSettings.Save();
                 }
             }
             // Built-in
-            if (currentSettings.DictionaryFiles[DictType.Default].Count == 0)
+            if (dictFiles[DictType.Default].Count == 0)
             {
                 CrosswordDictionary cd = new CrosswordDictionary(Path.Combine(dictionaryPath, "default.nev.dic"));
                 cd.Save();
@@ -1003,7 +1006,7 @@ namespace Neverer
             {
                 AllDictionaries.Add(DictType.Default, new List<CrosswordDictionary>());
                 CrosswordDictionary cdTmp;
-                foreach (String fileName in currentSettings.DictionaryFiles[DictType.Default])
+                foreach (String fileName in dictFiles[DictType.Default])
                 {
                     String ext = Path.GetExtension(fileName);
                     switch (ext)
@@ -1023,7 +1026,7 @@ namespace Neverer
                 }
             }
             // Custom
-            if (currentSettings.DictionaryFiles[DictType.Custom].Count == 0)
+            if (dictFiles[DictType.Custom].Count == 0)
             {
                 CrosswordDictionary cd = new CrosswordDictionary(Path.Combine(dictionaryPath, "custom.nev.dic"));
                 cd.Save();
@@ -1032,7 +1035,7 @@ namespace Neverer
             else
             {
                 AllDictionaries.Add(DictType.Custom, new List<CrosswordDictionary>());
-                foreach (String fileName in currentSettings.DictionaryFiles[DictType.Custom])
+                foreach (String fileName in dictFiles[DictType.Custom])
                 {
                     String ext = Path.GetExtension(fileName);
                     switch (ext)
@@ -1060,11 +1063,15 @@ namespace Neverer
                 {
                     case ".dic":
                         AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.XML));
-                        currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
+
+                        currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
+                        currentSettings.Save();
                         break;
                     default:
                         AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.Plaintext));
-                        currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
+                        dlgDictOpen.FileName += CrosswordDictionary.importSuffix;
+                        currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
+                        currentSettings.Save();
                         break;
                 }
             }
@@ -1191,12 +1198,13 @@ namespace Neverer
                 // Loop through each clue, seeing if it's solvable
                 foreach (PlacedClue pc in crossword.placedClues)
                 {
+                    pc.Matches.Clear();
                     String word = pc.clue.answer;
                     if ((word == null) | (word.Length == 0)) { continue; }
                     //if (word.IndexOf("?") == -1) { pc.status = PlacedClue.ClueStatus.MatchingWordNoQuestion; continue; }
 
                     // Create regular expression
-                    Regex reWord = new Regex(pc.clue.answer.Replace("?", "."), RegexOptions.IgnoreCase);
+                    Regex reWord = new Regex("^" + pc.clue.answer.Replace("?", ".") + "$", RegexOptions.IgnoreCase);
 
                     for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
                     {
@@ -1208,7 +1216,7 @@ namespace Neverer
                                                                                   select kvp).ToList();
                             foreach (KeyValuePair<String, List<String>> kvp in possibles)
                             {
-                                if (kvp.Value == null)
+                                if (kvp.Value == null || kvp.Value.Count == 0)
                                 {
                                     // Word without definition
                                     pc.addMatch(kvp.Key);
