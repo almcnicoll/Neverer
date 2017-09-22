@@ -383,7 +383,7 @@ namespace Neverer
         {
             PlacedClue template = new PlacedClue();
             template.x = x; template.y = y;
-            template.clue = new Clue("[Blank clue]", "?");
+            template.clue = new Clue(Clue.BlankQuestion, "?");
             ClueEntry ce = new ClueEntry(this, template);
             ce.ShowDialog();
 
@@ -699,7 +699,10 @@ namespace Neverer
                 {
                     if (pcLoop.UniqueID == pc.UniqueID)
                     {
+                        // Copy values across
                         pcTmp.CopyTo(pcLoop);
+                        // But set status to "Unknown" so we reevaluate it
+                        pcTmp.status = PlacedClue.ClueStatus.Unknown;
                     }
                 }
                 unsavedChanges = true;

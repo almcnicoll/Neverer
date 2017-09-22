@@ -10,6 +10,8 @@ namespace Neverer.UtilityClass
     [Serializable]
     public class Clue
     {
+        public const String BlankQuestion = "[blank clue]";
+
         private String __question = "";
         private String __answer = "";
 
@@ -76,7 +78,7 @@ namespace Neverer.UtilityClass
             Clue c = new Clue();
             regex.Regex reAllQuestionMarks = new regex.Regex("[^? ]");
             c.answer = reAllQuestionMarks.Replace(answer, "?");
-            c.question = "[blank clue]";
+            c.question = BlankQuestion;
             return c;
         }
         public void CopyTo(Clue cDest)

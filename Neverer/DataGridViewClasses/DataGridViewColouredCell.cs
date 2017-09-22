@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Neverer.UtilityClass;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace Neverer.DataGridViewClasses
 {
@@ -22,7 +23,7 @@ namespace Neverer.DataGridViewClasses
             DataGridViewPaintParts paintParts)
         {
             // Populate status from owning row's data object
-            PlacedClue pc = ((PlacedClue)this.OwningRow.DataBoundItem);
+            PlacedClue pc = ((PlacedClue)this.DataGridView.Rows[rowIndex].DataBoundItem);
             if (pc != null)
             {
                 this.Status = pc.status;
@@ -40,6 +41,7 @@ namespace Neverer.DataGridViewClasses
             ((DataGridViewColouredCell)o).Status = this.Status;
             return o;
         }
+        
     }
 
 

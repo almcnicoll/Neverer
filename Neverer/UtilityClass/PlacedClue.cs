@@ -49,7 +49,7 @@ namespace Neverer.UtilityClass
                 case PlacedClue.ClueStatus.NoMatchingWord:
                     return Color.Red;
                 case PlacedClue.ClueStatus.MatchingWordNoQuestion:
-                    return Color.Yellow;
+                    return Color.Gold;
                 case PlacedClue.ClueStatus.MatchingWordWithQuestion:
                     return Color.CornflowerBlue;
                 default:
@@ -111,13 +111,42 @@ namespace Neverer.UtilityClass
         {
             get
             {
+                if (__status == ClueStatus.Unknown)
+                {
+                    if (clue.answer.Contains("?"))
+                    {
+                        if ((Matches == null) || (Matches.Count==0))
+                        {
+                            __status = ClueStatus.NoMatchingWord;
+                        } else if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
+                        {
+                            __status = ClueStatus.MatchingWordNoQuestion;
+                        } else
+                        {
+                            __status = ClueStatus.MatchingWordWithQuestion;
+                        }
+                    } else
+                    {
+                        if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
+                        {
+                            __status = ClueStatus.MatchingWordNoQuestion;
+                        }
+                        else
+                        {
+                            __status = ClueStatus.MatchingWordWithQuestion;
+                        }
+                    }
+                }
                 return __status;
             }
             set
             {
-                __status = value;
-                EventHandler<ClueStatusChangedArgs> evt = ClueStatusChanged;
-                if (evt != null) { evt(this, new ClueStatusChangedArgs(value)); }
+                if (__status != value)
+                {
+                    __status = value;
+                    EventHandler<ClueStatusChangedArgs> evt = ClueStatusChanged;
+                    if (evt != null) { evt(this, new ClueStatusChangedArgs(value)); }
+                }
             }
         }
 
@@ -207,7 +236,17 @@ namespace Neverer.UtilityClass
         {
             __matches = null;
             __matches = new SerializableDictionary<String, List<String>>();
-            status = ClueStatus.Unknown;
+            status = ClueStatus.NoMatchingWord;
+            //if (clue.answer.Contains("?"))
+            //{
+            //    status = ClueStatus.NoMatchingWord;
+            //} else if ((clue.question == null)||(clue.question == Clue.BlankQuestion))
+            //{
+            //    status = ClueStatus.MatchingWordNoQuestion;
+            //} else
+            //{
+            //    status = ClueStatus.MatchingWordWithQuestion;
+            //}
         }
         public void addMatch(String answer, String question = "")
         {
