@@ -69,6 +69,9 @@
             this.tspbClueUpdate = new System.Windows.Forms.ToolStripProgressBar();
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
+            this.regularExpressionSearchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             this.cmsClueClick.SuspendLayout();
@@ -188,6 +191,9 @@
             this.dictionaryToolStripMenuItem,
             this.dictionaryManagementToolStripMenuItem,
             this.quickImportDictionaryToolStripMenuItem,
+            this.toolStripSeparator4,
+            this.regularExpressionSearchToolStripMenuItem,
+            this.toolStripSeparator5,
             this.optionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
             this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
@@ -196,28 +202,28 @@
             // dictionaryToolStripMenuItem
             // 
             this.dictionaryToolStripMenuItem.Name = "dictionaryToolStripMenuItem";
-            this.dictionaryToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
+            this.dictionaryToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
             this.dictionaryToolStripMenuItem.Text = "&Dictionary...";
             // 
             // dictionaryManagementToolStripMenuItem
             // 
             this.dictionaryManagementToolStripMenuItem.Name = "dictionaryManagementToolStripMenuItem";
-            this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.dictionaryManagementToolStripMenuItem.Text = "Dictionary &Management";
+            this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.dictionaryManagementToolStripMenuItem.Text = "Dictionary &Management...";
             this.dictionaryManagementToolStripMenuItem.Click += new System.EventHandler(this.dictionaryManagementToolStripMenuItem_Click);
             // 
             // quickImportDictionaryToolStripMenuItem
             // 
             this.quickImportDictionaryToolStripMenuItem.Name = "quickImportDictionaryToolStripMenuItem";
-            this.quickImportDictionaryToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.quickImportDictionaryToolStripMenuItem.Text = "&Quick Import Dictionary";
+            this.quickImportDictionaryToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.quickImportDictionaryToolStripMenuItem.Text = "&Quick Import Dictionary...";
             this.quickImportDictionaryToolStripMenuItem.Click += new System.EventHandler(this.quickImportDictionaryToolStripMenuItem_Click);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(202, 22);
-            this.optionsToolStripMenuItem.Text = "&Options";
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.optionsToolStripMenuItem.Text = "&Options...";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
@@ -410,6 +416,23 @@
             this.bwDictionaryChecker.WorkerSupportsCancellation = true;
             this.bwDictionaryChecker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwDictionaryChecker_DoWork);
             // 
+            // regularExpressionSearchToolStripMenuItem
+            // 
+            this.regularExpressionSearchToolStripMenuItem.Name = "regularExpressionSearchToolStripMenuItem";
+            this.regularExpressionSearchToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.regularExpressionSearchToolStripMenuItem.Text = "Regular E&xpression Search...";
+            this.regularExpressionSearchToolStripMenuItem.Click += new System.EventHandler(this.regularExpressionSearchToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(216, 6);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(216, 6);
+            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -486,6 +509,9 @@
         private System.Windows.Forms.Timer timerMessageReset;
         private System.ComponentModel.BackgroundWorker bwDictionaryChecker;
         private System.Windows.Forms.ToolStripProgressBar tspbClueUpdate;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
+        private System.Windows.Forms.ToolStripMenuItem regularExpressionSearchToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
     }
 }
 

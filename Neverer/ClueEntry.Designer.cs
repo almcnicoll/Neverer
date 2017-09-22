@@ -181,6 +181,7 @@
             this.dgvPossibleClues.RowHeadersVisible = false;
             this.dgvPossibleClues.Size = new System.Drawing.Size(433, 152);
             this.dgvPossibleClues.TabIndex = 12;
+            this.dgvPossibleClues.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPossibleClues_CellDoubleClick);
             // 
             // ClueEntry
             // 

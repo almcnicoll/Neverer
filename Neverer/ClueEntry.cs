@@ -112,44 +112,19 @@ namespace Neverer
         private void getIntersectionPattern()
         {
             UpdatePreview();
-            List<LetterSubstitution> proposedChanges = new List<LetterSubstitution>();
-            List<LetterSubstitution> definiteChanges = new List<LetterSubstitution>();
-            String[] letters = new String[txtAnswer.Text.Length];
 
-            foreach (PlacedClue pc2 in __callingInstance.crossword.placedClues)
-            {
-                System.Drawing.Point? overlap = pc.GetOverlap(pc2);
-                if ((pc.order == pc2.order) && (pc.orientation == pc2.orientation)) { continue; }
-                if (overlap.HasValue)
-                {
-                    int pos = Math.Max(overlap.Value.X - pc.x, overlap.Value.Y - pc.y);
-                    int pos2 = Math.Max(overlap.Value.X - pc2.x, overlap.Value.Y - pc2.y);
-                    letters[pos] = (pc2.clue.letters[pos2]).ToString();
-                    if (pc.clue.letters[pos].ToString() != letters[pos])
-                    {
-                        if (letters[pos] == "?")
-                        {
-                            // No need to do anything - it intersects with a clue that hasn't been filled out
-                        }
-                        else if (pc.clue.letters[pos] == '?')
-                        {
-                            definiteChanges.Add(new LetterSubstitution(pos, pc.clue.letters[pos].ToString(), letters[pos], true));
-                        }
-                        else
-                        {
-                            proposedChanges.Add(new LetterSubstitution(pos, pc.clue.letters[pos].ToString(), letters[pos]));
-                        }
-                    }
-                }
-            }
+            //String[] letters = new String[txtAnswer.Text.Length];
 
-            if (proposedChanges.Count > 0)
+            // Get definite and proposed substitutions
+            LetterSubstitutionSet ssChanges = LetterSubstitutionSet.getIntersectionChanges(pc, __callingInstance.crossword.placedClues, txtAnswer.Text.Length);
+
+            if (ssChanges.proposedChanges.Count > 0)
             {
-                DialogResult dr = MessageBox.Show(String.Format("This clue intersects with {0} other clue(s) which have letters in place. Do you want to update this clue's answer to match?", proposedChanges.Count),
+                DialogResult dr = MessageBox.Show(String.Format("This clue intersects with {0} other clue(s) which have letters in place. Do you want to update this clue's answer to match?", ssChanges.proposedChanges.Count),
                     "Update Clue?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (dr == DialogResult.Yes)
                 {
-                    foreach (LetterSubstitution ls in proposedChanges)
+                    foreach (LetterSubstitution ls in ssChanges.proposedChanges)
                     {
                         int j = 0;
                         for (int i = 0; i < ls.position; i++)
@@ -162,9 +137,9 @@ namespace Neverer
                     }
                 }
             }
-            if (definiteChanges.Count > 0)
+            if (ssChanges.definiteChanges.Count > 0)
             {
-                foreach (LetterSubstitution ls in definiteChanges)
+                foreach (LetterSubstitution ls in ssChanges.definiteChanges)
                 {
                     int j = 0;
                     for (int i = 0; i < ls.position; i++)
@@ -277,6 +252,14 @@ namespace Neverer
         private void nudRow_Enter(object sender, EventArgs e)
         {
             nudRow.Select(0, nudRow.Value.ToString().Length);
+        }
+
+        private void dgvPossibleClues_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            DataGridViewCell dgvc = dgvPossibleClues[0, e.RowIndex];
+            txtAnswer.Text = dgvc.Value.ToString().ToUpper();
+            dgvc = dgvPossibleClues[1, e.RowIndex];
+            if (dgvc.Value.ToString() != "") { txtQuestion.Text = dgvc.Value.ToString(); }
         }
     }
 }

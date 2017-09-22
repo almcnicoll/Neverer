@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
 
 namespace Neverer.UtilityClass
 {
@@ -32,6 +33,27 @@ namespace Neverer.UtilityClass
             public ClueStatusChangedArgs(ClueStatus NewStatus)
             {
                 this.NewStatus = NewStatus;
+            }
+        }
+        public Color statusColor
+        {
+            get
+            {
+                return PlacedClue.StatusColor(status);
+            }
+        }
+        public static Color StatusColor(PlacedClue.ClueStatus status)
+        {
+            switch (status)
+            {
+                case PlacedClue.ClueStatus.NoMatchingWord:
+                    return Color.Red;
+                case PlacedClue.ClueStatus.MatchingWordNoQuestion:
+                    return Color.Yellow;
+                case PlacedClue.ClueStatus.MatchingWordWithQuestion:
+                    return Color.CornflowerBlue;
+                default:
+                    return Color.FromKnownColor(KnownColor.Control);
             }
         }
 
@@ -84,7 +106,7 @@ namespace Neverer.UtilityClass
                 return clue.ToString();
             }
         }
-
+        
         public ClueStatus status
         {
             get

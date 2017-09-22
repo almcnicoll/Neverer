@@ -14,6 +14,7 @@ using System.IO;
 using Neverer.UtilityClass;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Reflection;
+using Neverer.DataGridViewClasses;
 
 /*using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;*/
@@ -265,11 +266,11 @@ namespace Neverer
             dgvClues.AutoGenerateColumns = false;
             dgvClues.Columns.Clear();
             dgvClues.DataSource = null;
-            DataGridViewColumn dgvcPlaceDescriptor = new DataGridViewTextBoxColumn();
+            DataGridViewColumn dgvcPlaceDescriptor = new DataGridViewColouredColumn();
             dgvcPlaceDescriptor.DataPropertyName = "placeDescriptor";
             dgvcPlaceDescriptor.HeaderText = "#";
             dgvcPlaceDescriptor.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            DataGridViewColumn dgvcClueText = new DataGridViewTextBoxColumn();
+            DataGridViewColumn dgvcClueText = new DataGridViewColouredColumn();
             dgvcClueText.DataPropertyName = "clueText";
             dgvcClueText.HeaderText = "Clue";
             dgvcClueText.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
@@ -287,25 +288,18 @@ namespace Neverer
                     {
                         dgvrLoop.Selected = true;
                     }
-                    switch (pcLoop.status)
-                    {
-                        case PlacedClue.ClueStatus.NoMatchingWord:
-                            dgvrLoop.DefaultCellStyle.BackColor = Color.Red;
-                            break;
-                        case PlacedClue.ClueStatus.MatchingWordNoQuestion:
-                            dgvrLoop.DefaultCellStyle.BackColor = Color.LightYellow;
-                            break;
-                        case PlacedClue.ClueStatus.MatchingWordWithQuestion:
-                            dgvrLoop.DefaultCellStyle.BackColor = Color.CornflowerBlue;
-                            break;
-                        default:
-                            dgvrLoop.DefaultCellStyle.BackColor = Color.Transparent;
-                            break;
-                    }
+
+                    DataGridViewCellStyle cs = new DataGridViewCellStyle(dgvrLoop.DefaultCellStyle);
+                    
+                    cs.BackColor = pcLoop.statusColor;
+
+                    ((DataGridViewColouredCell)(dgvrLoop.Cells[0])).Status = pcLoop.status;
+                    //dgvrLoop.Cells[0].Style = cs;
                 }
             }
 
             // TODO - colouring of cells by clue status
+            dgvClues.Invalidate();
         }
         private void UpdatePreview()
         {
@@ -1198,10 +1192,32 @@ namespace Neverer
                 // Loop through each clue, seeing if it's solvable
                 foreach (PlacedClue pc in crossword.placedClues)
                 {
-                    pc.Matches.Clear();
+                    pc.clearMatches();
                     String word = pc.clue.answer;
                     if ((word == null) | (word.Length == 0)) { continue; }
                     //if (word.IndexOf("?") == -1) { pc.status = PlacedClue.ClueStatus.MatchingWordNoQuestion; continue; }
+
+                    LetterSubstitutionSet lss = LetterSubstitutionSet.getIntersectionChanges(pc, crossword.placedClues);
+                    if (lss.definiteChanges.Count > 0)
+                    {
+                        foreach (LetterSubstitution ls in lss.definiteChanges)
+                        {
+                            int j = 0;
+                            for (int i = 0; i < ls.position; i++)
+                            {
+                                while (pc.clue.answer[i + j] == ' ') { j++; }
+                            }
+                            StringBuilder tmp = new StringBuilder(pc.clue.answer);
+                            tmp[ls.position + j] = Convert.ToChar(ls.newValue);
+                            pc.clue.answer = tmp.ToString();
+                        }
+                        //if (ClueChanged != null) { ClueChanged("", new EventArgs()); }
+                        this.Invoke(delegate
+                        {
+                            ClueChanged("", new EventArgs());
+                        }
+                        );
+                    }
 
                     // Create regular expression
                     Regex reWord = new Regex("^" + pc.clue.answer.Replace("?", ".") + "$", RegexOptions.IgnoreCase);
@@ -1236,6 +1252,12 @@ namespace Neverer
                 }
                 bwDictionaryChecker.ReportProgress(100);
             }
+        }
+
+        private void regularExpressionSearchToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RegexSearcher re = new RegexSearcher(this);
+            re.Show();
         }
     }
 }
