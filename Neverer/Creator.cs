@@ -1,20 +1,20 @@
-﻿using System;
+﻿using Neverer.DataGridViewClasses;
+using Neverer.UtilityClass;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using System.Web.UI;
 using System.Windows.Forms;
 using System.Xml;
-using Serial = System.Xml.Serialization;
-using System.IO;
-using Neverer.UtilityClass;
 using Excel = Microsoft.Office.Interop.Excel;
-using System.Reflection;
-using Neverer.DataGridViewClasses;
+using Serial = System.Xml.Serialization;
 
 /*using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;*/
@@ -82,6 +82,13 @@ namespace Neverer
             {
                 UpdateClueGrid();
             }
+        }
+
+        // Enums
+        public enum OutputStyle
+        {
+            EmptyGrid = 0,
+            GridWithAnswers = 1
         }
 
         // Variables
@@ -263,6 +270,16 @@ namespace Neverer
 
         private void UpdateClueGrid(PlacedClue LastClue = null)
         {
+            // If we don't specify a last clue, check if anything selected
+            if (LastClue == null)
+            {
+                DataGridViewSelectedCellCollection selCells = dgvClues.SelectedCells;
+                if ((selCells != null) && (selCells.Count > 0))
+                {
+                    DataGridViewRow dgvrLast = selCells[0].OwningRow;
+                    LastClue = (PlacedClue)dgvrLast.DataBoundItem;
+                }
+            }
             dgvClues.AutoGenerateColumns = false;
             dgvClues.Columns.Clear();
             dgvClues.DataSource = null;
@@ -290,7 +307,6 @@ namespace Neverer
                     }
 
                     DataGridViewCellStyle cs = new DataGridViewCellStyle(dgvrLoop.DefaultCellStyle);
-                    
                     cs.BackColor = pcLoop.statusColor;
 
                     ((DataGridViewColouredCell)(dgvrLoop.Cells[0])).Status = pcLoop.status;
@@ -298,7 +314,6 @@ namespace Neverer
                 }
             }
 
-            // TODO - colouring of cells by clue status
             dgvClues.Invalidate();
         }
         private void UpdatePreview()
@@ -699,10 +714,10 @@ namespace Neverer
                 {
                     if (pcLoop.UniqueID == pc.UniqueID)
                     {
-                        // Copy values across
-                        pcTmp.CopyTo(pcLoop);
-                        // But set status to "Unknown" so we reevaluate it
+                        // Copy values across, but set status to "Unknown" so we reevaluate it
                         pcTmp.status = PlacedClue.ClueStatus.Unknown;
+                        pcTmp.CopyTo(pcLoop);
+                        pcLoop.status = PlacedClue.ClueStatus.Unknown;
                     }
                 }
                 unsavedChanges = true;
@@ -802,10 +817,10 @@ namespace Neverer
         }
 
 
-        private void exportExcelToolStripMenuItem_Click(object sender, EventArgs e)
+        /*private void exportExcelToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MakeExcel();
-        }
+        }*/
         private void exportPDFToolStripMenuItem_Click(object sender, EventArgs e)
         {
             MakePDF();
@@ -855,7 +870,7 @@ namespace Neverer
             //doc.LastSection.Add(tabLayout);
         }
 
-        private void MakeExcel()
+        private void MakeExcel(OutputStyle style = OutputStyle.EmptyGrid)
         {
             if (crossword.title == null)
             {
@@ -884,9 +899,21 @@ namespace Neverer
 
             // Puzzle setup (black fill, square cells, borders
             ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Interior.Color = Color.Black.ToOle();
-            ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Font.Size = 6;
-            ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
-            ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).VerticalAlignment = Excel.XlVAlign.xlVAlignTop;
+            switch (style)
+            {
+                case OutputStyle.EmptyGrid:
+                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Font.Size = 6;
+                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
+                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).VerticalAlignment = Excel.XlVAlign.xlVAlignTop;
+                    break;
+
+                case OutputStyle.GridWithAnswers:
+                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Font.Size = 10;
+                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
+                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+                    break;
+            }
+
             ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Columns.ColumnWidth = 3;
             ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Rows.RowHeight = 20;
             ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).AllBorders();
@@ -896,6 +923,7 @@ namespace Neverer
             AD lastOrient = AD.Unset;
             foreach (PlacedClue pc in this.crossword.sortedClueList)
             {
+                // Add heading if it's first clue of this orientation
                 if (pc.orientation != lastOrient)
                 {
                     // Need clue-type title
@@ -914,26 +942,54 @@ namespace Neverer
                     }
                     lastOrient = pc.orientation;
                 }
+                // Add clue text to clue list
                 ((Excel.Range)eWks.Cells[r, firstClueCol]).Value = pc.placeNumber;
                 ((Excel.Range)eWks.Cells[r, firstClueCol + 1]).Value = pc.clueText;
                 ((Excel.Range)eWks.Cells[r, firstClueCol]).Rows.RowHeight = 20;
+                r++;
 
-                // White-out clue area
-                int x2 = pc.x; int y2 = pc.y;
-                switch (pc.orientation)
+                // Alter grid
+                switch (style)
                 {
-                    case AD.Down:
-                        y2 += pc.clue.length - 1;
+                    case OutputStyle.EmptyGrid:
+                        // White-out clue area
+                        int x2 = pc.x; int y2 = pc.y;
+                        switch (pc.orientation)
+                        {
+                            case AD.Down:
+                                y2 += pc.clue.length - 1;
+                                break;
+                            case AD.Across:
+                                x2 += pc.clue.length - 1;
+                                break;
+                        }
+                        ((Excel.Range)eWks.Range[eWks.Cells[pc.y + firstPuzzleRow, pc.x + firstPuzzleCol], eWks.Cells[y2 + firstPuzzleRow, x2 + firstPuzzleCol]]).Interior.Color = Color.White.ToOle();
+                        // Number clue
+                        ((Excel.Range)eWks.Cells[pc.y + firstPuzzleRow, pc.x + firstPuzzleCol]).Value = pc.placeNumber;
                         break;
-                    case AD.Across:
-                        x2 += pc.clue.length - 1;
+                    case OutputStyle.GridWithAnswers:
+                        // Enter answer into grid
+                        switch (pc.orientation)
+                        {
+                            case AD.Down:
+                                for (int yy = 0; yy < pc.clue.length; yy++)
+                                {
+                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol], eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol]]).Value = pc.clue.letters[yy].ToString();
+                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol], eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol]]).Interior.Color = Color.White.ToOle();
+                                }
+                                break;
+                            case AD.Across:
+                                for (int xx = 0; xx < pc.clue.length; xx++)
+                                {
+
+                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol], eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol]]).Value = pc.clue.letters[xx].ToString();
+                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol], eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol]]).Interior.Color = Color.White.ToOle();
+                                }
+                                break;
+                        }
                         break;
                 }
-                ((Excel.Range)eWks.Range[eWks.Cells[pc.y + firstPuzzleRow, pc.x + firstPuzzleCol], eWks.Cells[y2 + firstPuzzleRow, x2 + firstPuzzleCol]]).Interior.Color = Color.White.ToOle();
-                // Number clue
-                ((Excel.Range)eWks.Cells[pc.y + firstPuzzleRow, pc.x + firstPuzzleCol]).Value = pc.placeNumber;
 
-                r++;
             }
             ((Excel.Range)eWks.Range[eWks.Cells[1, 1], eWks.Cells[r, 2]]).Columns.AutoFit();
             Excel.PageSetup ps = eWks.PageSetup;
@@ -947,6 +1003,238 @@ namespace Neverer
             ps.FooterMargin = eApp.InchesToPoints(0.3);
             ps.FitToPagesTall = 1;
             ps.FitToPagesWide = 1;
+        }
+
+        private void MakeHtml(OutputStyle style = OutputStyle.EmptyGrid)
+        {
+            if (crossword.title == null)
+            {
+                ShowSettings();
+            }
+
+            //int firstClueCol = 1;
+            //int firstClueRow = 4;
+            int firstPuzzleCol = 0;
+            int firstPuzzleRow = 0;
+
+            int cellDimension = 24;
+
+            Matrix<HtmlTag> cells = new Matrix<HtmlTag>();
+
+            //int r = 0;
+
+            /**
+             * Styles
+             */
+            // Title
+            Dictionary<HtmlTextWriterAttribute, String> titleAttr = new Dictionary<HtmlTextWriterAttribute, string>();
+            titleAttr.Add(HtmlTextWriterAttribute.Class, "titlestyle");
+            Dictionary<HtmlTextWriterStyle, String> titleStyle = new Dictionary<HtmlTextWriterStyle, string>();
+            titleStyle.Add(HtmlTextWriterStyle.FontSize, "24px");
+            titleStyle.Add(HtmlTextWriterStyle.FontWeight, "bold");
+            titleStyle.Add(HtmlTextWriterStyle.TextAlign, "center");
+            titleStyle.Add(HtmlTextWriterStyle.VerticalAlign, "middle");
+            titleStyle.Add(HtmlTextWriterStyle.Margin, "auto");
+
+            // Black squares
+            Dictionary<HtmlTextWriterAttribute, String> blackAttr = new Dictionary<HtmlTextWriterAttribute, string>();
+            blackAttr.Add(HtmlTextWriterAttribute.Class, "blacksquare");
+            Dictionary<HtmlTextWriterStyle, String> blackStyle = new Dictionary<HtmlTextWriterStyle, string>();
+            blackStyle.Add(HtmlTextWriterStyle.TextAlign, "center");
+            blackStyle.Add(HtmlTextWriterStyle.VerticalAlign, "middle");
+            blackStyle.Add(HtmlTextWriterStyle.BackgroundColor, "#000");
+            blackStyle.Add(HtmlTextWriterStyle.Color, "#000");
+            blackStyle.Add(HtmlTextWriterStyle.BorderColor, "#000");
+            blackStyle.Add(HtmlTextWriterStyle.BorderWidth, "1px");
+            blackStyle.Add(HtmlTextWriterStyle.BorderStyle, "solid");
+            blackStyle.Add(HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
+            blackStyle.Add(HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
+
+            Dictionary<HtmlTextWriterAttribute, String> letterAttr = new Dictionary<HtmlTextWriterAttribute, string>();
+            letterAttr.Add(HtmlTextWriterAttribute.Class, "lettersquare");
+            Dictionary<HtmlTextWriterStyle, String> letterStyle = new Dictionary<HtmlTextWriterStyle, string>();
+            letterStyle.Add(HtmlTextWriterStyle.TextAlign, "center");
+            letterStyle.Add(HtmlTextWriterStyle.VerticalAlign, "middle");
+            letterStyle.Add(HtmlTextWriterStyle.BackgroundColor, "#fff");
+            letterStyle.Add(HtmlTextWriterStyle.Color, "#000");
+            letterStyle.Add(HtmlTextWriterStyle.FontSize, "18px");
+            letterStyle.Add(HtmlTextWriterStyle.BorderColor, "#000");
+            letterStyle.Add(HtmlTextWriterStyle.BorderWidth, "1px");
+            letterStyle.Add(HtmlTextWriterStyle.BorderStyle, "solid");
+            letterStyle.Add(HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
+            letterStyle.Add(HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
+
+            Dictionary<HtmlTextWriterAttribute, String> numberAttr = new Dictionary<HtmlTextWriterAttribute, string>();
+            numberAttr.Add(HtmlTextWriterAttribute.Class, "numbersquare");
+            Dictionary<HtmlTextWriterStyle, String> numberStyle = new Dictionary<HtmlTextWriterStyle, string>();
+            numberStyle.Add(HtmlTextWriterStyle.TextAlign, "left");
+            numberStyle.Add(HtmlTextWriterStyle.VerticalAlign, "top");
+            numberStyle.Add(HtmlTextWriterStyle.BackgroundColor, "#fff");
+            numberStyle.Add(HtmlTextWriterStyle.Color, "#000");
+            numberStyle.Add(HtmlTextWriterStyle.FontSize, "10px");
+            numberStyle.Add(HtmlTextWriterStyle.BorderColor, "#000");
+            numberStyle.Add(HtmlTextWriterStyle.BorderWidth, "1px");
+            numberStyle.Add(HtmlTextWriterStyle.BorderStyle, "solid");
+            numberStyle.Add(HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
+            numberStyle.Add(HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
+
+
+            // Create title
+            HtmlTag title = new HtmlTag(HtmlTextWriterTag.H1, crossword.title, titleAttr, titleStyle);
+
+            // Puzzle setup (black fill, square cells, borders)
+            for (int rr = firstPuzzleRow; rr < (firstPuzzleRow + crossword.rows); rr++)
+            {
+                for (int cc = firstPuzzleCol; cc < (firstPuzzleCol + crossword.cols); cc++)
+                {
+                    cells[cc, rr] = new HtmlTag(HtmlTextWriterTag.Td, "", blackAttr, blackStyle);
+                }
+            }
+
+
+            // Clue table setup
+            Dictionary<AD, List<HtmlTag>> clues = new Dictionary<AD, List<HtmlTag>>();
+            clues.Add(AD.Across, new List<HtmlTag>());
+            clues[AD.Across].Add(new HtmlTag(HtmlTextWriterTag.Td, "Clues across", titleAttr, titleStyle));
+            clues.Add(AD.Down, new List<HtmlTag>());
+            clues[AD.Down].Add(new HtmlTag(HtmlTextWriterTag.Td, "Clues down", titleAttr, titleStyle));
+            
+            // Clues
+            //r = firstClueRow;
+            if (true)
+            {
+                foreach (PlacedClue pc in this.crossword.sortedClueList)
+                {
+                    clues[pc.orientation].Add(new HtmlTag(HtmlTextWriterTag.Td, pc.placeNumber + " " + pc.clueText));
+                    // Add clue text to clue list
+                    //r++;
+
+                    // Alter grid
+                    switch (style)
+                    {
+                        case OutputStyle.EmptyGrid:
+                            // White-out clue area
+                            int x2 = pc.x; int y2 = pc.y;
+                            switch (pc.orientation)
+                            {
+                                case AD.Down:
+                                    for (int yy = 0; yy < pc.clue.length; yy++)
+                                    {
+                                        cells[pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, "", letterAttr, letterStyle);
+                                    }
+                                    y2 += pc.clue.length - 1;
+                                    break;
+                                case AD.Across:
+                                    for (int xx = 0; xx < pc.clue.length; xx++)
+                                    {
+                                        cells[pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, "", letterAttr, letterStyle);
+                                    }
+                                    x2 += pc.clue.length - 1;
+                                    break;
+                            }
+                            // Number clue
+                            cells[pc.x + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, pc.placeNumber.ToString(), numberAttr, numberStyle);
+                            break;
+                        case OutputStyle.GridWithAnswers:
+                            // Enter answer into grid
+                            switch (pc.orientation)
+                            {
+                                case AD.Down:
+                                    for (int yy = 0; yy < pc.clue.length; yy++)
+                                    {
+                                        cells[pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, pc.clue.letters[yy].ToString(), letterAttr, letterStyle);
+                                    }
+                                    break;
+                                case AD.Across:
+                                    for (int xx = 0; xx < pc.clue.length; xx++)
+                                    {
+                                        cells[pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, pc.clue.letters[xx].ToString(), letterAttr, letterStyle);
+                                    }
+                                    break;
+                            }
+                            break;
+                    }
+                }
+            }
+            /* Start new code */
+            #region "Tag writing"
+            StringWriter stringWriter = new StringWriter();
+
+            using (HtmlTextWriter writer = new HtmlTextWriter(stringWriter))
+            {
+                // Html
+                writer.RenderBeginTag(HtmlTextWriterTag.Html); // html
+                writer.RenderBeginTag(HtmlTextWriterTag.Head); // head
+                writer.RenderEndTag(); // head
+                writer.RenderBeginTag(HtmlTextWriterTag.Body); // body
+
+                // Title
+                writer.RenderWholeTag(title); // h1
+
+                // Grid table
+                writer.AddStyleAttribute(HtmlTextWriterStyle.BorderCollapse, "collapse");
+                writer.AddStyleAttribute(HtmlTextWriterStyle.Margin, "auto");
+                writer.RenderBeginTag(HtmlTextWriterTag.Table); // table
+                for (int rr = 0; rr < cells.rows; rr++)
+                {
+                    writer.RenderBeginTag(HtmlTextWriterTag.Tr); // tr
+                    for (int cc = 0; cc < cells.cols; cc++)
+                    {
+                        try
+                        {
+                            writer.RenderWholeTag(cells[cc, rr]);
+                        }
+                        catch
+                        {
+                            // Ignore
+                        }
+                    }
+                    writer.RenderEndTag(); // tr
+                }
+                writer.RenderEndTag(); // table
+
+                // Clues table
+                writer.AddStyleAttribute(HtmlTextWriterStyle.Margin, "auto");
+                writer.RenderBeginTag(HtmlTextWriterTag.Table); // table
+                int clueTableRows = Math.Max(clues[AD.Across].Count - 1, clues[AD.Down].Count - 1);
+                for (int rr = 0; rr < clueTableRows; rr++)
+                {
+                    // Across
+                    writer.RenderBeginTag(HtmlTextWriterTag.Tr); // tr
+                    if (clues[AD.Across].Count > rr)
+                    {
+                        writer.RenderWholeTag(clues[AD.Across][rr]); // td
+                    }
+                    else
+                    {
+                        writer.RenderBeginTag(HtmlTextWriterTag.Td); // td
+                        writer.RenderEndTag(); // td
+                    }
+                    // Down
+                    if (clues[AD.Down].Count > rr)
+                    {
+                        writer.RenderWholeTag(clues[AD.Down][rr]); // td
+                    }
+                    else
+                    {
+                        writer.RenderBeginTag(HtmlTextWriterTag.Td); // td
+                        writer.RenderEndTag(); // td
+                    }
+                    writer.RenderEndTag(); // tr
+                }
+                writer.RenderEndTag(); // table
+
+                writer.RenderEndTag(); // body
+                writer.RenderEndTag(); // html
+            }
+
+            // Write the result.
+            String fileName = System.IO.Path.GetTempPath() + Guid.NewGuid().ToString() + ".html";
+            System.IO.File.WriteAllText(fileName, stringWriter.ToString());
+            System.Diagnostics.Process.Start(fileName);
+            #endregion "Tag writing"
+            /* End new code */
+
         }
 
         private void ShowSettings()
@@ -1165,6 +1453,7 @@ namespace Neverer
                 // Just add it!
                 cd.entries.Add(word, new List<String>() { pc.clue.question });
             }
+            cd.Save();
             tsslMessage.Text = String.Format("Saved clue for {0}", word);
 
             timerMessageReset.Enabled = false;
@@ -1193,13 +1482,24 @@ namespace Neverer
                 bwDictionaryChecker.ReportProgress(0);
                 int cluesChecked = 0;
                 // Loop through each clue, seeing if it's solvable
-                foreach (PlacedClue pc in crossword.placedClues)
+                for (var ii = 0; ii < crossword.placedClues.Count; ii++)
+                //foreach (PlacedClue pc in crossword.placedClues)
                 {
-                    pc.clearMatches();
+                    PlacedClue pc = null;
+                    if (ii < crossword.placedClues.Count)
+                    {
+                        pc = crossword.placedClues[ii];
+                    }
+                    // Ignore unchanged clues
+                    if (!pc.uncheckedChanges) { continue; }
+
+                    // Ignore blank answers
                     String word = pc.clue.answer;
                     if ((word == null) | (word.Length == 0)) { continue; }
+
                     //if (word.IndexOf("?") == -1) { pc.status = PlacedClue.ClueStatus.MatchingWordNoQuestion; continue; }
 
+                    // Change pattern as needed, depending on intersection with other clues
                     LetterSubstitutionSet lss = LetterSubstitutionSet.getIntersectionChanges(pc, crossword.placedClues);
                     if (lss.definiteChanges.Count > 0)
                     {
@@ -1223,8 +1523,20 @@ namespace Neverer
                     }
 
                     // Create regular expression
-                    Regex reWord = new Regex("^" + pc.clue.answer.Replace("?", ".") + "$", RegexOptions.IgnoreCase);
+                    Regex reWord = new Regex(
+                        "^"
+                        + Regex.Replace(
+                            pc.clue.answer.Replace("?", ".")
+                            , "."
+                            , "$0[" + Clue.NonCountingChars_Regex + "]*"
+                        )
+                        + "$"
+                    , RegexOptions.IgnoreCase);
 
+                    // Clear any existing matches
+                    pc.clearMatches();
+
+                    // Loop through dictionaries, looking for matches
                     for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
                     {
                         List<CrosswordDictionary> dicts = AllDictionaries[dt];
@@ -1251,6 +1563,7 @@ namespace Neverer
                             }
                         }
                     }
+                    pc.changesChecked(); // Notify clue that all changes checked
                     bwDictionaryChecker.ReportProgress((int)Math.Round((Decimal)cluesChecked / (Decimal)crossword.placedClues.Count));
                 }
                 bwDictionaryChecker.ReportProgress(100);
@@ -1261,6 +1574,26 @@ namespace Neverer
         {
             RegexSearcher re = new RegexSearcher(this);
             re.Show();
+        }
+
+        private void emptyGridToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MakeExcel(OutputStyle.EmptyGrid);
+        }
+
+        private void gridWithAnswersToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            MakeExcel(OutputStyle.GridWithAnswers);
+        }
+
+        private void emptyGridToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MakeHtml(OutputStyle.EmptyGrid);
+        }
+
+        private void gridWithAnswersToolStripMenuItem1_Click(object sender, EventArgs e)
+        {
+            MakeHtml(OutputStyle.GridWithAnswers);
         }
     }
 }

@@ -1,19 +1,13 @@
-﻿using System;
+﻿using Neverer.UtilityClass;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Excel = Microsoft.Office.Interop.Excel;
-using System.Xml;
-using System.Xml.Serialization;
 using System.IO;
 using System.Text.RegularExpressions;
-using System.Globalization;
+using System.Web.UI;
 using System.Windows.Forms;
-using Neverer.UtilityClass;
-using System.Drawing;
-
-
+using System.Xml;
+using System.Xml.Serialization;
+using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Neverer
 {
@@ -173,7 +167,47 @@ namespace Neverer
         {
             return needle.MatchesRegex(new Regex(haystack, options));
         }
-        
+
+        public static String Replace(this String original, IEnumerable<String> oldStrings, String newString)
+        {
+            String output = original;
+            foreach (String oldString in oldStrings)
+            {
+                if (oldString != null)
+                {
+                    output = output.Replace(oldString, newString);
+                }
+            }
+            return output;
+        }
+
+        public static void OpenTag(this HtmlTextWriter writer, HtmlTag tag)
+        {
+            foreach (KeyValuePair<HtmlTextWriterAttribute, string> attr in tag.Attributes)
+            {
+                writer.AddAttribute(attr.Key, attr.Value);
+            }
+            foreach (KeyValuePair<HtmlTextWriterStyle, string> style in tag.StyleAttributes)
+            {
+                writer.AddStyleAttribute(style.Key, style.Value);
+            }
+            writer.RenderBeginTag(tag.TagName);
+        }
+        public static void RenderTagContents(this HtmlTextWriter writer, HtmlTag tag)
+        {
+            if (tag.InnerTag != null) { writer.RenderWholeTag(tag.InnerTag); }
+            if (tag.InnerText != null) { writer.Write(tag.InnerText); }
+        }
+        public static void CloseTag(this HtmlTextWriter writer, HtmlTag tag)
+        {
+            writer.RenderEndTag();
+        }
+        public static void RenderWholeTag(this HtmlTextWriter writer, HtmlTag tag)
+        {
+            writer.OpenTag(tag);
+            writer.RenderTagContents(tag);
+            writer.CloseTag(tag);
+        }
     }
 
     /// <summary>
@@ -191,7 +225,7 @@ namespace Neverer
         /// </summary>
         /// <param name="control">The control whose window handle the delegate should be invoked on.</param>
         /// <param name="method">A delegate that contains a method to be called in the control's thread context.</param>
-        public static void Invoke(this Control control, Action method)
+        public static void Invoke(this System.Windows.Forms.Control control, Action method)
         {
             if (control.InvokeRequired)
             {
@@ -211,7 +245,7 @@ namespace Neverer
         /// <param name="method">A delegate that contains a method to be called in the control's thread context and
         /// that returns a value.</param>
         /// <returns>The return value from the delegate being invoked.</returns>
-        public static TResult Invoke<TResult>(this Control control, Func<TResult> method)
+        public static TResult Invoke<TResult>(this System.Windows.Forms.Control control, Func<TResult> method)
         {
             if (control.InvokeRequired)
             {

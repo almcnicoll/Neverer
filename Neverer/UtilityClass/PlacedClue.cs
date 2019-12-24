@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Drawing;
 
 namespace Neverer.UtilityClass
@@ -24,7 +21,8 @@ namespace Neverer.UtilityClass
             Unknown = 0,
             NoMatchingWord = 1,
             MatchingWordNoQuestion = 2,
-            MatchingWordWithQuestion = 3
+            MatchingWordWithQuestion = 3,
+            NoMatchingWordComplete = 4
         }
         public class ClueStatusChangedArgs : EventArgs
         {
@@ -52,6 +50,8 @@ namespace Neverer.UtilityClass
                     return Color.Gold;
                 case PlacedClue.ClueStatus.MatchingWordWithQuestion:
                     return Color.CornflowerBlue;
+                case PlacedClue.ClueStatus.NoMatchingWordComplete:
+                    return Color.CornflowerBlue;
                 default:
                     return Color.FromKnownColor(KnownColor.Control);
             }
@@ -67,6 +67,7 @@ namespace Neverer.UtilityClass
         private Guid __UniqueID;
         private ClueStatus __status = ClueStatus.Unknown;
         private SerializableDictionary<String, List<String>> __matches = new SerializableDictionary<String, List<String>>();
+        private bool __uncheckedChanges = true;
 
         // Properties
         public int order
@@ -106,7 +107,7 @@ namespace Neverer.UtilityClass
                 return clue.ToString();
             }
         }
-        
+
         public ClueStatus status
         {
             get
@@ -115,17 +116,20 @@ namespace Neverer.UtilityClass
                 {
                     if (clue.answer.Contains("?"))
                     {
-                        if ((Matches == null) || (Matches.Count==0))
+                        if ((Matches == null) || (Matches.Count == 0))
                         {
                             __status = ClueStatus.NoMatchingWord;
-                        } else if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
+                        }
+                        else if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
                         {
                             __status = ClueStatus.MatchingWordNoQuestion;
-                        } else
+                        }
+                        else
                         {
                             __status = ClueStatus.MatchingWordWithQuestion;
                         }
-                    } else
+                    }
+                    else
                     {
                         if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
                         {
@@ -133,7 +137,14 @@ namespace Neverer.UtilityClass
                         }
                         else
                         {
-                            __status = ClueStatus.MatchingWordWithQuestion;
+                            if ((Matches == null) || (Matches.Count == 0))
+                            {
+                                __status = ClueStatus.NoMatchingWordComplete;
+                            }
+                            else
+                            {
+                                __status = ClueStatus.MatchingWordWithQuestion;
+                            }
                         }
                     }
                 }
@@ -158,6 +169,23 @@ namespace Neverer.UtilityClass
             }
         }
 
+        public bool uncheckedChanges
+        {
+            get
+            {
+                return __uncheckedChanges;
+            }
+        }
+        private void baseClueChanged(Clue sender, EventArgs e)
+        {
+            __uncheckedChanges = true;
+        }
+        public void changesChecked()
+        {
+            __uncheckedChanges = false;
+        }
+
+
         // Events
         public event EventHandler<ClueStatusChangedArgs> ClueStatusChanged;
 
@@ -165,6 +193,7 @@ namespace Neverer.UtilityClass
         public PlacedClue()
         {
             __UniqueID = Guid.NewGuid();
+            clue.changed += baseClueChanged;
         }
         public Guid UniqueID
         {
@@ -181,6 +210,13 @@ namespace Neverer.UtilityClass
             pcDest.x = x;
             pcDest.y = y;
             pcDest.status = status;
+            if(uncheckedChanges)
+            {
+                pcDest.baseClueChanged(null, new EventArgs());
+            } else
+            {
+                pcDest.changesChecked();
+            }
             clue.CopyTo(pcDest.clue);
         }
 
@@ -236,7 +272,7 @@ namespace Neverer.UtilityClass
         {
             __matches = null;
             __matches = new SerializableDictionary<String, List<String>>();
-            status = ClueStatus.NoMatchingWord;
+            //status = ClueStatus.NoMatchingWord;
             //if (clue.answer.Contains("?"))
             //{
             //    status = ClueStatus.NoMatchingWord;

@@ -38,6 +38,8 @@
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exportExcelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.emptyGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.gridWithAnswersToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exportPDFToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.recentFilesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -47,6 +49,9 @@
             this.dictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dictionaryManagementToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quickImportDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
+            this.regularExpressionSearchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,9 +74,9 @@
             this.tspbClueUpdate = new System.Windows.Forms.ToolStripProgressBar();
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
-            this.regularExpressionSearchToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
+            this.exportHTMLToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.emptyGridToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
+            this.gridWithAnswersToolStripMenuItem1 = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             this.cmsClueClick.SuspendLayout();
@@ -101,6 +106,7 @@
             this.saveAsToolStripMenuItem,
             this.toolStripSeparator1,
             this.exportExcelToolStripMenuItem,
+            this.exportHTMLToolStripMenuItem,
             this.exportPDFToolStripMenuItem,
             this.toolStripSeparator2,
             this.recentFilesToolStripMenuItem,
@@ -114,7 +120,7 @@
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New...";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -122,7 +128,7 @@
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "&Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -130,33 +136,49 @@
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save &As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exportExcelToolStripMenuItem
             // 
+            this.exportExcelToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.emptyGridToolStripMenuItem,
+            this.gridWithAnswersToolStripMenuItem});
             this.exportExcelToolStripMenuItem.Name = "exportExcelToolStripMenuItem";
-            this.exportExcelToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exportExcelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportExcelToolStripMenuItem.Text = "Export &Excel";
-            this.exportExcelToolStripMenuItem.Click += new System.EventHandler(this.exportExcelToolStripMenuItem_Click);
+            // 
+            // emptyGridToolStripMenuItem
+            // 
+            this.emptyGridToolStripMenuItem.Name = "emptyGridToolStripMenuItem";
+            this.emptyGridToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.emptyGridToolStripMenuItem.Text = "&Empty Grid";
+            this.emptyGridToolStripMenuItem.Click += new System.EventHandler(this.emptyGridToolStripMenuItem_Click);
+            // 
+            // gridWithAnswersToolStripMenuItem
+            // 
+            this.gridWithAnswersToolStripMenuItem.Name = "gridWithAnswersToolStripMenuItem";
+            this.gridWithAnswersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.gridWithAnswersToolStripMenuItem.Text = "Grid with &Answers";
+            this.gridWithAnswersToolStripMenuItem.Click += new System.EventHandler(this.gridWithAnswersToolStripMenuItem_Click);
             // 
             // exportPDFToolStripMenuItem
             // 
             this.exportPDFToolStripMenuItem.Name = "exportPDFToolStripMenuItem";
-            this.exportPDFToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exportPDFToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportPDFToolStripMenuItem.Text = "Export &PDF";
             this.exportPDFToolStripMenuItem.Visible = false;
             this.exportPDFToolStripMenuItem.Click += new System.EventHandler(this.exportPDFToolStripMenuItem_Click);
@@ -164,24 +186,24 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // recentFilesToolStripMenuItem
             // 
             this.recentFilesToolStripMenuItem.Name = "recentFilesToolStripMenuItem";
-            this.recentFilesToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.recentFilesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.recentFilesToolStripMenuItem.Text = "Recent &Files";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -196,33 +218,50 @@
             this.toolStripSeparator5,
             this.optionsToolStripMenuItem});
             this.toolsToolStripMenuItem.Name = "toolsToolStripMenuItem";
-            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(47, 20);
+            this.toolsToolStripMenuItem.Size = new System.Drawing.Size(46, 20);
             this.toolsToolStripMenuItem.Text = "&Tools";
             // 
             // dictionaryToolStripMenuItem
             // 
             this.dictionaryToolStripMenuItem.Name = "dictionaryToolStripMenuItem";
-            this.dictionaryToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.dictionaryToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.dictionaryToolStripMenuItem.Text = "&Dictionary...";
             // 
             // dictionaryManagementToolStripMenuItem
             // 
             this.dictionaryManagementToolStripMenuItem.Name = "dictionaryManagementToolStripMenuItem";
-            this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.dictionaryManagementToolStripMenuItem.Text = "Dictionary &Management...";
             this.dictionaryManagementToolStripMenuItem.Click += new System.EventHandler(this.dictionaryManagementToolStripMenuItem_Click);
             // 
             // quickImportDictionaryToolStripMenuItem
             // 
             this.quickImportDictionaryToolStripMenuItem.Name = "quickImportDictionaryToolStripMenuItem";
-            this.quickImportDictionaryToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.quickImportDictionaryToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.quickImportDictionaryToolStripMenuItem.Text = "&Quick Import Dictionary...";
             this.quickImportDictionaryToolStripMenuItem.Click += new System.EventHandler(this.quickImportDictionaryToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator4
+            // 
+            this.toolStripSeparator4.Name = "toolStripSeparator4";
+            this.toolStripSeparator4.Size = new System.Drawing.Size(217, 6);
+            // 
+            // regularExpressionSearchToolStripMenuItem
+            // 
+            this.regularExpressionSearchToolStripMenuItem.Name = "regularExpressionSearchToolStripMenuItem";
+            this.regularExpressionSearchToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.regularExpressionSearchToolStripMenuItem.Text = "Regular E&xpression Search...";
+            this.regularExpressionSearchToolStripMenuItem.Click += new System.EventHandler(this.regularExpressionSearchToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator5
+            // 
+            this.toolStripSeparator5.Name = "toolStripSeparator5";
+            this.toolStripSeparator5.Size = new System.Drawing.Size(217, 6);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
             this.optionsToolStripMenuItem.Text = "&Options...";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -258,6 +297,7 @@
             this.dgvClues.MultiSelect = false;
             this.dgvClues.Name = "dgvClues";
             this.dgvClues.ReadOnly = true;
+            this.dgvClues.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
             this.dgvClues.Size = new System.Drawing.Size(262, 293);
             this.dgvClues.TabIndex = 1;
             this.dgvClues.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvClues_CellMouseDoubleClick);
@@ -416,22 +456,28 @@
             this.bwDictionaryChecker.WorkerSupportsCancellation = true;
             this.bwDictionaryChecker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwDictionaryChecker_DoWork);
             // 
-            // regularExpressionSearchToolStripMenuItem
+            // exportHTMLToolStripMenuItem
             // 
-            this.regularExpressionSearchToolStripMenuItem.Name = "regularExpressionSearchToolStripMenuItem";
-            this.regularExpressionSearchToolStripMenuItem.Size = new System.Drawing.Size(219, 22);
-            this.regularExpressionSearchToolStripMenuItem.Text = "Regular E&xpression Search...";
-            this.regularExpressionSearchToolStripMenuItem.Click += new System.EventHandler(this.regularExpressionSearchToolStripMenuItem_Click);
+            this.exportHTMLToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.emptyGridToolStripMenuItem1,
+            this.gridWithAnswersToolStripMenuItem1});
+            this.exportHTMLToolStripMenuItem.Name = "exportHTMLToolStripMenuItem";
+            this.exportHTMLToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exportHTMLToolStripMenuItem.Text = "Export &HTML";
             // 
-            // toolStripSeparator4
+            // emptyGridToolStripMenuItem1
             // 
-            this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(216, 6);
+            this.emptyGridToolStripMenuItem1.Name = "emptyGridToolStripMenuItem1";
+            this.emptyGridToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.emptyGridToolStripMenuItem1.Text = "&Empty Grid";
+            this.emptyGridToolStripMenuItem1.Click += new System.EventHandler(this.emptyGridToolStripMenuItem1_Click);
             // 
-            // toolStripSeparator5
+            // gridWithAnswersToolStripMenuItem1
             // 
-            this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(216, 6);
+            this.gridWithAnswersToolStripMenuItem1.Name = "gridWithAnswersToolStripMenuItem1";
+            this.gridWithAnswersToolStripMenuItem1.Size = new System.Drawing.Size(180, 22);
+            this.gridWithAnswersToolStripMenuItem1.Text = "Grid with &Answers";
+            this.gridWithAnswersToolStripMenuItem1.Click += new System.EventHandler(this.gridWithAnswersToolStripMenuItem1_Click);
             // 
             // Creator
             // 
@@ -512,6 +558,11 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator4;
         private System.Windows.Forms.ToolStripMenuItem regularExpressionSearchToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
+        private System.Windows.Forms.ToolStripMenuItem emptyGridToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem gridWithAnswersToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem exportHTMLToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem emptyGridToolStripMenuItem1;
+        private System.Windows.Forms.ToolStripMenuItem gridWithAnswersToolStripMenuItem1;
     }
 }
 

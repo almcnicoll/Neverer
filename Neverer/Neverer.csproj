@@ -19,9 +19,10 @@
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
     <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -44,6 +45,7 @@
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -108,8 +110,10 @@
     <Compile Include="UtilityClass\Crossword.cs" />
     <Compile Include="UtilityClass\CrosswordDictionaryCollection.cs" />
     <Compile Include="UtilityClass\FlexStack.cs" />
+    <Compile Include="UtilityClass\HtmlTag.cs" />
     <Compile Include="UtilityClass\LetterSubstitution.cs" />
     <Compile Include="UtilityClass\LetterSubstitutionSet.cs" />
+    <Compile Include="UtilityClass\Matrix.cs" />
     <Compile Include="UtilityClass\MRUManager.cs">
       <SubType>Component</SubType>
     </Compile>

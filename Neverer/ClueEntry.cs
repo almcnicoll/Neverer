@@ -11,6 +11,7 @@ using Neverer.UtilityClass;
 
 namespace Neverer
 {
+    // FIXED METHINKS - when loading solutions from dictionaries, spaces are counted as a letter, resulting in wrong letter count
     public partial class ClueEntry : Form
     {
         Creator __callingInstance;
@@ -72,7 +73,7 @@ namespace Neverer
 
         private void setMinMax()
         {
-            int currentLength = txtAnswer.Text.Replace(" ", "").Length;
+            int currentLength = txtAnswer.Text.Replace(Clue.NonCountingChars, "").Length;
             int maxX; int maxY;
             switch (comboOrientation.Text)
             {
@@ -158,7 +159,7 @@ namespace Neverer
         {
             get
             {
-                if (result == DialogResult.OK)
+                  if (result == DialogResult.OK)
                 {
                     return pc;
                 }
