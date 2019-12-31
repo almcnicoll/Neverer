@@ -26,7 +26,7 @@
     <InstallUrl>http://almcnicoll.co.uk/neverer/install/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>2</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -233,18 +233,4 @@
   <Target Name="AfterBuild">
   </Target>
   -->
-  <!--INSERT STARTS HERE-->
-  <!--note the use of .build directory-->
-  <PropertyGroup Condition="'$(BuildingInsideVisualStudio)' == 'true'">
-    <MSBuildCommunityTasksPath>$(SolutionDir)\.build\MSBuildCommunityTasks</MSBuildCommunityTasksPath>
-  </PropertyGroup>
-  <!-- Required Import to use MSBuild Community Tasks -->
-  <!-- Import Project="$(SolutionDir)\.build\MSBuild.Community.Tasks.targets" Condition="'$(BuildingInsideVisualStudio)' == 'true'" / -->
-  <Import Project="$(MSBuildExtensionsPath)\MSBuildCommunityTasks\MSBuild.Community.Tasks.Targets" Condition="'$(BuildingInsideVisualStudio)' == 'true'" />
-  <Target Name="BeforeCompile" Condition="'$(BuildingInsideVisualStudio)|$(Configuration)' == 'true|Release'">
-    <FormatVersion Version="$(ApplicationVersion)" Revision="$(ApplicationRevision)">
-      <Output TaskParameter="OutputVersion" PropertyName="AssemblyVersionToUse" />
-    </FormatVersion>
-    <AssemblyInfo CodeLanguage="CS" OutputFile="$(ProjectDir)Properties\VersionInfo.cs" AssemblyVersion="$(AssemblyVersionToUse)" AssemblyFileVersion="$(AssemblyVersionToUse)" />
-  </Target>
 </Project>

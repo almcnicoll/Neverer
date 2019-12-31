@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Deployment.Application;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -1098,7 +1099,7 @@ namespace Neverer
             clues[AD.Across].Add(new HtmlTag(HtmlTextWriterTag.Td, "Clues across", titleAttr, titleStyle));
             clues.Add(AD.Down, new List<HtmlTag>());
             clues[AD.Down].Add(new HtmlTag(HtmlTextWriterTag.Td, "Clues down", titleAttr, titleStyle));
-            
+
             // Clues
             //r = firstClueRow;
             if (true)
@@ -1594,6 +1595,18 @@ namespace Neverer
         private void gridWithAnswersToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             MakeHtml(OutputStyle.GridWithAnswers);
+        }
+
+        private void Creator_Load(object sender, EventArgs e)
+        {
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                this.Text += String.Format(" v{0}", ApplicationDeployment.CurrentDeployment.CurrentVersion);
+            }
+            else
+            {
+                this.Text += String.Format(" static version {0}", Assembly.GetExecutingAssembly().GetName().Version);
+            }
         }
     }
 }
