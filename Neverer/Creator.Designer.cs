@@ -77,6 +77,7 @@
             this.tspbClueUpdate = new System.Windows.Forms.ToolStripProgressBar();
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
+            this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
             this.msMain.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             this.cmsClueClick.SuspendLayout();
@@ -479,11 +480,22 @@
             this.bwDictionaryChecker.WorkerSupportsCancellation = true;
             this.bwDictionaryChecker.DoWork += new System.ComponentModel.DoWorkEventHandler(this.bwDictionaryChecker_DoWork);
             // 
+            // flpClues
+            // 
+            this.flpClues.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
+            this.flpClues.Location = new System.Drawing.Point(12, 43);
+            this.flpClues.Margin = new System.Windows.Forms.Padding(0);
+            this.flpClues.Name = "flpClues";
+            this.flpClues.Size = new System.Drawing.Size(262, 293);
+            this.flpClues.TabIndex = 11;
+            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(636, 390);
+            this.Controls.Add(this.flpClues);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.lblPuzzleTitle);
             this.Controls.Add(this.cmdEdit);
@@ -564,6 +576,7 @@
         private System.Windows.Forms.ToolStripMenuItem exportHTMLToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem emptyGridToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem gridWithAnswersToolStripMenuItem1;
+        private System.Windows.Forms.FlowLayoutPanel flpClues;
     }
 }
 

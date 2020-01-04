@@ -12,7 +12,7 @@ namespace Neverer.DataGridViewClasses
 {
     public class DataGridViewColouredCell : DataGridViewTextBoxCell
     {
-        public Neverer.UtilityClass.PlacedClue.ClueStatus Status;
+        public Neverer.UtilityClass.ClueStatus Status;
 
         protected override void Paint(System.Drawing.Graphics graphics,
             System.Drawing.Rectangle clipBounds, System.Drawing.Rectangle cellBounds,

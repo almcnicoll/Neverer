@@ -29,15 +29,15 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutBox));
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
+            this.cmdDonate = new System.Windows.Forms.Button();
             this.logoPictureBox = new System.Windows.Forms.PictureBox();
             this.labelProductName = new System.Windows.Forms.Label();
             this.labelVersion = new System.Windows.Forms.Label();
             this.labelCopyright = new System.Windows.Forms.Label();
             this.labelCompanyName = new System.Windows.Forms.Label();
             this.textBoxDescription = new System.Windows.Forms.TextBox();
-            this.okButton = new System.Windows.Forms.Button();
-            this.cmdDonate = new System.Windows.Forms.Button();
             this.lblDonateMessage = new System.Windows.Forms.Label();
+            this.okButton = new System.Windows.Forms.Button();
             this.tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
             this.SuspendLayout();
@@ -70,6 +70,18 @@
             this.tableLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 10F));
             this.tableLayoutPanel.Size = new System.Drawing.Size(417, 288);
             this.tableLayoutPanel.TabIndex = 0;
+            // 
+            // cmdDonate
+            // 
+            this.cmdDonate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.cmdDonate.Location = new System.Drawing.Point(364, 232);
+            this.cmdDonate.Name = "cmdDonate";
+            this.cmdDonate.Size = new System.Drawing.Size(50, 20);
+            this.cmdDonate.TabIndex = 25;
+            this.cmdDonate.Text = "Donate!";
+            this.cmdDonate.UseVisualStyleBackColor = true;
+            this.cmdDonate.Click += new System.EventHandler(this.cmdDonate_Click);
             // 
             // logoPictureBox
             // 
@@ -149,29 +161,6 @@
             this.textBoxDescription.TabStop = false;
             this.textBoxDescription.Text = "Description";
             // 
-            // okButton
-            // 
-            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.okButton.Location = new System.Drawing.Point(364, 262);
-            this.okButton.Name = "okButton";
-            this.okButton.Size = new System.Drawing.Size(50, 23);
-            this.okButton.TabIndex = 24;
-            this.okButton.Text = "&OK";
-            // 
-            // cmdDonate
-            // 
-            this.cmdDonate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdDonate.Location = new System.Drawing.Point(364, 232);
-            this.cmdDonate.Name = "cmdDonate";
-            this.cmdDonate.Size = new System.Drawing.Size(50, 20);
-            this.cmdDonate.TabIndex = 25;
-            this.cmdDonate.Text = "Donate!";
-            this.cmdDonate.UseVisualStyleBackColor = true;
-            this.cmdDonate.Click += new System.EventHandler(this.cmdDonate_Click);
-            // 
             // lblDonateMessage
             // 
             this.lblDonateMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
@@ -185,6 +174,17 @@
             this.lblDonateMessage.Text = "This product is free and worked on in my spare time. If you have found it useful," +
     " please consider making a donation!";
             this.lblDonateMessage.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
+            // 
+            // okButton
+            // 
+            this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.okButton.DialogResult = System.Windows.Forms.DialogResult.Cancel;
+            this.okButton.Location = new System.Drawing.Point(364, 262);
+            this.okButton.Name = "okButton";
+            this.okButton.Size = new System.Drawing.Size(50, 23);
+            this.okButton.TabIndex = 24;
+            this.okButton.Text = "&OK";
             // 
             // AboutBox
             // 

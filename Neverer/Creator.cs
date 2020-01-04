@@ -1,4 +1,5 @@
-﻿using Neverer.DataGridViewClasses;
+﻿using CrosswordControls;
+using Neverer.DataGridViewClasses;
 using Neverer.UtilityClass;
 using System;
 using System.Collections.Generic;
@@ -28,6 +29,8 @@ namespace Neverer
         private bool __unsavedChanges = false;
         private String __currentFilename = null;
         private bool __cluesToCheck = false;
+
+        private List<CrosswordControls.ClueDisplay> __clueDisplays = new List<CrosswordControls.ClueDisplay>();
 
         public Settings currentSettings = new Settings();
 
@@ -67,10 +70,12 @@ namespace Neverer
             if (sender is PlacedClue)
             {
                 UpdateClueGrid(sender as PlacedClue);
+                //populateClueDisplays(sender as PlacedClue);
             }
             else
             {
                 UpdateClueGrid();
+                //populateClueDisplays();
             }
             UpdatePreview();
             runClueCheck();
@@ -406,6 +411,48 @@ namespace Neverer
             return ce.AcceptedClue;
         }
 
+        private void populateClueDisplays(PlacedClue pc = null)
+        {
+            // TODO - if pc != null, only update that one clue
+            // (NB might not be needed - in theory, should update itself
+            //  with the right event subscribed, similar to the statuschanged one)
+
+            // Clear the panel
+            flpClues.Controls.Clear();
+
+            // Populate new controls from the PlacedClues collection
+            foreach (PlacedClue pcRef in crossword.placedClues)
+            {
+                ClueDisplay cd = new ClueDisplay();
+                cd.Height = 24;
+                cd.BorderStyle = BorderStyle.FixedSingle;
+                cd.Margin = new Padding(0);
+                cd.Clue = pcRef;
+                __clueDisplays.Add(cd);
+                flpClues.Controls.Add(cd);
+                cd.Click += ClueDisplay_Click;
+            }
+        }
+
+        private void ClueDisplay_Click(object sender, EventArgs e)
+        {
+            if (sender is ClueDisplay)
+            {
+                ClueDisplay cdClicked = (ClueDisplay)sender;
+                if (cdClicked.Selected)
+                {
+                    cdClicked.Selected = false;
+                }
+                else
+                {
+                    foreach (ClueDisplay cdLoop in flpClues.Controls)
+                    {
+                        cdLoop.Selected = false;
+                    }
+                    cdClicked.Selected = true;
+                }
+            }
+        }
 
         private void cmdAddClue_Click(object sender, EventArgs e)
         {
@@ -547,6 +594,7 @@ namespace Neverer
                 unsavedChanges = false;
                 currentSettings.AddToFileList(fileName);
                 runClueCheck();
+                populateClueDisplays();
                 return true;
             }
             catch (Exception ex)
@@ -711,19 +759,24 @@ namespace Neverer
             PlacedClue pcTmp = getClue(pc);
             if (pcTmp != null)
             {
+                // Copy to original PlacedClue entry, to update crossword object and clue list
+                pcTmp.CopyTo(pc); // TODO - test this line for ClueDisplay usage
+                var junk = crossword.sortedClueList; // TODO - test this line for ClueDisplay usage
+
                 foreach (PlacedClue pcLoop in crossword.placedClues)
                 {
                     if (pcLoop.UniqueID == pc.UniqueID)
                     {
                         // Copy values across, but set status to "Unknown" so we reevaluate it
-                        pcTmp.status = PlacedClue.ClueStatus.Unknown;
+                        pcTmp.status = ClueStatus.Unknown;
                         pcTmp.CopyTo(pcLoop);
-                        pcLoop.status = PlacedClue.ClueStatus.Unknown;
+                        pcLoop.status = ClueStatus.Unknown;
                     }
                 }
                 unsavedChanges = true;
                 ClueChanged(pcTmp, new EventArgs());
             }
+            // TODO - need routine we can call to reorder ClueDisplay controls list
         }
 
         private void cmdRemoveClue_Click(object sender, EventArgs e)
@@ -1498,7 +1551,7 @@ namespace Neverer
                     String word = pc.clue.answer;
                     if ((word == null) | (word.Length == 0)) { continue; }
 
-                    //if (word.IndexOf("?") == -1) { pc.status = PlacedClue.ClueStatus.MatchingWordNoQuestion; continue; }
+                    //if (word.IndexOf("?") == -1) { pc.status = ClueStatus.MatchingWordNoQuestion; continue; }
 
                     // Change pattern as needed, depending on intersection with other clues
                     LetterSubstitutionSet lss = LetterSubstitutionSet.getIntersectionChanges(pc, crossword.placedClues);
@@ -1601,11 +1654,23 @@ namespace Neverer
         {
             if (ApplicationDeployment.IsNetworkDeployed)
             {
-                this.Text += String.Format(" v{0}", ApplicationDeployment.CurrentDeployment.CurrentVersion);
+                this.Text += " " + Creator.VersionText();
             }
             else
             {
-                this.Text += String.Format(" static version {0}", Assembly.GetExecutingAssembly().GetName().Version);
+                this.Text += " " + Creator.VersionText();
+            }
+        }
+
+        public static String VersionText()
+        {
+            if (ApplicationDeployment.IsNetworkDeployed)
+            {
+                return String.Format("v{0}", ApplicationDeployment.CurrentDeployment.CurrentVersion);
+            }
+            else
+            {
+                return String.Format("static version {0}", Assembly.GetExecutingAssembly().GetName().Version);
             }
         }
     }

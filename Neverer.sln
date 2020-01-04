@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.28307.960
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neverer", "Neverer\Neverer.csproj", "{381ABFB2-7B2C-4EA2-8A61-9D76D6FA9D50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosswordControls", "CrosswordControls\CrosswordControls.csproj", "{043FFBBF-ED15-4B0A-AB9D-F3C982F6243C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosswordShared", "CrosswordShared\CrosswordShared.csproj", "{E3AF0E61-909E-440A-8BD4-3FE58DCF1483}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +19,14 @@ Global
 		{381ABFB2-7B2C-4EA2-8A61-9D76D6FA9D50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{381ABFB2-7B2C-4EA2-8A61-9D76D6FA9D50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{381ABFB2-7B2C-4EA2-8A61-9D76D6FA9D50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{043FFBBF-ED15-4B0A-AB9D-F3C982F6243C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{043FFBBF-ED15-4B0A-AB9D-F3C982F6243C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{043FFBBF-ED15-4B0A-AB9D-F3C982F6243C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{043FFBBF-ED15-4B0A-AB9D-F3C982F6243C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E3AF0E61-909E-440A-8BD4-3FE58DCF1483}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E3AF0E61-909E-440A-8BD4-3FE58DCF1483}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E3AF0E61-909E-440A-8BD4-3FE58DCF1483}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E3AF0E61-909E-440A-8BD4-3FE58DCF1483}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
