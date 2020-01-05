@@ -12,7 +12,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.Web.UI;
+using WebUI = System.Web.UI;
 using System.Windows.Forms;
 using System.Xml;
 using Excel = Microsoft.Office.Interop.Excel;
@@ -431,11 +431,37 @@ namespace Neverer
                 __clueDisplays.Add(cd);
                 flpClues.Controls.Add(cd);
                 cd.Click += ClueDisplay_Click;
+                cd.DoubleClick += ClueDisplay_DoubleClick;
+            }
+        }
+
+        private void SelectOnly(ClueDisplay clueDisplay)
+        {
+            foreach (ClueDisplay cdLoop in flpClues.Controls)
+            {
+                cdLoop.Selected = false;
+            }
+            clueDisplay.Selected = true;
+        }
+
+        private void ClueDisplay_DoubleClick(object sender, EventArgs e)
+        {
+            if (sender is ClueDisplay)
+            {
+                ClueDisplay cdClicked = (ClueDisplay)sender;
+                SelectOnly(cdClicked);
+                TryClueEdit();
+            } else
+            {
+                throw new NotImplementedException();
             }
         }
 
         private void ClueDisplay_Click(object sender, EventArgs e)
         {
+            // TODO - right-click of ClueDisplay
+            // TODO - select clue on crossword when selected in clue list
+            // TODO - lose dgvClues and associated code when this is complete
             if (sender is ClueDisplay)
             {
                 ClueDisplay cdClicked = (ClueDisplay)sender;
@@ -445,11 +471,7 @@ namespace Neverer
                 }
                 else
                 {
-                    foreach (ClueDisplay cdLoop in flpClues.Controls)
-                    {
-                        cdLoop.Selected = false;
-                    }
-                    cdClicked.Selected = true;
+                    SelectOnly(cdClicked);
                 }
             }
         }
@@ -749,6 +771,19 @@ namespace Neverer
 
         private void TryClueEdit()
         {
+            // Get selected clue
+            ClueDisplay cdSelected
+                = (from Control ctrl in flpClues.Controls
+                   where ((ctrl is ClueDisplay) && (((ClueDisplay)ctrl).Selected == true))
+                   select (ClueDisplay)ctrl).FirstOrDefault();
+            if (cdSelected == null)
+            {
+                MessageBox.Show("You must select a clue to edit", "Edit Clue", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+            PlacedClue pc = cdSelected.Clue;
+            /*
+            // (old) selection method - DataGridView
             if (dgvClues.SelectedCells == null || dgvClues.SelectedCells.Count == 0)
             {
                 MessageBox.Show("You must select a clue to edit", "Edit Clue", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -756,6 +791,7 @@ namespace Neverer
             }
             int row = dgvClues.SelectedCells[0].RowIndex;
             PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
+            */
             PlacedClue pcTmp = getClue(pc);
             if (pcTmp != null)
             {
@@ -1081,67 +1117,67 @@ namespace Neverer
              * Styles
              */
             // Title
-            Dictionary<HtmlTextWriterAttribute, String> titleAttr = new Dictionary<HtmlTextWriterAttribute, string>();
-            titleAttr.Add(HtmlTextWriterAttribute.Class, "titlestyle");
-            Dictionary<HtmlTextWriterStyle, String> titleStyle = new Dictionary<HtmlTextWriterStyle, string>();
-            titleStyle.Add(HtmlTextWriterStyle.FontSize, "24px");
-            titleStyle.Add(HtmlTextWriterStyle.FontWeight, "bold");
-            titleStyle.Add(HtmlTextWriterStyle.TextAlign, "center");
-            titleStyle.Add(HtmlTextWriterStyle.VerticalAlign, "middle");
-            titleStyle.Add(HtmlTextWriterStyle.Margin, "auto");
+            Dictionary<WebUI.HtmlTextWriterAttribute, String> titleAttr = new Dictionary<WebUI.HtmlTextWriterAttribute, string>();
+            titleAttr.Add(WebUI.HtmlTextWriterAttribute.Class, "titlestyle");
+            Dictionary<WebUI.HtmlTextWriterStyle, String> titleStyle = new Dictionary<WebUI.HtmlTextWriterStyle, string>();
+            titleStyle.Add(WebUI.HtmlTextWriterStyle.FontSize, "24px");
+            titleStyle.Add(WebUI.HtmlTextWriterStyle.FontWeight, "bold");
+            titleStyle.Add(WebUI.HtmlTextWriterStyle.TextAlign, "center");
+            titleStyle.Add(WebUI.HtmlTextWriterStyle.VerticalAlign, "middle");
+            titleStyle.Add(WebUI.HtmlTextWriterStyle.Margin, "auto");
 
             // Black squares
-            Dictionary<HtmlTextWriterAttribute, String> blackAttr = new Dictionary<HtmlTextWriterAttribute, string>();
-            blackAttr.Add(HtmlTextWriterAttribute.Class, "blacksquare");
-            Dictionary<HtmlTextWriterStyle, String> blackStyle = new Dictionary<HtmlTextWriterStyle, string>();
-            blackStyle.Add(HtmlTextWriterStyle.TextAlign, "center");
-            blackStyle.Add(HtmlTextWriterStyle.VerticalAlign, "middle");
-            blackStyle.Add(HtmlTextWriterStyle.BackgroundColor, "#000");
-            blackStyle.Add(HtmlTextWriterStyle.Color, "#000");
-            blackStyle.Add(HtmlTextWriterStyle.BorderColor, "#000");
-            blackStyle.Add(HtmlTextWriterStyle.BorderWidth, "1px");
-            blackStyle.Add(HtmlTextWriterStyle.BorderStyle, "solid");
-            blackStyle.Add(HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
-            blackStyle.Add(HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
+            Dictionary<WebUI.HtmlTextWriterAttribute, String> blackAttr = new Dictionary<WebUI.HtmlTextWriterAttribute, string>();
+            blackAttr.Add(WebUI.HtmlTextWriterAttribute.Class, "blacksquare");
+            Dictionary<WebUI.HtmlTextWriterStyle, String> blackStyle = new Dictionary<WebUI.HtmlTextWriterStyle, string>();
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.TextAlign, "center");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.VerticalAlign, "middle");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.BackgroundColor, "#000");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.Color, "#000");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.BorderColor, "#000");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.BorderWidth, "1px");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.BorderStyle, "solid");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
+            blackStyle.Add(WebUI.HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
 
-            Dictionary<HtmlTextWriterAttribute, String> letterAttr = new Dictionary<HtmlTextWriterAttribute, string>();
-            letterAttr.Add(HtmlTextWriterAttribute.Class, "lettersquare");
-            Dictionary<HtmlTextWriterStyle, String> letterStyle = new Dictionary<HtmlTextWriterStyle, string>();
-            letterStyle.Add(HtmlTextWriterStyle.TextAlign, "center");
-            letterStyle.Add(HtmlTextWriterStyle.VerticalAlign, "middle");
-            letterStyle.Add(HtmlTextWriterStyle.BackgroundColor, "#fff");
-            letterStyle.Add(HtmlTextWriterStyle.Color, "#000");
-            letterStyle.Add(HtmlTextWriterStyle.FontSize, "18px");
-            letterStyle.Add(HtmlTextWriterStyle.BorderColor, "#000");
-            letterStyle.Add(HtmlTextWriterStyle.BorderWidth, "1px");
-            letterStyle.Add(HtmlTextWriterStyle.BorderStyle, "solid");
-            letterStyle.Add(HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
-            letterStyle.Add(HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
+            Dictionary<WebUI.HtmlTextWriterAttribute, String> letterAttr = new Dictionary<WebUI.HtmlTextWriterAttribute, string>();
+            letterAttr.Add(WebUI.HtmlTextWriterAttribute.Class, "lettersquare");
+            Dictionary<WebUI.HtmlTextWriterStyle, String> letterStyle = new Dictionary<WebUI.HtmlTextWriterStyle, string>();
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.TextAlign, "center");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.VerticalAlign, "middle");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.BackgroundColor, "#fff");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.Color, "#000");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.FontSize, "18px");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.BorderColor, "#000");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.BorderWidth, "1px");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.BorderStyle, "solid");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
+            letterStyle.Add(WebUI.HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
 
-            Dictionary<HtmlTextWriterAttribute, String> numberAttr = new Dictionary<HtmlTextWriterAttribute, string>();
-            numberAttr.Add(HtmlTextWriterAttribute.Class, "numbersquare");
-            Dictionary<HtmlTextWriterStyle, String> numberStyle = new Dictionary<HtmlTextWriterStyle, string>();
-            numberStyle.Add(HtmlTextWriterStyle.TextAlign, "left");
-            numberStyle.Add(HtmlTextWriterStyle.VerticalAlign, "top");
-            numberStyle.Add(HtmlTextWriterStyle.BackgroundColor, "#fff");
-            numberStyle.Add(HtmlTextWriterStyle.Color, "#000");
-            numberStyle.Add(HtmlTextWriterStyle.FontSize, "10px");
-            numberStyle.Add(HtmlTextWriterStyle.BorderColor, "#000");
-            numberStyle.Add(HtmlTextWriterStyle.BorderWidth, "1px");
-            numberStyle.Add(HtmlTextWriterStyle.BorderStyle, "solid");
-            numberStyle.Add(HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
-            numberStyle.Add(HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
+            Dictionary<WebUI.HtmlTextWriterAttribute, String> numberAttr = new Dictionary<WebUI.HtmlTextWriterAttribute, string>();
+            numberAttr.Add(WebUI.HtmlTextWriterAttribute.Class, "numbersquare");
+            Dictionary<WebUI.HtmlTextWriterStyle, String> numberStyle = new Dictionary<WebUI.HtmlTextWriterStyle, string>();
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.TextAlign, "left");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.VerticalAlign, "top");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.BackgroundColor, "#fff");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.Color, "#000");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.FontSize, "10px");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.BorderColor, "#000");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.BorderWidth, "1px");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.BorderStyle, "solid");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.Width, cellDimension.ToString() + "px");
+            numberStyle.Add(WebUI.HtmlTextWriterStyle.Height, cellDimension.ToString() + "px");
 
 
             // Create title
-            HtmlTag title = new HtmlTag(HtmlTextWriterTag.H1, crossword.title, titleAttr, titleStyle);
+            HtmlTag title = new HtmlTag(WebUI.HtmlTextWriterTag.H1, crossword.title, titleAttr, titleStyle);
 
             // Puzzle setup (black fill, square cells, borders)
             for (int rr = firstPuzzleRow; rr < (firstPuzzleRow + crossword.rows); rr++)
             {
                 for (int cc = firstPuzzleCol; cc < (firstPuzzleCol + crossword.cols); cc++)
                 {
-                    cells[cc, rr] = new HtmlTag(HtmlTextWriterTag.Td, "", blackAttr, blackStyle);
+                    cells[cc, rr] = new HtmlTag(WebUI.HtmlTextWriterTag.Td, "", blackAttr, blackStyle);
                 }
             }
 
@@ -1149,9 +1185,9 @@ namespace Neverer
             // Clue table setup
             Dictionary<AD, List<HtmlTag>> clues = new Dictionary<AD, List<HtmlTag>>();
             clues.Add(AD.Across, new List<HtmlTag>());
-            clues[AD.Across].Add(new HtmlTag(HtmlTextWriterTag.Td, "Clues across", titleAttr, titleStyle));
+            clues[AD.Across].Add(new HtmlTag(WebUI.HtmlTextWriterTag.Td, "Clues across", titleAttr, titleStyle));
             clues.Add(AD.Down, new List<HtmlTag>());
-            clues[AD.Down].Add(new HtmlTag(HtmlTextWriterTag.Td, "Clues down", titleAttr, titleStyle));
+            clues[AD.Down].Add(new HtmlTag(WebUI.HtmlTextWriterTag.Td, "Clues down", titleAttr, titleStyle));
 
             // Clues
             //r = firstClueRow;
@@ -1159,7 +1195,7 @@ namespace Neverer
             {
                 foreach (PlacedClue pc in this.crossword.sortedClueList)
                 {
-                    clues[pc.orientation].Add(new HtmlTag(HtmlTextWriterTag.Td, pc.placeNumber + " " + pc.clueText));
+                    clues[pc.orientation].Add(new HtmlTag(WebUI.HtmlTextWriterTag.Td, pc.placeNumber + " " + pc.clueText));
                     // Add clue text to clue list
                     //r++;
 
@@ -1174,20 +1210,20 @@ namespace Neverer
                                 case AD.Down:
                                     for (int yy = 0; yy < pc.clue.length; yy++)
                                     {
-                                        cells[pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, "", letterAttr, letterStyle);
+                                        cells[pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow] = new HtmlTag(WebUI.HtmlTextWriterTag.Td, "", letterAttr, letterStyle);
                                     }
                                     y2 += pc.clue.length - 1;
                                     break;
                                 case AD.Across:
                                     for (int xx = 0; xx < pc.clue.length; xx++)
                                     {
-                                        cells[pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, "", letterAttr, letterStyle);
+                                        cells[pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(WebUI.HtmlTextWriterTag.Td, "", letterAttr, letterStyle);
                                     }
                                     x2 += pc.clue.length - 1;
                                     break;
                             }
                             // Number clue
-                            cells[pc.x + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, pc.placeNumber.ToString(), numberAttr, numberStyle);
+                            cells[pc.x + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(WebUI.HtmlTextWriterTag.Td, pc.placeNumber.ToString(), numberAttr, numberStyle);
                             break;
                         case OutputStyle.GridWithAnswers:
                             // Enter answer into grid
@@ -1196,13 +1232,13 @@ namespace Neverer
                                 case AD.Down:
                                     for (int yy = 0; yy < pc.clue.length; yy++)
                                     {
-                                        cells[pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, pc.clue.letters[yy].ToString(), letterAttr, letterStyle);
+                                        cells[pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow] = new HtmlTag(WebUI.HtmlTextWriterTag.Td, pc.clue.letters[yy].ToString(), letterAttr, letterStyle);
                                     }
                                     break;
                                 case AD.Across:
                                     for (int xx = 0; xx < pc.clue.length; xx++)
                                     {
-                                        cells[pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(HtmlTextWriterTag.Td, pc.clue.letters[xx].ToString(), letterAttr, letterStyle);
+                                        cells[pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow] = new HtmlTag(WebUI.HtmlTextWriterTag.Td, pc.clue.letters[xx].ToString(), letterAttr, letterStyle);
                                     }
                                     break;
                             }
@@ -1214,24 +1250,24 @@ namespace Neverer
             #region "Tag writing"
             StringWriter stringWriter = new StringWriter();
 
-            using (HtmlTextWriter writer = new HtmlTextWriter(stringWriter))
+            using (WebUI.HtmlTextWriter writer = new WebUI.HtmlTextWriter(stringWriter))
             {
                 // Html
-                writer.RenderBeginTag(HtmlTextWriterTag.Html); // html
-                writer.RenderBeginTag(HtmlTextWriterTag.Head); // head
+                writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Html); // html
+                writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Head); // head
                 writer.RenderEndTag(); // head
-                writer.RenderBeginTag(HtmlTextWriterTag.Body); // body
+                writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Body); // body
 
                 // Title
                 writer.RenderWholeTag(title); // h1
 
                 // Grid table
-                writer.AddStyleAttribute(HtmlTextWriterStyle.BorderCollapse, "collapse");
-                writer.AddStyleAttribute(HtmlTextWriterStyle.Margin, "auto");
-                writer.RenderBeginTag(HtmlTextWriterTag.Table); // table
+                writer.AddStyleAttribute(WebUI.HtmlTextWriterStyle.BorderCollapse, "collapse");
+                writer.AddStyleAttribute(WebUI.HtmlTextWriterStyle.Margin, "auto");
+                writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Table); // table
                 for (int rr = 0; rr < cells.rows; rr++)
                 {
-                    writer.RenderBeginTag(HtmlTextWriterTag.Tr); // tr
+                    writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Tr); // tr
                     for (int cc = 0; cc < cells.cols; cc++)
                     {
                         try
@@ -1248,20 +1284,20 @@ namespace Neverer
                 writer.RenderEndTag(); // table
 
                 // Clues table
-                writer.AddStyleAttribute(HtmlTextWriterStyle.Margin, "auto");
-                writer.RenderBeginTag(HtmlTextWriterTag.Table); // table
+                writer.AddStyleAttribute(WebUI.HtmlTextWriterStyle.Margin, "auto");
+                writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Table); // table
                 int clueTableRows = Math.Max(clues[AD.Across].Count - 1, clues[AD.Down].Count - 1);
                 for (int rr = 0; rr < clueTableRows; rr++)
                 {
                     // Across
-                    writer.RenderBeginTag(HtmlTextWriterTag.Tr); // tr
+                    writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Tr); // tr
                     if (clues[AD.Across].Count > rr)
                     {
                         writer.RenderWholeTag(clues[AD.Across][rr]); // td
                     }
                     else
                     {
-                        writer.RenderBeginTag(HtmlTextWriterTag.Td); // td
+                        writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Td); // td
                         writer.RenderEndTag(); // td
                     }
                     // Down
@@ -1271,7 +1307,7 @@ namespace Neverer
                     }
                     else
                     {
-                        writer.RenderBeginTag(HtmlTextWriterTag.Td); // td
+                        writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Td); // td
                         writer.RenderEndTag(); // td
                     }
                     writer.RenderEndTag(); // tr

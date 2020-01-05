@@ -58,7 +58,6 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.donateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgvClues = new System.Windows.Forms.DataGridView();
             this.cmsClueClick = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addToDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -90,8 +89,7 @@
             this.msMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.toolsToolStripMenuItem,
-            this.helpToolStripMenuItem,
-            this.donateToolStripMenuItem});
+            this.helpToolStripMenuItem});
             this.msMain.Location = new System.Drawing.Point(0, 0);
             this.msMain.Name = "msMain";
             this.msMain.Size = new System.Drawing.Size(636, 24);
@@ -121,7 +119,7 @@
             // 
             this.newToolStripMenuItem.Name = "newToolStripMenuItem";
             this.newToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.N)));
-            this.newToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.newToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.newToolStripMenuItem.Text = "&New...";
             this.newToolStripMenuItem.Click += new System.EventHandler(this.newToolStripMenuItem_Click);
             // 
@@ -129,7 +127,7 @@
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
             this.openToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.O)));
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.openToolStripMenuItem.Text = "&Open...";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
@@ -137,21 +135,21 @@
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
             this.saveToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.S)));
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveToolStripMenuItem.Text = "&Save";
             this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // saveAsToolStripMenuItem
             // 
             this.saveAsToolStripMenuItem.Name = "saveAsToolStripMenuItem";
-            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save &As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // exportExcelToolStripMenuItem
             // 
@@ -159,7 +157,7 @@
             this.emptyGridToolStripMenuItem,
             this.gridWithAnswersToolStripMenuItem});
             this.exportExcelToolStripMenuItem.Name = "exportExcelToolStripMenuItem";
-            this.exportExcelToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exportExcelToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportExcelToolStripMenuItem.Text = "Export &Excel";
             // 
             // emptyGridToolStripMenuItem
@@ -182,7 +180,7 @@
             this.emptyGridToolStripMenuItem1,
             this.gridWithAnswersToolStripMenuItem1});
             this.exportHTMLToolStripMenuItem.Name = "exportHTMLToolStripMenuItem";
-            this.exportHTMLToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exportHTMLToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportHTMLToolStripMenuItem.Text = "Export &HTML";
             // 
             // emptyGridToolStripMenuItem1
@@ -202,7 +200,7 @@
             // exportPDFToolStripMenuItem
             // 
             this.exportPDFToolStripMenuItem.Name = "exportPDFToolStripMenuItem";
-            this.exportPDFToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exportPDFToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exportPDFToolStripMenuItem.Text = "Export &PDF";
             this.exportPDFToolStripMenuItem.Visible = false;
             this.exportPDFToolStripMenuItem.Click += new System.EventHandler(this.exportPDFToolStripMenuItem_Click);
@@ -210,24 +208,24 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // recentFilesToolStripMenuItem
             // 
             this.recentFilesToolStripMenuItem.Name = "recentFilesToolStripMenuItem";
-            this.recentFilesToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.recentFilesToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.recentFilesToolStripMenuItem.Text = "Recent &Files";
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(152, 6);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(177, 6);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
             this.exitToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(155, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.exitToolStripMenuItem.Text = "E&xit";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
@@ -300,16 +298,9 @@
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(107, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
-            // 
-            // donateToolStripMenuItem
-            // 
-            this.donateToolStripMenuItem.Name = "donateToolStripMenuItem";
-            this.donateToolStripMenuItem.Size = new System.Drawing.Size(57, 20);
-            this.donateToolStripMenuItem.Text = "&Donate";
-            this.donateToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
             // dgvClues
             // 
@@ -354,14 +345,14 @@
             this.dgvPuzzle.BackgroundColor = System.Drawing.SystemColors.Control;
             this.dgvPuzzle.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvPuzzle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvPuzzle.Location = new System.Drawing.Point(280, 43);
+            this.dgvPuzzle.Location = new System.Drawing.Point(321, 43);
             this.dgvPuzzle.MultiSelect = false;
             this.dgvPuzzle.Name = "dgvPuzzle";
             this.dgvPuzzle.ReadOnly = true;
             this.dgvPuzzle.ShowCellErrors = false;
             this.dgvPuzzle.ShowEditingIcon = false;
             this.dgvPuzzle.ShowRowErrors = false;
-            this.dgvPuzzle.Size = new System.Drawing.Size(344, 322);
+            this.dgvPuzzle.Size = new System.Drawing.Size(303, 322);
             this.dgvPuzzle.TabIndex = 2;
             this.dgvPuzzle.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellClick);
             this.dgvPuzzle.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellDoubleClick);
@@ -379,7 +370,7 @@
             // lblGrid
             // 
             this.lblGrid.AutoSize = true;
-            this.lblGrid.Location = new System.Drawing.Point(277, 27);
+            this.lblGrid.Location = new System.Drawing.Point(318, 27);
             this.lblGrid.Name = "lblGrid";
             this.lblGrid.Size = new System.Drawing.Size(64, 13);
             this.lblGrid.TabIndex = 4;
@@ -399,7 +390,7 @@
             // cmdRemoveClue
             // 
             this.cmdRemoveClue.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cmdRemoveClue.Location = new System.Drawing.Point(199, 342);
+            this.cmdRemoveClue.Location = new System.Drawing.Point(240, 342);
             this.cmdRemoveClue.Name = "cmdRemoveClue";
             this.cmdRemoveClue.Size = new System.Drawing.Size(75, 23);
             this.cmdRemoveClue.TabIndex = 6;
@@ -424,7 +415,7 @@
             // cmdEdit
             // 
             this.cmdEdit.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.cmdEdit.Location = new System.Drawing.Point(105, 342);
+            this.cmdEdit.Location = new System.Drawing.Point(128, 342);
             this.cmdEdit.Name = "cmdEdit";
             this.cmdEdit.Size = new System.Drawing.Size(75, 23);
             this.cmdEdit.TabIndex = 7;
@@ -436,7 +427,7 @@
             // 
             this.lblPuzzleTitle.AutoSize = true;
             this.lblPuzzleTitle.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblPuzzleTitle.Location = new System.Drawing.Point(347, 27);
+            this.lblPuzzleTitle.Location = new System.Drawing.Point(388, 27);
             this.lblPuzzleTitle.Name = "lblPuzzleTitle";
             this.lblPuzzleTitle.Size = new System.Drawing.Size(36, 13);
             this.lblPuzzleTitle.TabIndex = 8;
@@ -484,10 +475,11 @@
             // 
             this.flpClues.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left)));
+            this.flpClues.AutoScroll = true;
             this.flpClues.Location = new System.Drawing.Point(12, 43);
             this.flpClues.Margin = new System.Windows.Forms.Padding(0);
             this.flpClues.Name = "flpClues";
-            this.flpClues.Size = new System.Drawing.Size(262, 293);
+            this.flpClues.Size = new System.Drawing.Size(306, 293);
             this.flpClues.TabIndex = 11;
             // 
             // Creator
@@ -560,7 +552,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator3;
         private System.Windows.Forms.ToolStripMenuItem helpToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem aboutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem donateToolStripMenuItem;
         private System.Windows.Forms.ContextMenuStrip cmsClueClick;
         private System.Windows.Forms.ToolStripMenuItem addToDictionaryToolStripMenuItem;
         private System.Windows.Forms.StatusStrip statusStrip1;

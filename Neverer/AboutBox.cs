@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
+using System.Diagnostics;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace Neverer
@@ -101,25 +97,31 @@ namespace Neverer
             }
         }
         #endregion
-
-        private void cmdDonate_Click(object sender, EventArgs e)
+        
+        private void VisitLink(LinkLabel label, String url)
         {
-            string url = "";
+            try
+            {
+                Process.Start(url);
+                label.LinkVisited = true;
+            }
+            catch
+            {
+                MessageBox.Show(
+                    String.Format("Unable to launch link - this is usually down to Windows or antivirus software.{0}"
+                    + "You will need to visit the following URL by copying it into a browser:{0}{1}",
+                    Environment.NewLine, url));
+            }
+        }
 
-            string business = "paypal@almcnicoll.co.uk";    // your paypal email
-            string description = "Neverer%20Donation";      // '%20' represents a space. remember HTML!
-            string country = "UK";                          // AU, US, etc.
-            string currency = "GBP";                        // AUD, USD, etc.
+        private void lnkIssues_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            VisitLink(lnkIssues, "https://github.com/almcnicoll/neverer/issues");
+        }
 
-            url += "https://www.paypal.com/cgi-bin/webscr" +
-                "?cmd=" + "_donations" +
-                "&business=" + business +
-                "&lc=" + country +
-                "&item_name=" + description +
-                "&currency_code=" + currency +
-                "&bn=" + "PP%2dDonationsBF";
-
-            System.Diagnostics.Process.Start(url);
+        private void lnkEmail_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            VisitLink(lnkEmail, "mailto:neverer@almcnicoll.co.uk");
         }
     }
 }

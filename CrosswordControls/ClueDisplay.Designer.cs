@@ -80,19 +80,22 @@
             this.lblClueNumber.Text = "xx across";
             this.lblClueNumber.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.lblClueNumber.Click += new System.EventHandler(this.lblClueNumber_Click);
+            this.lblClueNumber.DoubleClick += new System.EventHandler(this.lblClueNumber_DoubleClick);
             // 
             // lblClueText
             // 
             this.lblClueText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblClueText.AutoSize = true;
             this.lblClueText.Location = new System.Drawing.Point(93, 0);
             this.lblClueText.Name = "lblClueText";
-            this.lblClueText.Size = new System.Drawing.Size(259, 24);
+            this.lblClueText.Size = new System.Drawing.Size(249, 24);
             this.lblClueText.TabIndex = 5;
             this.lblClueText.Text = "clue text here";
             this.lblClueText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.lblClueText.Click += new System.EventHandler(this.lblClueText_Click);
+            this.lblClueText.DoubleClick += new System.EventHandler(this.lblClueText_DoubleClick);
             // 
             // ClueDisplay
             // 

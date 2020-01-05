@@ -123,6 +123,16 @@ namespace CrosswordControls
             InvokeOnClick(this, e);
         }
 
+        private void lblClueText_DoubleClick(object sender, EventArgs e)
+        {
+            OnDoubleClick(e);
+        }
+
+        private void lblClueNumber_DoubleClick(object sender, EventArgs e)
+        {
+            OnDoubleClick(e);
+        }
+
         /*private void ClueDisplay_Click(object sender, EventArgs e)
         {
             // Click event

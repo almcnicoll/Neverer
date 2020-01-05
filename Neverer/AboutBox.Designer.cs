@@ -29,15 +29,15 @@
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutBox));
             this.tableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.cmdDonate = new System.Windows.Forms.Button();
+            this.lnkEmail = new System.Windows.Forms.LinkLabel();
             this.logoPictureBox = new System.Windows.Forms.PictureBox();
             this.labelProductName = new System.Windows.Forms.Label();
             this.labelVersion = new System.Windows.Forms.Label();
             this.labelCopyright = new System.Windows.Forms.Label();
             this.labelCompanyName = new System.Windows.Forms.Label();
             this.textBoxDescription = new System.Windows.Forms.TextBox();
-            this.lblDonateMessage = new System.Windows.Forms.Label();
             this.okButton = new System.Windows.Forms.Button();
+            this.lnkIssues = new System.Windows.Forms.LinkLabel();
             this.tableLayoutPanel.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.logoPictureBox)).BeginInit();
             this.SuspendLayout();
@@ -48,15 +48,15 @@
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 28.69565F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 58.26087F));
             this.tableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 13.04348F));
-            this.tableLayoutPanel.Controls.Add(this.cmdDonate, 2, 5);
+            this.tableLayoutPanel.Controls.Add(this.lnkEmail, 1, 5);
             this.tableLayoutPanel.Controls.Add(this.logoPictureBox, 0, 0);
             this.tableLayoutPanel.Controls.Add(this.labelProductName, 1, 0);
             this.tableLayoutPanel.Controls.Add(this.labelVersion, 1, 1);
             this.tableLayoutPanel.Controls.Add(this.labelCopyright, 1, 2);
             this.tableLayoutPanel.Controls.Add(this.labelCompanyName, 1, 3);
             this.tableLayoutPanel.Controls.Add(this.textBoxDescription, 1, 4);
-            this.tableLayoutPanel.Controls.Add(this.lblDonateMessage, 1, 5);
             this.tableLayoutPanel.Controls.Add(this.okButton, 2, 6);
+            this.tableLayoutPanel.Controls.Add(this.lnkIssues, 1, 6);
             this.tableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel.Location = new System.Drawing.Point(9, 9);
             this.tableLayoutPanel.Name = "tableLayoutPanel";
@@ -71,17 +71,21 @@
             this.tableLayoutPanel.Size = new System.Drawing.Size(417, 288);
             this.tableLayoutPanel.TabIndex = 0;
             // 
-            // cmdDonate
+            // lnkEmail
             // 
-            this.cmdDonate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdDonate.Location = new System.Drawing.Point(364, 232);
-            this.cmdDonate.Name = "cmdDonate";
-            this.cmdDonate.Size = new System.Drawing.Size(50, 20);
-            this.cmdDonate.TabIndex = 25;
-            this.cmdDonate.Text = "Donate!";
-            this.cmdDonate.UseVisualStyleBackColor = true;
-            this.cmdDonate.Click += new System.EventHandler(this.cmdDonate_Click);
+            this.lnkEmail.AutoSize = true;
+            this.lnkEmail.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lnkEmail.LinkArea = new System.Windows.Forms.LinkArea(119, 24);
+            this.lnkEmail.Location = new System.Drawing.Point(122, 198);
+            this.lnkEmail.Name = "lnkEmail";
+            this.lnkEmail.Size = new System.Drawing.Size(236, 57);
+            this.lnkEmail.TabIndex = 29;
+            this.lnkEmail.TabStop = true;
+            this.lnkEmail.Text = "This product is free and worked on in my spare time. If you\'d like to reach out w" +
+    "ith a question, you can contact me on neverer@almcnicoll.co.uk.";
+            this.lnkEmail.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lnkEmail.UseCompatibleTextRendering = true;
+            this.lnkEmail.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkEmail_LinkClicked);
             // 
             // logoPictureBox
             // 
@@ -161,20 +165,6 @@
             this.textBoxDescription.TabStop = false;
             this.textBoxDescription.Text = "Description";
             // 
-            // lblDonateMessage
-            // 
-            this.lblDonateMessage.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lblDonateMessage.AutoSize = true;
-            this.lblDonateMessage.Location = new System.Drawing.Point(122, 198);
-            this.lblDonateMessage.Name = "lblDonateMessage";
-            this.lblDonateMessage.Size = new System.Drawing.Size(236, 57);
-            this.lblDonateMessage.TabIndex = 26;
-            this.lblDonateMessage.Text = "This product is free and worked on in my spare time. If you have found it useful," +
-    " please consider making a donation!";
-            this.lblDonateMessage.TextAlign = System.Drawing.ContentAlignment.BottomLeft;
-            // 
             // okButton
             // 
             this.okButton.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -186,11 +176,28 @@
             this.okButton.TabIndex = 24;
             this.okButton.Text = "&OK";
             // 
+            // lnkIssues
+            // 
+            this.lnkIssues.AutoSize = true;
+            this.lnkIssues.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.lnkIssues.LinkArea = new System.Windows.Forms.LinkArea(60, 21);
+            this.lnkIssues.Location = new System.Drawing.Point(122, 255);
+            this.lnkIssues.Name = "lnkIssues";
+            this.lnkIssues.Size = new System.Drawing.Size(236, 33);
+            this.lnkIssues.TabIndex = 27;
+            this.lnkIssues.TabStop = true;
+            this.lnkIssues.Text = "To file a bug report or request a feature, please visit the issues page on github" +
+    ".";
+            this.lnkIssues.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lnkIssues.UseCompatibleTextRendering = true;
+            this.lnkIssues.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.lnkIssues_LinkClicked);
+            // 
             // AboutBox
             // 
             this.AcceptButton = this.okButton;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.CancelButton = this.okButton;
             this.ClientSize = new System.Drawing.Size(435, 306);
             this.Controls.Add(this.tableLayoutPanel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
@@ -219,7 +226,7 @@
         private System.Windows.Forms.Label labelCompanyName;
         private System.Windows.Forms.TextBox textBoxDescription;
         private System.Windows.Forms.Button okButton;
-        private System.Windows.Forms.Button cmdDonate;
-        private System.Windows.Forms.Label lblDonateMessage;
+        private System.Windows.Forms.LinkLabel lnkEmail;
+        private System.Windows.Forms.LinkLabel lnkIssues;
     }
 }
