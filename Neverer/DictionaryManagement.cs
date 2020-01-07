@@ -13,6 +13,10 @@ namespace Neverer
 {
     public partial class DictionaryManagement : Form
     {
+        // TODO - dispense with Default, Custom dictionary categories, and instead have a DictionaryCollection IEnumerable
+        //  with a DefaultDictionary property and each dictionary having a ReadOnly boolean on it to allow for 
+        //  non-writeable contexts like web dictionaries.
+
         Creator caller = null;
 
         public DictionaryManagement(Creator caller)

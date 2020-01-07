@@ -1,5 +1,6 @@
 ﻿using Neverer.UtilityClass;
 using System;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -108,7 +109,7 @@ namespace CrosswordControls
         }
 
 
-        private void lblClueNumber_Click(object sender, EventArgs e)
+        /*private void lblClueNumber_Click(object sender, EventArgs e)
         {
             InvokeOnClick(this, e);
         }
@@ -121,7 +122,7 @@ namespace CrosswordControls
         private void chkRowSelect_Click(object sender, EventArgs e)
         {
             InvokeOnClick(this, e);
-        }
+        }*/
 
         private void lblClueText_DoubleClick(object sender, EventArgs e)
         {
@@ -133,9 +134,23 @@ namespace CrosswordControls
             OnDoubleClick(e);
         }
 
-        /*private void ClueDisplay_Click(object sender, EventArgs e)
+        private void lblClueNumber_MouseClick(object sender, MouseEventArgs e)
         {
-            // Click event
-        }*/
+            OnMouseClick(e);
+        }
+
+        private void lblClueText_MouseClick(object sender, MouseEventArgs e)
+        {
+            OnMouseClick(e);
+        }
+
+        private void chkRowSelect_MouseClick(object sender, MouseEventArgs e)
+        {
+            OnMouseClick(e);
+        }
+
+        // Prevent using Click - we want them to use MouseClick
+        [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
+        private new EventHandler Click(object sender, EventArgs e) { return null; }
     }
 }

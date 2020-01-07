@@ -65,7 +65,7 @@
             this.chkRowSelect.Size = new System.Drawing.Size(14, 18);
             this.chkRowSelect.TabIndex = 6;
             this.chkRowSelect.UseVisualStyleBackColor = true;
-            this.chkRowSelect.Click += new System.EventHandler(this.chkRowSelect_Click);
+            this.chkRowSelect.MouseClick += new System.Windows.Forms.MouseEventHandler(this.chkRowSelect_MouseClick);
             // 
             // lblClueNumber
             // 
@@ -79,8 +79,8 @@
             this.lblClueNumber.TabIndex = 4;
             this.lblClueNumber.Text = "xx across";
             this.lblClueNumber.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblClueNumber.Click += new System.EventHandler(this.lblClueNumber_Click);
             this.lblClueNumber.DoubleClick += new System.EventHandler(this.lblClueNumber_DoubleClick);
+            this.lblClueNumber.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lblClueNumber_MouseClick);
             // 
             // lblClueText
             // 
@@ -94,8 +94,8 @@
             this.lblClueText.TabIndex = 5;
             this.lblClueText.Text = "clue text here";
             this.lblClueText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            this.lblClueText.Click += new System.EventHandler(this.lblClueText_Click);
             this.lblClueText.DoubleClick += new System.EventHandler(this.lblClueText_DoubleClick);
+            this.lblClueText.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lblClueText_MouseClick);
             // 
             // ClueDisplay
             // 

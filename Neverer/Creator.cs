@@ -12,11 +12,11 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using WebUI = System.Web.UI;
 using System.Windows.Forms;
 using System.Xml;
 using Excel = Microsoft.Office.Interop.Excel;
 using Serial = System.Xml.Serialization;
+using WebUI = System.Web.UI;
 
 /*using MigraDoc.DocumentObjectModel;
 using MigraDoc.DocumentObjectModel.Tables;*/
@@ -324,10 +324,20 @@ namespace Neverer
         }
         private void UpdatePreview()
         {
+            // TODO - This seems a slow & inefficient way to process changes, especially where the change is just a selection change
             this.Cursor = Cursors.WaitCursor;
             dgvPuzzle.SuspendLayout();
-            PlacedClue pc;
-            if (dgvClues.SelectedCells == null || dgvClues.SelectedCells.Count == 0)
+            ClueDisplay cd = GetSelectedClue();
+            PlacedClue pc = null;
+            if (cd == null)
+            {
+                pc = null;
+            }
+            else
+            {
+                pc = cd.Clue;
+            }
+            /*if (dgvClues.SelectedCells == null || dgvClues.SelectedCells.Count == 0)
             {
                 pc = null;
             }
@@ -335,7 +345,7 @@ namespace Neverer
             {
                 int row = dgvClues.SelectedCells[0].RowIndex;
                 pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
-            }
+            }*/
 
             String[,] ga = GridArray;
 
@@ -430,7 +440,7 @@ namespace Neverer
                 cd.Clue = pcRef;
                 __clueDisplays.Add(cd);
                 flpClues.Controls.Add(cd);
-                cd.Click += ClueDisplay_Click;
+                cd.MouseClick += ClueDisplay_MouseClick;
                 cd.DoubleClick += ClueDisplay_DoubleClick;
             }
         }
@@ -442,6 +452,7 @@ namespace Neverer
                 cdLoop.Selected = false;
             }
             clueDisplay.Selected = true;
+            UpdatePreview();
         }
 
         private void ClueDisplay_DoubleClick(object sender, EventArgs e)
@@ -451,27 +462,40 @@ namespace Neverer
                 ClueDisplay cdClicked = (ClueDisplay)sender;
                 SelectOnly(cdClicked);
                 TryClueEdit();
-            } else
+            }
+            else
             {
                 throw new NotImplementedException();
             }
         }
 
-        private void ClueDisplay_Click(object sender, EventArgs e)
+        private void ClueDisplay_MouseClick(object sender, MouseEventArgs e)
         {
-            // TODO - right-click of ClueDisplay
             // TODO - select clue on crossword when selected in clue list
             // TODO - lose dgvClues and associated code when this is complete
             if (sender is ClueDisplay)
             {
                 ClueDisplay cdClicked = (ClueDisplay)sender;
-                if (cdClicked.Selected)
+                switch (e.Button)
                 {
-                    cdClicked.Selected = false;
-                }
-                else
-                {
-                    SelectOnly(cdClicked);
+                    case MouseButtons.Left:
+                        if (cdClicked.Selected)
+                        {
+                            cdClicked.Selected = false;
+                        }
+                        else
+                        {
+                            SelectOnly(cdClicked);
+                        }
+                        break;
+                    case MouseButtons.Right:
+                        // Select right-clicked clue
+                        SelectOnly(cdClicked);
+                        cmsClueClick.Show(Cursor.Position);
+                        break;
+                    default:
+                        // Ignore
+                        break;
                 }
             }
         }
@@ -769,13 +793,27 @@ namespace Neverer
             ClueChanged("", new EventArgs());
         }
 
-        private void TryClueEdit()
+        private ClueDisplay GetSelectedClue()
         {
             // Get selected clue
             ClueDisplay cdSelected
                 = (from Control ctrl in flpClues.Controls
                    where ((ctrl is ClueDisplay) && (((ClueDisplay)ctrl).Selected == true))
                    select (ClueDisplay)ctrl).FirstOrDefault();
+            if (cdSelected == null)
+            {
+                return null;
+            }
+            else
+            {
+                return cdSelected;
+            }
+        }
+
+        private void TryClueEdit()
+        {
+            // Get selected clue
+            ClueDisplay cdSelected = GetSelectedClue();
             if (cdSelected == null)
             {
                 MessageBox.Show("You must select a clue to edit", "Edit Clue", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -1479,8 +1517,18 @@ namespace Neverer
         private void addToDictionaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
             // Check if the clue is valid to be added
-            int row = dgvClues.SelectedCells[0].RowIndex;
-            PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
+            //int row = dgvClues.SelectedCells[0].RowIndex;
+            //PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
+
+            // Get selected clue
+            ClueDisplay cdSelected = GetSelectedClue();
+            if (cdSelected == null)
+            {
+                MessageBox.Show("You must select a clue to add to the dictionary", "Add to Dictionary", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                return;
+            }
+            PlacedClue pc = cdSelected.Clue;
+
             String word = pc.clue.answer;
             if ((word == null) | (word.Length == 0))
             {
