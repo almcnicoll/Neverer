@@ -58,7 +58,6 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.dgvClues = new System.Windows.Forms.DataGridView();
             this.cmsClueClick = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addToDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgvPuzzle = new System.Windows.Forms.DataGridView();
@@ -78,7 +77,6 @@
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
             this.msMain.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).BeginInit();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
             this.statusStrip1.SuspendLayout();
@@ -302,23 +300,6 @@
             this.aboutToolStripMenuItem.Text = "&About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
-            // dgvClues
-            // 
-            this.dgvClues.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.dgvClues.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvClues.ContextMenuStrip = this.cmsClueClick;
-            this.dgvClues.Location = new System.Drawing.Point(12, 43);
-            this.dgvClues.MultiSelect = false;
-            this.dgvClues.Name = "dgvClues";
-            this.dgvClues.ReadOnly = true;
-            this.dgvClues.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.dgvClues.Size = new System.Drawing.Size(262, 293);
-            this.dgvClues.TabIndex = 1;
-            this.dgvClues.CellMouseDoubleClick += new System.Windows.Forms.DataGridViewCellMouseEventHandler(this.dgvClues_CellMouseDoubleClick);
-            this.dgvClues.SelectionChanged += new System.EventHandler(this.dgvClues_SelectionChanged);
-            this.dgvClues.KeyDown += new System.Windows.Forms.KeyEventHandler(this.dgvClues_KeyDown);
-            // 
             // cmsClueClick
             // 
             this.cmsClueClick.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -496,7 +477,6 @@
             this.Controls.Add(this.lblGrid);
             this.Controls.Add(this.lblClues);
             this.Controls.Add(this.dgvPuzzle);
-            this.Controls.Add(this.dgvClues);
             this.Controls.Add(this.msMain);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.msMain;
@@ -508,7 +488,6 @@
             this.Load += new System.EventHandler(this.Creator_Load);
             this.msMain.ResumeLayout(false);
             this.msMain.PerformLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.dgvClues)).EndInit();
             this.cmsClueClick.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).EndInit();
             this.statusStrip1.ResumeLayout(false);
@@ -526,7 +505,6 @@
         private System.Windows.Forms.ToolStripMenuItem openToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveAsToolStripMenuItem;
-        private System.Windows.Forms.DataGridView dgvClues;
         private System.Windows.Forms.DataGridView dgvPuzzle;
         private System.Windows.Forms.Label lblClues;
         private System.Windows.Forms.Label lblGrid;

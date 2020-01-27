@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
 using System.IO;
+using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -74,7 +71,7 @@ namespace Neverer.UtilityClass
 
         public override String ToString()
         {
-            return ((dictionaryName==null)? "Untitled" : dictionaryName);
+            return ((dictionaryName == null) ? "Untitled" : dictionaryName);
         }
 
         public static CrosswordDictionary Load(String fileName, DictFileType fileType = DictFileType.XML)
@@ -86,8 +83,7 @@ namespace Neverer.UtilityClass
                 case DictFileType.Plaintext:
                     return CrosswordDictionary.LoadText(fileName);
                 default:
-                    // TODO - throw some kind of error here
-                    return null;
+                    throw new Exception(String.Format("Unknown dictionary type {0}", fileType));
             }
         }
 

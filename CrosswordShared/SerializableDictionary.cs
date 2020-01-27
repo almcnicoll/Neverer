@@ -1,23 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace System.Collections.Generic
+﻿namespace System.Collections.Generic
 {
     using System;
     using System.Runtime.Serialization;
     using System.Xml;
     using System.Xml.Serialization;
-    using System.Collections.Generic;
-    using System.Text;
 
     // This code copyright (c) Dacris Software Inc. under MIT license
 
     [Serializable()]
     //[XmlInclude(typeof(Neverer.UtilityClass.CrosswordDictionary))]
-    public class SerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, IXmlSerializable, ISerializable where TVal:class
+    public class SerializableDictionary<TKey, TVal> : Dictionary<TKey, TVal>, IXmlSerializable, ISerializable //where TVal : class
     {
         #region Constants
         private const string DictionaryNodeName = "Dictionary";
@@ -25,39 +17,44 @@ namespace System.Collections.Generic
         private const string KeyNodeName = "Key";
         private const string ValueNodeName = "Value";
         #endregion
+
         #region Constructors
         public SerializableDictionary()
         {
-        }
 
-        public SerializableDictionary(IDictionary<TKey, TVal> dictionary)
-            : base(dictionary)
+        }
+        public SerializableDictionary(bool Readonly)
         {
+            this.Readonly = Readonly;
         }
-
-        public SerializableDictionary(IEqualityComparer<TKey> comparer)
+        public SerializableDictionary(IDictionary<TKey, TVal> dictionary, bool Readonly = false)
+                    : base(dictionary)
+        {
+            this.Readonly = Readonly;
+        }
+        public SerializableDictionary(IEqualityComparer<TKey> comparer, bool Readonly = false)
             : base(comparer)
         {
+            this.Readonly = Readonly;
         }
-
-        public SerializableDictionary(int capacity)
+        public SerializableDictionary(int capacity, bool Readonly = false)
             : base(capacity)
         {
+            this.Readonly = Readonly;
         }
-
-        public SerializableDictionary(IDictionary<TKey, TVal> dictionary, IEqualityComparer<TKey> comparer)
+        public SerializableDictionary(IDictionary<TKey, TVal> dictionary, IEqualityComparer<TKey> comparer, bool Readonly = false)
             : base(dictionary, comparer)
         {
+            this.Readonly = Readonly;
         }
-
-        public SerializableDictionary(int capacity, IEqualityComparer<TKey> comparer)
+        public SerializableDictionary(int capacity, IEqualityComparer<TKey> comparer, bool Readonly = false)
             : base(capacity, comparer)
         {
+            this.Readonly = Readonly;
         }
-
         #endregion
-        #region ISerializable Members
 
+        #region ISerializable Members
         protected SerializableDictionary(SerializationInfo info, StreamingContext context)
         {
             int itemCount = info.GetInt32("ItemCount");
@@ -67,7 +64,6 @@ namespace System.Collections.Generic
                 this.Add(kvp.Key, kvp.Value);
             }
         }
-
         void ISerializable.GetObjectData(SerializationInfo info, StreamingContext context)
         {
             info.AddValue("ItemCount", this.Count);
@@ -78,10 +74,9 @@ namespace System.Collections.Generic
                 itemIdx++;
             }
         }
-
         #endregion
-        #region IXmlSerializable Members
 
+        #region IXmlSerializable Members
         void IXmlSerializable.WriteXml(System.Xml.XmlWriter writer)
         {
             //writer.WriteStartElement(DictionaryNodeName);
@@ -98,7 +93,6 @@ namespace System.Collections.Generic
             }
             //writer.WriteEndElement();
         }
-
         void IXmlSerializable.ReadXml(System.Xml.XmlReader reader)
         {
             if (reader.IsEmptyElement)
@@ -137,13 +131,16 @@ namespace System.Collections.Generic
 
             reader.ReadEndElement(); // Read End Element to close Read of containing node
         }
-
         System.Xml.Schema.XmlSchema IXmlSerializable.GetSchema()
         {
             return null;
         }
-
         #endregion
+
+        #region Public properties
+        public bool Readonly { get; set; }
+        #endregion
+
         #region Private Properties
         protected XmlSerializer ValueSerializer
         {
@@ -163,7 +160,6 @@ namespace System.Collections.Generic
                 return valueSerializer;
             }
         }
-
         private XmlSerializer KeySerializer
         {
             get
@@ -176,6 +172,7 @@ namespace System.Collections.Generic
             }
         }
         #endregion
+
         #region Private Members
         private XmlSerializer keySerializer = null;
         private XmlSerializer valueSerializer = null;
@@ -190,7 +187,7 @@ namespace System.Collections.Generic
             }
             this.Add(key, valueIfNotExists);
         }
-        public TVal RetrieveIfKeyExists(TKey key, TVal valueIfNotExists = null)
+        public TVal RetrieveIfKeyExists(TKey key, TVal valueIfNotExists = default(TVal))
         {
             if (this.ContainsKey(key))
             {

@@ -1,5 +1,4 @@
 ﻿using CrosswordControls;
-using Neverer.DataGridViewClasses;
 using Neverer.UtilityClass;
 using System;
 using System.Collections.Generic;
@@ -276,51 +275,14 @@ namespace Neverer
 
         private void UpdateClueGrid(PlacedClue LastClue = null)
         {
+            // TODO - this function seems obsolete now - check if that's true
+            // All functionality related to dgvClues (but may need applying to flpClues?)
             // If we don't specify a last clue, check if anything selected
             if (LastClue == null)
             {
-                DataGridViewSelectedCellCollection selCells = dgvClues.SelectedCells;
-                if ((selCells != null) && (selCells.Count > 0))
-                {
-                    DataGridViewRow dgvrLast = selCells[0].OwningRow;
-                    LastClue = (PlacedClue)dgvrLast.DataBoundItem;
-                }
+                ClueDisplay cdSelected = GetSelectedClue();
+                LastClue = cdSelected.Clue;
             }
-            dgvClues.AutoGenerateColumns = false;
-            dgvClues.Columns.Clear();
-            dgvClues.DataSource = null;
-            DataGridViewColumn dgvcPlaceDescriptor = new DataGridViewColouredColumn();
-            dgvcPlaceDescriptor.DataPropertyName = "placeDescriptor";
-            dgvcPlaceDescriptor.HeaderText = "#";
-            dgvcPlaceDescriptor.AutoSizeMode = DataGridViewAutoSizeColumnMode.AllCells;
-            DataGridViewColumn dgvcClueText = new DataGridViewColouredColumn();
-            dgvcClueText.DataPropertyName = "clueText";
-            dgvcClueText.HeaderText = "Clue";
-            dgvcClueText.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
-            dgvClues.Columns.Add(dgvcPlaceDescriptor);
-            dgvClues.Columns.Add(dgvcClueText);
-            dgvClues.RowHeadersWidth = 20;
-            dgvClues.DataSource = crossword.sortedClueList;
-
-            if (LastClue != null)
-            {
-                foreach (DataGridViewRow dgvrLoop in dgvClues.Rows)
-                {
-                    PlacedClue pcLoop = (PlacedClue)dgvrLoop.DataBoundItem;
-                    if (pcLoop.UniqueID == LastClue.UniqueID)
-                    {
-                        dgvrLoop.Selected = true;
-                    }
-
-                    DataGridViewCellStyle cs = new DataGridViewCellStyle(dgvrLoop.DefaultCellStyle);
-                    cs.BackColor = pcLoop.statusColor;
-
-                    ((DataGridViewColouredCell)(dgvrLoop.Cells[0])).Status = pcLoop.status;
-                    //dgvrLoop.Cells[0].Style = cs;
-                }
-            }
-
-            dgvClues.Invalidate();
         }
         private void UpdatePreview()
         {
@@ -855,13 +817,13 @@ namespace Neverer
 
         private void cmdRemoveClue_Click(object sender, EventArgs e)
         {
-            if (dgvClues.SelectedCells == null || dgvClues.SelectedCells.Count == 0)
+            ClueDisplay cdSelected = GetSelectedClue();
+            if (cdSelected == null)
             {
                 MessageBox.Show("You must select a clue to remove", "Remove Clue", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
                 return;
             }
-            int row = dgvClues.SelectedCells[0].RowIndex;
-            PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
+            PlacedClue pc = cdSelected.Clue;
 
             DialogResult dr = MessageBox.Show(String.Format("Are you sure you want to remove this clue?{0}{0}{1}{0}{2}", Environment.NewLine, pc.clueText, pc.clue.answer), "Remove Clue", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (dr == DialogResult.No)
@@ -869,6 +831,7 @@ namespace Neverer
                 return;
             }
 
+            // Backwards loop, so removed clues don't affect indexing
             for (int i = crossword.placedClues.Count - 1; i >= 0; i--)
             {
                 PlacedClue pcLoop = crossword.placedClues[i];
@@ -909,15 +872,18 @@ namespace Neverer
             {
                 if (pc.Overlaps(x, y))
                 {
-                    foreach (DataGridViewRow dgvr in dgvClues.Rows)
+                    foreach (Control ctrl in flpClues.Controls)
+                    //foreach (DataGridViewRow dgvr in dgvClues.Rows)
                     {
-                        PlacedClue pc2 = (PlacedClue)dgvr.DataBoundItem;
-                        if (pc.UniqueID == pc2.UniqueID)
+                        if (ctrl is ClueDisplay)
                         {
-                            dgvClues.ClearSelection();
-                            dgvr.Selected = true;
-                            dgvClues.CurrentCell = dgvr.Cells[0];
-                            return true;
+                            ClueDisplay cdLoop = (ClueDisplay)ctrl;
+                            PlacedClue pc2 = cdLoop.Clue;
+                            if (pc.UniqueID == pc2.UniqueID)
+                            {
+                                SelectOnly(cdLoop);
+                                return true;
+                            }
                         }
                     }
                 }

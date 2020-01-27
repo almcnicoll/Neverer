@@ -61,6 +61,13 @@ namespace Neverer
 
         public SettingValue(Object Value)
         {
+            if (Value == null)
+            {
+                this.Value = null;
+                this.Serialized = false;
+                this.ValueType = typeof(Object);
+                return;
+            }
             switch (Type.GetTypeCode(Value.GetType()))
             {
                 case TypeCode.String:
@@ -103,12 +110,15 @@ namespace Neverer
         /*[System.Xml.Serialization.XmlElement]
         public FlexStack<String> RecentFiles { get; set; }*/
         public const String keyRecentFiles = "RecentFiles";
-        public const String keyDictionaryFiles = "DictionaryFiles";
+        public const String keyDictionaryFiles = "DictionaryFiles"; // NB obsolete
+        public const String keyDictionaries = "Dictionaries"; // XML dictionaries
+        public const String keyWordLists = "WordLists"; // plaintext files
+
+        Crossword AutoSave = null;
 
         public Settings()
         {
-            this.DictionaryFiles = new SerializableDictionary<DictType, List<String>>();
-            this.DictionaryFiles.Add(DictType.Default, new List<String>());
+            this.DictionaryFiles = null;
             this.Set(Settings.keyRecentFiles, new FlexStack<String>());
         }
 
@@ -129,6 +139,7 @@ namespace Neverer
                 }
                 if (sv.Serialized)
                 {
+                    if (sv.Value == null) { return default(T); }
                     return (T)sv.Value.DeserializeObject<T>();
                 }
                 else
@@ -162,11 +173,47 @@ namespace Neverer
         {
             get
             {
-                return this.Get<SerializableDictionary<DictType, List<String>>>(Settings.keyDictionaryFiles);
+                SerializableDictionary<DictType, List<String>> returnVal;
+                returnVal = this.Get<SerializableDictionary<DictType, List<String>>>(Settings.keyDictionaryFiles);
+                if (returnVal == null)
+                {
+                    // Initialise if null
+                    returnVal = new SerializableDictionary<DictType, List<String>>();
+                    this.DictionaryFiles.Add(DictType.Default, new List<String>());
+                }
+                return returnVal;
             }
             set
             {
                 this.Set(Settings.keyDictionaryFiles, value);
+            }
+        }
+        // New property to replace old "DictionaryFiles" key
+        // Added new rather than replaced old property to ensure backward-compatibility
+        [Serial.XmlElement("Dictionaries")]
+        public SerializableDictionary<Guid, List<String>> Dictionaries
+        {
+            get
+            {
+                return this.Get<SerializableDictionary<Guid, List<String>>>(Settings.keyDictionaries);
+            }
+            set
+            {
+                this.Set(Settings.keyDictionaryFiles, value);
+            }
+        }
+        // New property to replace old "DictionaryFiles" key
+        // Added new rather than replaced old property to ensure backward-compatibility
+        [Serial.XmlElement("WordLists")]
+        public SerializableDictionary<Guid, List<String>> WordLists
+        {
+            get
+            {
+                return this.Get<SerializableDictionary<Guid, List<String>>>(Settings.keyWordLists);
+            }
+            set
+            {
+                this.Set(Settings.keyWordLists, value);
             }
         }
 
@@ -257,5 +304,9 @@ namespace Neverer
         }
 
         // TODO - autosave of currently edited crossword, populated on timer and removed every time crossword is saved, autoloaded on load when present
+        public void Autosave()
+        {
+
+        }
     }
 }

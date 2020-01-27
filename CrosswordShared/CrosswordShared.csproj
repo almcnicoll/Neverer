@@ -64,6 +64,7 @@
     <Compile Include="UtilityClass\LetterSubstitutionSet.cs" />
     <Compile Include="UtilityClass\Matrix.cs" />
     <Compile Include="UtilityClass\PlacedClue.cs" />
+    <Compile Include="WordList.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
