@@ -94,6 +94,7 @@
             this.lblClueText.TabIndex = 5;
             this.lblClueText.Text = "clue text here";
             this.lblClueText.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
+            this.lblClueText.UseMnemonic = false;
             this.lblClueText.DoubleClick += new System.EventHandler(this.lblClueText_DoubleClick);
             this.lblClueText.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lblClueText_MouseClick);
             // 

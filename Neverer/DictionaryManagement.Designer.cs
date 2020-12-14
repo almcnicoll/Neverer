@@ -31,13 +31,18 @@
             this.tlpMain = new System.Windows.Forms.TableLayoutPanel();
             this.clbDictionaries = new System.Windows.Forms.CheckedListBox();
             this.lblDictionaryList = new System.Windows.Forms.Label();
-            this.cmdClose = new System.Windows.Forms.Button();
-            this.flpAddButtons = new System.Windows.Forms.FlowLayoutPanel();
+            this.flpDictionaryAddButtons = new System.Windows.Forms.FlowLayoutPanel();
             this.cmdAddLocal = new System.Windows.Forms.Button();
             this.cmdAddNetwork = new System.Windows.Forms.Button();
+            this.lblWordListList = new System.Windows.Forms.Label();
+            this.clbWordLists = new System.Windows.Forms.CheckedListBox();
+            this.flpWordListAddButtons = new System.Windows.Forms.FlowLayoutPanel();
+            this.button1 = new System.Windows.Forms.Button();
+            this.button2 = new System.Windows.Forms.Button();
             this.ofdOpenDictionary = new System.Windows.Forms.OpenFileDialog();
             this.tlpMain.SuspendLayout();
-            this.flpAddButtons.SuspendLayout();
+            this.flpDictionaryAddButtons.SuspendLayout();
+            this.flpWordListAddButtons.SuspendLayout();
             this.SuspendLayout();
             // 
             // tlpMain
@@ -47,8 +52,10 @@
             this.tlpMain.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.tlpMain.Controls.Add(this.clbDictionaries, 0, 1);
             this.tlpMain.Controls.Add(this.lblDictionaryList, 0, 0);
-            this.tlpMain.Controls.Add(this.cmdClose, 1, 2);
-            this.tlpMain.Controls.Add(this.flpAddButtons, 0, 2);
+            this.tlpMain.Controls.Add(this.flpDictionaryAddButtons, 0, 2);
+            this.tlpMain.Controls.Add(this.lblWordListList, 1, 0);
+            this.tlpMain.Controls.Add(this.clbWordLists, 1, 1);
+            this.tlpMain.Controls.Add(this.flpWordListAddButtons, 1, 2);
             this.tlpMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tlpMain.Location = new System.Drawing.Point(0, 0);
             this.tlpMain.Name = "tlpMain";
@@ -86,27 +93,16 @@
             this.lblDictionaryList.TabIndex = 1;
             this.lblDictionaryList.Text = "Current Dictionaries";
             // 
-            // cmdClose
+            // flpDictionaryAddButtons
             // 
-            this.cmdClose.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.cmdClose.Location = new System.Drawing.Point(341, 311);
-            this.cmdClose.Name = "cmdClose";
-            this.cmdClose.Size = new System.Drawing.Size(75, 34);
-            this.cmdClose.TabIndex = 2;
-            this.cmdClose.Text = "Close";
-            this.cmdClose.UseVisualStyleBackColor = true;
-            this.cmdClose.Click += new System.EventHandler(this.cmdClose_Click);
-            // 
-            // flpAddButtons
-            // 
-            this.flpAddButtons.Controls.Add(this.cmdAddLocal);
-            this.flpAddButtons.Controls.Add(this.cmdAddNetwork);
-            this.flpAddButtons.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.flpAddButtons.Location = new System.Drawing.Point(0, 308);
-            this.flpAddButtons.Margin = new System.Windows.Forms.Padding(0);
-            this.flpAddButtons.Name = "flpAddButtons";
-            this.flpAddButtons.Size = new System.Drawing.Size(209, 40);
-            this.flpAddButtons.TabIndex = 4;
+            this.flpDictionaryAddButtons.Controls.Add(this.cmdAddLocal);
+            this.flpDictionaryAddButtons.Controls.Add(this.cmdAddNetwork);
+            this.flpDictionaryAddButtons.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpDictionaryAddButtons.Location = new System.Drawing.Point(0, 308);
+            this.flpDictionaryAddButtons.Margin = new System.Windows.Forms.Padding(0);
+            this.flpDictionaryAddButtons.Name = "flpDictionaryAddButtons";
+            this.flpDictionaryAddButtons.Size = new System.Drawing.Size(209, 40);
+            this.flpDictionaryAddButtons.TabIndex = 4;
             // 
             // cmdAddLocal
             // 
@@ -129,6 +125,60 @@
             this.cmdAddNetwork.Text = "Add Remote...";
             this.cmdAddNetwork.UseVisualStyleBackColor = true;
             // 
+            // lblWordListList
+            // 
+            this.lblWordListList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblWordListList.AutoSize = true;
+            this.lblWordListList.Location = new System.Drawing.Point(212, 0);
+            this.lblWordListList.Name = "lblWordListList";
+            this.lblWordListList.Size = new System.Drawing.Size(204, 13);
+            this.lblWordListList.TabIndex = 1;
+            this.lblWordListList.Text = "Current Word Lists";
+            // 
+            // clbWordLists
+            // 
+            this.clbWordLists.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.clbWordLists.FormattingEnabled = true;
+            this.clbWordLists.Location = new System.Drawing.Point(212, 16);
+            this.clbWordLists.Name = "clbWordLists";
+            this.clbWordLists.Size = new System.Drawing.Size(204, 289);
+            this.clbWordLists.TabIndex = 0;
+            // 
+            // flpWordListAddButtons
+            // 
+            this.flpWordListAddButtons.Controls.Add(this.button1);
+            this.flpWordListAddButtons.Controls.Add(this.button2);
+            this.flpWordListAddButtons.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpWordListAddButtons.Location = new System.Drawing.Point(209, 308);
+            this.flpWordListAddButtons.Margin = new System.Windows.Forms.Padding(0);
+            this.flpWordListAddButtons.Name = "flpWordListAddButtons";
+            this.flpWordListAddButtons.Size = new System.Drawing.Size(210, 40);
+            this.flpWordListAddButtons.TabIndex = 5;
+            // 
+            // button1
+            // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button1.Location = new System.Drawing.Point(3, 3);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(98, 34);
+            this.button1.TabIndex = 3;
+            this.button1.Text = "Add Local...";
+            this.button1.UseVisualStyleBackColor = true;
+            // 
+            // button2
+            // 
+            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.button2.Location = new System.Drawing.Point(107, 3);
+            this.button2.Name = "button2";
+            this.button2.Size = new System.Drawing.Size(98, 34);
+            this.button2.TabIndex = 4;
+            this.button2.Text = "Add Remote...";
+            this.button2.UseVisualStyleBackColor = true;
+            // 
             // ofdOpenDictionary
             // 
             this.ofdOpenDictionary.DefaultExt = "*.dic";
@@ -146,7 +196,8 @@
             this.Load += new System.EventHandler(this.DictionaryManagement_Load);
             this.tlpMain.ResumeLayout(false);
             this.tlpMain.PerformLayout();
-            this.flpAddButtons.ResumeLayout(false);
+            this.flpDictionaryAddButtons.ResumeLayout(false);
+            this.flpWordListAddButtons.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -156,10 +207,14 @@
         private System.Windows.Forms.TableLayoutPanel tlpMain;
         private System.Windows.Forms.CheckedListBox clbDictionaries;
         private System.Windows.Forms.Label lblDictionaryList;
-        private System.Windows.Forms.Button cmdClose;
-        private System.Windows.Forms.FlowLayoutPanel flpAddButtons;
+        private System.Windows.Forms.FlowLayoutPanel flpDictionaryAddButtons;
         private System.Windows.Forms.Button cmdAddLocal;
         private System.Windows.Forms.Button cmdAddNetwork;
         private System.Windows.Forms.OpenFileDialog ofdOpenDictionary;
+        private System.Windows.Forms.Label lblWordListList;
+        private System.Windows.Forms.CheckedListBox clbWordLists;
+        private System.Windows.Forms.FlowLayoutPanel flpWordListAddButtons;
+        private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Button button2;
     }
 }

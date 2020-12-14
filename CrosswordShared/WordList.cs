@@ -12,19 +12,22 @@ namespace Neverer.UtilityClass
         public bool Readonly { get; set; }
         public String Filename { get; set; }
         public bool Autosave { get; set; }
+        public bool Enabled { get; set; }
 
         public WordList()
         {
             this.Readonly = true;
             this.Autosave = false;
             this.Filename = null;
+            this.Enabled = true;
             this.Words = new ObservableCollection<String>();
             this.Words.CollectionChanged += Words_CollectionChanged;
         }
-        public WordList(String filename, bool Readonly = false, bool Autosave = false)
+        public WordList(String filename, bool Enabled = true, bool Readonly = false, bool Autosave = false)
         {
             this.Readonly = Readonly;
             this.Autosave = Autosave;
+            this.Enabled = Enabled;
             this.Filename = filename;
             try
             {
@@ -40,6 +43,7 @@ namespace Neverer.UtilityClass
         {
             this.Readonly = true;
             this.Autosave = false;
+            this.Enabled = true;
             this.Filename = null;
             this.Words = Words;
             this.Words.CollectionChanged += Words_CollectionChanged;
@@ -84,7 +88,7 @@ namespace Neverer.UtilityClass
             tw.Close();
         }
 
-        public void LoadFromFile(String filename, bool persistFilename = true, bool Autosave = false)
+        public void LoadFromFile(String filename, bool persistFilename = true, bool Enabled = true, bool Autosave = false)
         {
             if (!File.Exists(filename))
             {
@@ -98,6 +102,7 @@ namespace Neverer.UtilityClass
             // If persistFilename is true, this is our new filename for the wordlist, even if we already have one
             if (persistFilename) { this.Filename = filename; }
             this.Autosave = Autosave;
+            this.Enabled = Enabled;
         }
     }
 }

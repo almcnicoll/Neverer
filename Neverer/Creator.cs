@@ -28,6 +28,8 @@ namespace Neverer
         private bool __unsavedChanges = false;
         private String __currentFilename = null;
         private bool __cluesToCheck = false;
+        private int __mouseRow = 0;
+        private int __mouseCol = 0;
 
         private List<CrosswordControls.ClueDisplay> __clueDisplays = new List<CrosswordControls.ClueDisplay>();
 
@@ -56,7 +58,7 @@ namespace Neverer
             // Repopulate Recent Files
             RepopulateRecentFiles();
 
-            PopulateForm();
+            SetupGrid();
             LoadDictionaries();
 
             // Handle background worker updates
@@ -64,19 +66,29 @@ namespace Neverer
             this.ClueChanged += Creator_ClueChanged;
         }
 
-        private void Creator_ClueChanged(Object sender, EventArgs e)
+        private void Creator_ClueChanged(object sender, PlacedClueChangedEventArgs e)
         {
-            if (sender is PlacedClue)
+            if ((e.clues != null) && (e.clues.Count > 0))
             {
-                UpdateClueGrid(sender as PlacedClue);
-                //populateClueDisplays(sender as PlacedClue);
+                // Do any per-clue events here
+                if (e.newlyCreated)
+                {
+                    foreach (PlacedClue pc in e.clues)
+                    {
+                        createClueDisplay(pc);
+                    }
+                }
+
+                // Do any once-only events here
+                crossword.refreshNumbers();
+                reorderClueDisplays();
             }
             else
             {
-                UpdateClueGrid();
-                //populateClueDisplays();
+                //UpdateClueGrid();
+                populateClueDisplays();
             }
-            UpdatePreview();
+            UpdatePreviewGrid();
             runClueCheck();
         }
 
@@ -85,7 +97,9 @@ namespace Neverer
             tspbClueUpdate.Value = e.ProgressPercentage;
             if (e.ProgressPercentage == 100)
             {
-                UpdateClueGrid();
+                // Shouldn't now need to call anything - controls should update themselves as needed
+                //UpdateClueGrid();
+                //populateClueDisplays();
             }
         }
 
@@ -101,7 +115,7 @@ namespace Neverer
         private int __minDimension = 10000;
 
         // Events
-        public event EventHandler ClueChanged;
+        public event EventHandler<PlacedClueChangedEventArgs> ClueChanged;
 
         // Functions & Properties
         private void UpdateTitleText()
@@ -232,7 +246,7 @@ namespace Neverer
                 return allLetters;
             }
         }
-        public void PopulateForm()
+        public void SetupGrid()
         {
             // Set up columns and rows
             dgvPuzzle.ColumnCount = crossword.width;
@@ -243,7 +257,8 @@ namespace Neverer
 
             SetBoxSize();
 
-            if (ClueChanged != null) { ClueChanged("", new EventArgs()); }
+            // if (ClueChanged != null) { ClueChanged("", new EventArgs()); } // This just triggers a clue repaint, which should get handled elsewhere in code
+            UpdatePreviewGrid();
             DisplayCrosswordTitle();
 
             cmdAddClue.Focus();
@@ -273,7 +288,7 @@ namespace Neverer
             foreach (DataGridViewRow dgvr in dgvPuzzle.Rows) { dgvr.Height = __minDimension; }
         }
 
-        private void UpdateClueGrid(PlacedClue LastClue = null)
+        /*private void UpdateClueGrid(PlacedClue LastClue = null)
         {
             // TODO - this function seems obsolete now - check if that's true
             // All functionality related to dgvClues (but may need applying to flpClues?)
@@ -281,10 +296,14 @@ namespace Neverer
             if (LastClue == null)
             {
                 ClueDisplay cdSelected = GetSelectedClue();
-                LastClue = cdSelected.Clue;
+                if (cdSelected != null)
+                {
+                    LastClue = cdSelected.Clue;
+                }
             }
-        }
-        private void UpdatePreview()
+        }*/
+
+        private void UpdatePreviewGrid()
         {
             // TODO - This seems a slow & inefficient way to process changes, especially where the change is just a selection change
             this.Cursor = Cursors.WaitCursor;
@@ -383,19 +402,53 @@ namespace Neverer
             return ce.AcceptedClue;
         }
 
-        private void populateClueDisplays(PlacedClue pc = null)
+        private void reorderClueDisplays()
         {
-            // TODO - if pc != null, only update that one clue
-            // (NB might not be needed - in theory, should update itself
-            //  with the right event subscribed, similar to the statuschanged one)
+            var allCDs = (from Control ctrl in flpClues.Controls
+                          where ctrl is ClueDisplay
+                          orderby (ctrl as ClueDisplay).Clue.orientation, (ctrl as ClueDisplay).Clue.order
+                          select (ctrl as ClueDisplay)).ToArray();
+            /*var allCDs = (from ClueDisplay cd in flpClues.Controls
+                          orderby cd.Clue.orientation, cd.Clue.order
+                          select cd).ToArray();*/
+            /*var allPCs = (from PlacedClue pc in crossword.placedClues
+                          orderby pc.orientation, pc.order
+                          select pc).ToArray();*/
+            for (var i = 0; i < allCDs.Count(); i++)
+            {
+                flpClues.Controls.SetChildIndex(allCDs[i], i);
+            }
+        }
 
+        private ClueDisplay createClueDisplay(PlacedClue pcRef)
+        {
+            ClueDisplay cd = new ClueDisplay();
+            cd.Height = 24;
+            cd.BorderStyle = BorderStyle.FixedSingle;
+            cd.Margin = new Padding(0);
+            cd.Clue = pcRef;
+            __clueDisplays.Add(cd);
+            flpClues.Controls.Add(cd);
+            cd.MouseClick += ClueDisplay_MouseClick;
+            cd.DoubleClick += ClueDisplay_DoubleClick;
+            return cd;
+        }
+
+        private void populateClueDisplays()
+        {
             // Clear the panel
-            flpClues.Controls.Clear();
+            flpClues.ClearAndDispose();
+
+            //crossword.RefreshNumbers(); // Use this more wisely (sometimes instead of refreshing whole grid)
 
             // Populate new controls from the PlacedClues collection
-            foreach (PlacedClue pcRef in crossword.placedClues)
+            var clueList = (from PlacedClue pcLoop in crossword.placedClues
+                            orderby pcLoop.orientation, pcLoop.order
+                            select pcLoop);
+            foreach (PlacedClue pcRef in clueList) // crossword.placedClues)
             {
-                ClueDisplay cd = new ClueDisplay();
+                createClueDisplay(pcRef);
+                /*ClueDisplay cd = new ClueDisplay();
                 cd.Height = 24;
                 cd.BorderStyle = BorderStyle.FixedSingle;
                 cd.Margin = new Padding(0);
@@ -404,6 +457,7 @@ namespace Neverer
                 flpClues.Controls.Add(cd);
                 cd.MouseClick += ClueDisplay_MouseClick;
                 cd.DoubleClick += ClueDisplay_DoubleClick;
+                */
             }
         }
 
@@ -414,7 +468,7 @@ namespace Neverer
                 cdLoop.Selected = false;
             }
             clueDisplay.Selected = true;
-            UpdatePreview();
+            UpdatePreviewGrid();
         }
 
         private void ClueDisplay_DoubleClick(object sender, EventArgs e)
@@ -486,7 +540,7 @@ namespace Neverer
             currentFilename = null;
             ShowSettings();
             // In case they hit cancel, we still need to show new blank, default crossword
-            PopulateForm();
+            SetupGrid();
         }
 
         private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -601,7 +655,7 @@ namespace Neverer
                 }
                 unsavedChanges = false;
                 currentSettings.AddToFileList(fileName);
-                runClueCheck();
+                runClueCheck(true);
                 populateClueDisplays();
                 return true;
             }
@@ -628,7 +682,7 @@ namespace Neverer
 
             if (open(fileName))
             {
-                PopulateForm();
+                SetupGrid();
                 currentFilename = fileName;
                 currentSettings.AddToFileList(fileName);
             }
@@ -671,7 +725,7 @@ namespace Neverer
 
             if (open(fileName))
             {
-                PopulateForm();
+                SetupGrid();
                 currentFilename = fileName;
             }
         }
@@ -688,10 +742,12 @@ namespace Neverer
 
         private void TryClueAdd(int x = 1, int y = 1)
         {
+            List<PlacedClue> added = new List<PlacedClue>();
             PlacedClue pc = getClue(x, y);
             if (pc != null)
             {
                 crossword.placedClues.Add(pc);
+                added.Add(pc);
                 unsavedChanges = true;
                 switch (crossword.rotationalSymmetryOrder)
                 {
@@ -725,8 +781,11 @@ namespace Neverer
                         pc270.y = pc180.x;
 
                         crossword.placedClues.Add(pc90);
+                        added.Add(pc90);
                         crossword.placedClues.Add(pc180);
+                        added.Add(pc180);
                         crossword.placedClues.Add(pc270);
+                        added.Add(pc270);
                         break;
                     case 2:
                         // Reflect 1x Complement-degree clue
@@ -745,14 +804,16 @@ namespace Neverer
                             pcComplement.x = crossword.cols - 1 - pc.x;
                         }
                         crossword.placedClues.Add(pcComplement);
+                        added.Add(pcComplement);
                         break;
                     default:
                         // No need to reflect any clues
                         break;
                 }
-                UpdatePreview();
+                UpdatePreviewGrid();
             }
-            ClueChanged("", new EventArgs());
+            if (added.Count == 0) { added = null; }
+            ClueChanged("", new PlacedClueChangedEventArgs(added, true));
         }
 
         private ClueDisplay GetSelectedClue()
@@ -792,14 +853,19 @@ namespace Neverer
             int row = dgvClues.SelectedCells[0].RowIndex;
             PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
             */
+
+            // pc is template, pcTmp is the edited clone
             PlacedClue pcTmp = getClue(pc);
             if (pcTmp != null)
             {
                 // Copy to original PlacedClue entry, to update crossword object and clue list
                 pcTmp.CopyTo(pc); // TODO - test this line for ClueDisplay usage
-                var junk = crossword.sortedClueList; // TODO - test this line for ClueDisplay usage
+                //var junk = crossword.sortedClueList; // TODO - test this line for ClueDisplay usage
 
-                foreach (PlacedClue pcLoop in crossword.placedClues)
+                pc.status = ClueStatus.Unknown;
+                pc.changesChecked(false);
+
+                /*foreach (PlacedClue pcLoop in crossword.placedClues)
                 {
                     if (pcLoop.UniqueID == pc.UniqueID)
                     {
@@ -808,11 +874,11 @@ namespace Neverer
                         pcTmp.CopyTo(pcLoop);
                         pcLoop.status = ClueStatus.Unknown;
                     }
-                }
+                }*/
                 unsavedChanges = true;
-                ClueChanged(pcTmp, new EventArgs());
+                ClueChanged("", new PlacedClueChangedEventArgs(pc));
             }
-            // TODO - need routine we can call to reorder ClueDisplay controls list
+            // Reorder ClueDisplay controls list - happens automatically on clue change
         }
 
         private void cmdRemoveClue_Click(object sender, EventArgs e)
@@ -837,16 +903,16 @@ namespace Neverer
                 PlacedClue pcLoop = crossword.placedClues[i];
                 if (pcLoop.UniqueID == pc.UniqueID)
                 {
+                    ClueChanged("", new PlacedClueChangedEventArgs(pcLoop));
                     crossword.placedClues.RemoveAt(i);
                 }
             }
             unsavedChanges = true;
-            ClueChanged("", new EventArgs());
         }
 
         private void dgvClues_SelectionChanged(object sender, EventArgs e)
         {
-            UpdatePreview();
+            UpdatePreviewGrid();
         }
 
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -866,7 +932,7 @@ namespace Neverer
             }
         }
 
-        private bool FindClueFromGridPos(int x, int y)
+        private bool SelectClueFromGridPos(int x, int y)
         {
             foreach (PlacedClue pc in this.crossword.placedClues)
             {
@@ -890,14 +956,35 @@ namespace Neverer
             }
             return false;
         }
+
+        private List<PlacedClue> FindCluesFromGridPos(int x, int y)
+        {
+            List<PlacedClue> outList = new List<PlacedClue>();
+            foreach (PlacedClue pc in this.crossword.placedClues)
+            {
+                if (pc.Overlaps(x, y))
+                {
+                    outList.Add(pc);
+                }
+            }
+            return outList;
+        }
+
+        private void dgvPuzzle_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        {
+            __mouseCol = e.ColumnIndex;
+            __mouseRow = e.RowIndex;
+        }
+
         private void dgvPuzzle_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-            FindClueFromGridPos(e.ColumnIndex, e.RowIndex);
+
+            SelectClueFromGridPos(e.ColumnIndex, e.RowIndex);
         }
 
         private void dgvPuzzle_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            bool foundClue = FindClueFromGridPos(e.ColumnIndex, e.RowIndex);
+            bool foundClue = SelectClueFromGridPos(e.ColumnIndex, e.RowIndex);
             if (foundClue)
             {
                 // Edit double-clicked clue
@@ -1339,7 +1426,7 @@ namespace Neverer
             if (dr == DialogResult.OK)
             {
                 unsavedChanges = true;
-                PopulateForm();
+                SetupGrid();
             }
         }
 
@@ -1443,13 +1530,15 @@ namespace Neverer
                     case ".dic":
                         AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.XML));
 
-                        currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
+                        //currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
+                        currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
                         currentSettings.Save();
                         break;
                     default:
                         AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.Plaintext));
                         dlgDictOpen.FileName += CrosswordDictionary.importSuffix;
-                        currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
+                        //currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
+                        currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
                         currentSettings.Save();
                         break;
                 }
@@ -1570,8 +1659,13 @@ namespace Neverer
             tsslMessage.Text = "";
         }
 
-        private void runClueCheck()
+        private void runClueCheck(bool forceCheckAll = false)
         {
+            // Force-check-all means we re-run the background worker on all clues (e.g. on crossword load)
+            if (forceCheckAll)
+            {
+                foreach (PlacedClue pc in crossword.placedClues) { pc.changesChecked(false); }
+            }
             __cluesToCheck = true;
             if (!bwDictionaryChecker.IsBusy)
             {
@@ -1621,7 +1715,7 @@ namespace Neverer
                         //if (ClueChanged != null) { ClueChanged("", new EventArgs()); }
                         this.Invoke(delegate
                         {
-                            ClueChanged("", new EventArgs());
+                            ClueChanged("", new PlacedClueChangedEventArgs(pc));
                         }
                         );
                     }
@@ -1668,6 +1762,7 @@ namespace Neverer
                         }
                     }
                     pc.changesChecked(); // Notify clue that all changes checked
+                    pc.recalculateStatus();
                     bwDictionaryChecker.ReportProgress((int)Math.Round((Decimal)cluesChecked / (Decimal)crossword.placedClues.Count));
                 }
                 bwDictionaryChecker.ReportProgress(100);
@@ -1722,6 +1817,31 @@ namespace Neverer
             {
                 return String.Format("static version {0}", Assembly.GetExecutingAssembly().GetName().Version);
             }
+        }
+
+        private void tsClearCell_Click(object sender, EventArgs e)
+        {
+            if ((__mouseRow > 0) && (__mouseCol > 0))
+            {
+                List<PlacedClue> matches = FindCluesFromGridPos(__mouseCol, __mouseRow);
+                int pos = 0;
+                foreach (PlacedClue pc in matches)
+                {
+                    switch (pc.orientation)
+                    {
+                        case AD.Across:
+                            pos = __mouseCol - pc.x;
+                            break;
+                        case AD.Down:
+                            pos = __mouseRow - pc.y;
+                            break;
+                    }
+                    StringBuilder sb = new StringBuilder(pc.clue.answer);
+                    sb[pos] = '?';
+                    pc.clue.answer = sb.ToString();
+                }
+            }
+            UpdatePreviewGrid();
         }
     }
 }

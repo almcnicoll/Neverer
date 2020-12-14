@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Neverer</RootNamespace>
     <AssemblyName>Neverer</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <IsWebBootstrapper>true</IsWebBootstrapper>
+    <TargetFrameworkProfile />
     <PublishUrl>publish/</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Web</InstallFrom>
@@ -26,7 +27,7 @@
     <InstallUrl>http://almcnicoll.co.uk/neverer/install/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>3</ApplicationRevision>
+    <ApplicationRevision>4</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
@@ -56,10 +57,10 @@
     <ApplicationIcon>crossword.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>75AC0044ABBE04CDDD71C792B5C514F5D2BBA07D</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>4C98FC0BE79A0DD90D5897F91388678A784F1231</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>Neverer_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>almcnicoll.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -119,6 +120,7 @@
     <Compile Include="DictionaryManagement.Designer.cs">
       <DependentUpon>DictionaryManagement.cs</DependentUpon>
     </Compile>
+    <Compile Include="ExtensionMethods.cs" />
     <Compile Include="MRUManager.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -162,10 +164,12 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <EmbeddedResource Include="RegexSearcher.resx">
       <DependentUpon>RegexSearcher.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="almcnicoll.pfx" />
     <None Include="Neverer_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

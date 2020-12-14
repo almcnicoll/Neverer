@@ -16,6 +16,7 @@ namespace Neverer
         // TODO - dispense with Default, Custom dictionary categories, and instead have a DictionaryCollection IEnumerable
         //  with a DefaultDictionary property and each dictionary having a ReadOnly boolean on it to allow for 
         //  non-writeable contexts like web dictionaries.
+        // TODO - separate entities for Dictionaries and WordLists - Dictionaries contain definitions
 
         Creator caller = null;
 
@@ -33,8 +34,12 @@ namespace Neverer
         private void DictionaryManagement_Load(object sender, EventArgs e)
         {
             clbDictionaries.DisplayMember = "ToString";
+            clbWordLists.DisplayMember = "ToString";
             //clbDictionaries.ValueMember = "enabled";
 
+
+
+            /*
             foreach (DictType dt in Enum.GetValues(typeof(DictType)))
             {
                 if (!caller.AllDictionaries.ContainsKey(dt)) { caller.AllDictionaries.Add(dt, new List<CrosswordDictionary>()); }
@@ -44,6 +49,7 @@ namespace Neverer
                     clbDictionaries.SetItemChecked(i, cd.enabled);
                 }
             }
+            */
         }
 
         private void cmdAddLocal_Click(object sender, EventArgs e)

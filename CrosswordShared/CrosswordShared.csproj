@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>CrosswordShared</RootNamespace>
     <AssemblyName>CrosswordShared</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
     <TargetFrameworkProfile />
@@ -64,7 +64,9 @@
     <Compile Include="UtilityClass\LetterSubstitutionSet.cs" />
     <Compile Include="UtilityClass\Matrix.cs" />
     <Compile Include="UtilityClass\PlacedClue.cs" />
+    <Compile Include="UtilityClass\Position.cs" />
     <Compile Include="WordList.cs" />
+    <Compile Include="WordSources.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

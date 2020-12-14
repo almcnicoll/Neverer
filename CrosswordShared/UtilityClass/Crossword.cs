@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Serialization;
 
 namespace Neverer.UtilityClass
@@ -156,6 +154,38 @@ namespace Neverer.UtilityClass
                     orderby Convert.ToInt32(((KeyValuePair<AD, int>)entry.Key).Key), ((KeyValuePair<AD, int>)entry.Key).Value
                     select (PlacedClue)entry.Value
                     ).ToList();
+            }
+        }
+
+        private IEnumerable<KeyValuePair<int, int>> clueHeads()
+        {
+            int r = 0;
+            return
+                from PlacedClue pc in this.placedClues
+                group pc by new { pc.y, pc.x } into g
+                orderby g.Key.y, g.Key.x
+                let number = r++
+                select new KeyValuePair<int, int>(PlacedClue.GetOrder(g.Key.y, g.Key.x), r)
+                ;
+
+        }
+
+        public void refreshNumbers()
+        {
+            Dictionary<int, int> lookup = new Dictionary<int, int>();
+            var clues = this.clueHeads();
+            foreach (KeyValuePair<int, int> kvp in clues)
+            {
+                lookup.Add(kvp.Key, kvp.Value);
+            }
+
+            foreach (PlacedClue pc in this.placedClues)
+            {
+                int o = PlacedClue.GetOrder(pc.y, pc.x);
+                if (lookup.ContainsKey(o))
+                {
+                    pc.placeNumber = lookup[o];
+                }
             }
         }
     }

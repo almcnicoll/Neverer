@@ -11,6 +11,7 @@ namespace CrosswordControls
         private Color __StatusColor = Color.Transparent;
         private PlacedClue __Clue = null;
         private bool __Selected = false;
+        private String __clueText = "";
 
         public Color StatusColor
         {
@@ -44,10 +45,11 @@ namespace CrosswordControls
         {
             get
             {
-                return lblClueText.Text;
+                return __clueText;
             }
             set
             {
+                __clueText = value;
                 lblClueText.Text = value;
             }
         }

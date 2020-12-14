@@ -111,8 +111,9 @@ namespace Neverer
         public FlexStack<String> RecentFiles { get; set; }*/
         public const String keyRecentFiles = "RecentFiles";
         public const String keyDictionaryFiles = "DictionaryFiles"; // NB obsolete
-        public const String keyDictionaries = "Dictionaries"; // XML dictionaries
-        public const String keyWordLists = "WordLists"; // plaintext files
+        // TODO - move the next two items into separate WordSources file
+        //public const String keyDictionaries = "Dictionaries"; // XML dictionaries
+        //public const String keyWordLists = "WordLists"; // plaintext files
 
         Crossword AutoSave = null;
 
@@ -191,7 +192,7 @@ namespace Neverer
         // New property to replace old "DictionaryFiles" key
         // Added new rather than replaced old property to ensure backward-compatibility
         [Serial.XmlElement("Dictionaries")]
-        public SerializableDictionary<Guid, List<String>> Dictionaries
+        /*public SerializableDictionary<Guid, List<String>> Dictionaries
         {
             get
             {
@@ -226,7 +227,7 @@ namespace Neverer
                 dict[dictionaryType].Add(name);
                 this.DictionaryFiles = dict;
             }
-        }
+        }*/
 
         public FlexStack<String> RecentFiles
         {

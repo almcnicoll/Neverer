@@ -76,10 +76,13 @@
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
+            this.cmsPuzzleGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsClearCell = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
             this.statusStrip1.SuspendLayout();
+            this.cmsPuzzleGrid.SuspendLayout();
             this.SuspendLayout();
             // 
             // msMain
@@ -326,6 +329,7 @@
             this.dgvPuzzle.BackgroundColor = System.Drawing.SystemColors.Control;
             this.dgvPuzzle.BorderStyle = System.Windows.Forms.BorderStyle.None;
             this.dgvPuzzle.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dgvPuzzle.ContextMenuStrip = this.cmsPuzzleGrid;
             this.dgvPuzzle.Location = new System.Drawing.Point(321, 43);
             this.dgvPuzzle.MultiSelect = false;
             this.dgvPuzzle.Name = "dgvPuzzle";
@@ -337,6 +341,7 @@
             this.dgvPuzzle.TabIndex = 2;
             this.dgvPuzzle.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellClick);
             this.dgvPuzzle.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellDoubleClick);
+            this.dgvPuzzle.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellMouseEnter);
             this.dgvPuzzle.Resize += new System.EventHandler(this.dgvPuzzle_Resize);
             // 
             // lblClues
@@ -463,6 +468,20 @@
             this.flpClues.Size = new System.Drawing.Size(306, 293);
             this.flpClues.TabIndex = 11;
             // 
+            // cmsPuzzleGrid
+            // 
+            this.cmsPuzzleGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsClearCell});
+            this.cmsPuzzleGrid.Name = "cmsPuzzleGrid";
+            this.cmsPuzzleGrid.Size = new System.Drawing.Size(181, 48);
+            // 
+            // tsClearCell
+            // 
+            this.tsClearCell.Name = "tsClearCell";
+            this.tsClearCell.Size = new System.Drawing.Size(180, 22);
+            this.tsClearCell.Text = "Clear Cell";
+            this.tsClearCell.Click += new System.EventHandler(this.tsClearCell_Click);
+            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -492,6 +511,7 @@
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).EndInit();
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
+            this.cmsPuzzleGrid.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -546,6 +566,8 @@
         private System.Windows.Forms.ToolStripMenuItem emptyGridToolStripMenuItem1;
         private System.Windows.Forms.ToolStripMenuItem gridWithAnswersToolStripMenuItem1;
         private System.Windows.Forms.FlowLayoutPanel flpClues;
+        private System.Windows.Forms.ContextMenuStrip cmsPuzzleGrid;
+        private System.Windows.Forms.ToolStripMenuItem tsClearCell;
     }
 }
 

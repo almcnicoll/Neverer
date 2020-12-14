@@ -34,7 +34,7 @@ namespace Neverer.UtilityClass
                 case ClueStatus.MatchingWordWithQuestion:
                     return Color.CornflowerBlue;
                 case ClueStatus.NoMatchingWordComplete:
-                    return Color.CornflowerBlue;
+                    return Color.LightSlateGray;
                 default:
                     return Color.FromKnownColor(KnownColor.Control);
             }
@@ -50,13 +50,19 @@ namespace Neverer.UtilityClass
         private ClueStatus __status = ClueStatus.Unknown;
         private SerializableDictionary<String, List<String>> __matches = new SerializableDictionary<String, List<String>>();
         private bool __uncheckedChanges = true;
+        private bool __pauseEvents = false;
+
+        public static int GetOrder(int row, int col)
+        {
+            return (row * 1000) + col;
+        }
 
         // Properties
         public int order
         {
             get
             {
-                return (y * 1000) + x;
+                return PlacedClue.GetOrder(y, x);
             }
         }
 
@@ -94,45 +100,51 @@ namespace Neverer.UtilityClass
             }
         }
 
+        public void recalculateStatus()
+        {
+            if (clue.answer.Contains("?"))
+            {
+                if ((Matches == null) || (Matches.Count == 0))
+                {
+                    __status = ClueStatus.NoMatchingWord;
+                }
+                else if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
+                {
+                    __status = ClueStatus.MatchingWordNoQuestion;
+                }
+                else
+                {
+                    __status = ClueStatus.MatchingWordWithQuestion;
+                }
+            }
+            else
+            {
+                if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
+                {
+                    __status = ClueStatus.MatchingWordNoQuestion;
+                }
+                else
+                {
+                    if ((Matches == null) || (Matches.Count == 0))
+                    {
+                        __status = ClueStatus.NoMatchingWordComplete;
+                    }
+                    else
+                    {
+                        __status = ClueStatus.MatchingWordWithQuestion;
+                    }
+                }
+            }
+            Changed();
+        }
+
         public ClueStatus status
         {
             get
             {
                 if (__status == ClueStatus.Unknown)
                 {
-                    if (clue.answer.Contains("?"))
-                    {
-                        if ((Matches == null) || (Matches.Count == 0))
-                        {
-                            __status = ClueStatus.NoMatchingWord;
-                        }
-                        else if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
-                        {
-                            __status = ClueStatus.MatchingWordNoQuestion;
-                        }
-                        else
-                        {
-                            __status = ClueStatus.MatchingWordWithQuestion;
-                        }
-                    }
-                    else
-                    {
-                        if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
-                        {
-                            __status = ClueStatus.MatchingWordNoQuestion;
-                        }
-                        else
-                        {
-                            if ((Matches == null) || (Matches.Count == 0))
-                            {
-                                __status = ClueStatus.NoMatchingWordComplete;
-                            }
-                            else
-                            {
-                                __status = ClueStatus.MatchingWordWithQuestion;
-                            }
-                        }
-                    }
+                    recalculateStatus();
                 }
                 return __status;
             }
@@ -142,8 +154,9 @@ namespace Neverer.UtilityClass
                 {
                     if (value == ClueStatus.Unknown) { return; }
                     __status = value;
-                    EventHandler<ClueStatusChangedEventArgs> evt = ClueStatusChanged;
-                    if (evt != null) { evt(this, new ClueStatusChangedEventArgs(value)); }
+                    //EventHandler<ClueStatusChangedEventArgs> evt = ClueStatusChanged;
+                    //if (evt != null) { evt(this, new ClueStatusChangedEventArgs(value)); }
+                    Changed();
                 }
             }
         }
@@ -163,9 +176,9 @@ namespace Neverer.UtilityClass
                 return __uncheckedChanges;
             }
         }
-        public void changesChecked()
+        public void changesChecked(bool isChecked = true)
         {
-            __uncheckedChanges = false;
+            __uncheckedChanges = !isChecked;
         }
 
 
@@ -186,8 +199,13 @@ namespace Neverer.UtilityClass
             // One universal place to register that the clue has changed
             //  and needs to bubble up an event.
             //  this includes when the base text of the clue changes
+
+            // __pauseEvents allows us to make multiple changes without triggering a repaint every time (use with caution!)
+            if (this.__pauseEvents) { return; }
+
+            // Trigger event, leading to repaint etc.
             if (e == null) { e = new ClueChangedEventArgs(false); }
-            if (!e.NoRecheck) { __uncheckedChanges = true; }
+            if (!e.NoRecheck) { this.__uncheckedChanges = true; }
             EventHandler<EventArgs> evt = ClueDefinitionChanged;
             if (evt != null) { evt(this, new EventArgs()); }
         }
@@ -200,6 +218,7 @@ namespace Neverer.UtilityClass
         }
         public void CopyTo(PlacedClue pcDest)
         {
+            pcDest.__pauseEvents = true; // Don't repaint on every property-copy
             pcDest.orientation = orientation;
             pcDest.placeNumber = __placeNumber;
             pcDest.__UniqueID = __UniqueID;
@@ -207,6 +226,7 @@ namespace Neverer.UtilityClass
             pcDest.x = x;
             pcDest.y = y;
             pcDest.status = status;
+            pcDest.__pauseEvents = false;
             clue.CopyTo(pcDest.clue);
             pcDest.Changed();
         }
