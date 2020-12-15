@@ -61,6 +61,9 @@
             this.cmsClueClick = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.addToDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgvPuzzle = new System.Windows.Forms.DataGridView();
+            this.cmsPuzzleGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.tsClearCell = new System.Windows.Forms.ToolStripMenuItem();
+            this.newClueHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblClues = new System.Windows.Forms.Label();
             this.lblGrid = new System.Windows.Forms.Label();
             this.cmdAddClue = new System.Windows.Forms.Button();
@@ -76,13 +79,11 @@
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
-            this.cmsPuzzleGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.tsClearCell = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
-            this.statusStrip1.SuspendLayout();
             this.cmsPuzzleGrid.SuspendLayout();
+            this.statusStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
             // msMain
@@ -342,7 +343,30 @@
             this.dgvPuzzle.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellClick);
             this.dgvPuzzle.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellDoubleClick);
             this.dgvPuzzle.CellMouseEnter += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellMouseEnter);
+            this.dgvPuzzle.CellMouseLeave += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPuzzle_CellMouseLeave);
             this.dgvPuzzle.Resize += new System.EventHandler(this.dgvPuzzle_Resize);
+            // 
+            // cmsPuzzleGrid
+            // 
+            this.cmsPuzzleGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.tsClearCell,
+            this.newClueHereToolStripMenuItem});
+            this.cmsPuzzleGrid.Name = "cmsPuzzleGrid";
+            this.cmsPuzzleGrid.Size = new System.Drawing.Size(154, 48);
+            // 
+            // tsClearCell
+            // 
+            this.tsClearCell.Name = "tsClearCell";
+            this.tsClearCell.Size = new System.Drawing.Size(153, 22);
+            this.tsClearCell.Text = "C&lear Cell";
+            this.tsClearCell.Click += new System.EventHandler(this.tsClearCell_Click);
+            // 
+            // newClueHereToolStripMenuItem
+            // 
+            this.newClueHereToolStripMenuItem.Name = "newClueHereToolStripMenuItem";
+            this.newClueHereToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
+            this.newClueHereToolStripMenuItem.Text = "New Clue &Here";
+            this.newClueHereToolStripMenuItem.Click += new System.EventHandler(this.newClueHereToolStripMenuItem_Click);
             // 
             // lblClues
             // 
@@ -468,20 +492,6 @@
             this.flpClues.Size = new System.Drawing.Size(306, 293);
             this.flpClues.TabIndex = 11;
             // 
-            // cmsPuzzleGrid
-            // 
-            this.cmsPuzzleGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.tsClearCell});
-            this.cmsPuzzleGrid.Name = "cmsPuzzleGrid";
-            this.cmsPuzzleGrid.Size = new System.Drawing.Size(181, 48);
-            // 
-            // tsClearCell
-            // 
-            this.tsClearCell.Name = "tsClearCell";
-            this.tsClearCell.Size = new System.Drawing.Size(180, 22);
-            this.tsClearCell.Text = "Clear Cell";
-            this.tsClearCell.Click += new System.EventHandler(this.tsClearCell_Click);
-            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -509,9 +519,9 @@
             this.msMain.PerformLayout();
             this.cmsClueClick.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).EndInit();
+            this.cmsPuzzleGrid.ResumeLayout(false);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
-            this.cmsPuzzleGrid.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -568,6 +578,7 @@
         private System.Windows.Forms.FlowLayoutPanel flpClues;
         private System.Windows.Forms.ContextMenuStrip cmsPuzzleGrid;
         private System.Windows.Forms.ToolStripMenuItem tsClearCell;
+        private System.Windows.Forms.ToolStripMenuItem newClueHereToolStripMenuItem;
     }
 }
 

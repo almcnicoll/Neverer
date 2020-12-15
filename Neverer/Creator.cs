@@ -44,6 +44,8 @@ namespace Neverer
         {
             InitializeComponent();
 
+            // Optimize painting to avoid flicker
+            this.SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer | System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
 #if (DEBUG == false)
             dlgOpen.InitialDirectory = Application.StartupPath;
             dlgSave.InitialDirectory = Application.StartupPath;
@@ -288,21 +290,6 @@ namespace Neverer
             foreach (DataGridViewRow dgvr in dgvPuzzle.Rows) { dgvr.Height = __minDimension; }
         }
 
-        /*private void UpdateClueGrid(PlacedClue LastClue = null)
-        {
-            // TODO - this function seems obsolete now - check if that's true
-            // All functionality related to dgvClues (but may need applying to flpClues?)
-            // If we don't specify a last clue, check if anything selected
-            if (LastClue == null)
-            {
-                ClueDisplay cdSelected = GetSelectedClue();
-                if (cdSelected != null)
-                {
-                    LastClue = cdSelected.Clue;
-                }
-            }
-        }*/
-
         private void UpdatePreviewGrid()
         {
             // TODO - This seems a slow & inefficient way to process changes, especially where the change is just a selection change
@@ -318,15 +305,6 @@ namespace Neverer
             {
                 pc = cd.Clue;
             }
-            /*if (dgvClues.SelectedCells == null || dgvClues.SelectedCells.Count == 0)
-            {
-                pc = null;
-            }
-            else
-            {
-                int row = dgvClues.SelectedCells[0].RowIndex;
-                pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
-            }*/
 
             String[,] ga = GridArray;
 
@@ -487,8 +465,6 @@ namespace Neverer
 
         private void ClueDisplay_MouseClick(object sender, MouseEventArgs e)
         {
-            // TODO - select clue on crossword when selected in clue list
-            // TODO - lose dgvClues and associated code when this is complete
             if (sender is ClueDisplay)
             {
                 ClueDisplay cdClicked = (ClueDisplay)sender;
@@ -735,11 +711,6 @@ namespace Neverer
             TryClueEdit();
         }
 
-        private void dgvClues_CellMouseDoubleClick(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            TryClueEdit();
-        }
-
         private void TryClueAdd(int x = 1, int y = 1)
         {
             List<PlacedClue> added = new List<PlacedClue>();
@@ -843,16 +814,6 @@ namespace Neverer
                 return;
             }
             PlacedClue pc = cdSelected.Clue;
-            /*
-            // (old) selection method - DataGridView
-            if (dgvClues.SelectedCells == null || dgvClues.SelectedCells.Count == 0)
-            {
-                MessageBox.Show("You must select a clue to edit", "Edit Clue", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                return;
-            }
-            int row = dgvClues.SelectedCells[0].RowIndex;
-            PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
-            */
 
             // pc is template, pcTmp is the edited clone
             PlacedClue pcTmp = getClue(pc);
@@ -910,26 +871,9 @@ namespace Neverer
             unsavedChanges = true;
         }
 
-        private void dgvClues_SelectionChanged(object sender, EventArgs e)
-        {
-            UpdatePreviewGrid();
-        }
-
         private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Application.Exit();
-        }
-
-        private void dgvClues_KeyDown(object sender, KeyEventArgs e)
-        {
-            switch (e.KeyCode)
-            {
-                case Keys.Enter:
-                    e.Handled = true;
-                    e.SuppressKeyPress = true;
-                    TryClueEdit();
-                    break;
-            }
         }
 
         private bool SelectClueFromGridPos(int x, int y)
@@ -939,7 +883,6 @@ namespace Neverer
                 if (pc.Overlaps(x, y))
                 {
                     foreach (Control ctrl in flpClues.Controls)
-                    //foreach (DataGridViewRow dgvr in dgvClues.Rows)
                     {
                         if (ctrl is ClueDisplay)
                         {
@@ -974,6 +917,8 @@ namespace Neverer
         {
             __mouseCol = e.ColumnIndex;
             __mouseRow = e.RowIndex;
+            dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag = dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor;
+            dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = Color.FromKnownColor(KnownColor.Yellow);
         }
 
         private void dgvPuzzle_CellClick(object sender, DataGridViewCellEventArgs e)
@@ -1571,10 +1516,6 @@ namespace Neverer
 
         private void addToDictionaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            // Check if the clue is valid to be added
-            //int row = dgvClues.SelectedCells[0].RowIndex;
-            //PlacedClue pc = ((PlacedClue)dgvClues.Rows[row].DataBoundItem);
-
             // Get selected clue
             ClueDisplay cdSelected = GetSelectedClue();
             if (cdSelected == null)
@@ -1842,6 +1783,20 @@ namespace Neverer
                 }
             }
             UpdatePreviewGrid();
+        }
+
+        private void newClueHereToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TryClueAdd(__mouseCol, __mouseRow);
+        }
+
+        private void dgvPuzzle_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            try
+            {
+                dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = (System.Drawing.Color)dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag;
+            }
+            catch { }
         }
     }
 }
