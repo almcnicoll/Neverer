@@ -1,15 +1,11 @@
-﻿using System;
+﻿using Neverer.UtilityClass;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Text.RegularExpressions;
-using Neverer.UtilityClass;
 using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
+using System.Windows.Forms;
 
 namespace Neverer
 {
@@ -24,7 +20,27 @@ namespace Neverer
             InitializeComponent();
         }
 
+        public RegexSearcher(Creator callingForm, Clue clue)
+        {
+            this.__callingForm = callingForm;
+            InitializeComponent();
+            if (clue == null)
+            {
+                this.txtSearchPattern.Text = "";
+            }
+            else
+            {
+                this.txtSearchPattern.Text = clue.regExp.ToString();
+                runSearch();
+            }
+        }
+
         private void cmdSearch_Click(object sender, EventArgs e)
+        {
+            runSearch();
+        }
+
+        private void runSearch()
         {
             String pattern = txtSearchPattern.Text;
             String patternError = "Unknown error in search pattern";

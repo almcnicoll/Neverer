@@ -248,6 +248,10 @@ namespace Neverer
                 return allLetters;
             }
         }
+
+        /// <summary>
+        /// Sets up or resets the crossword preview grid
+        /// </summary>
         public void SetupGrid()
         {
             // Set up columns and rows
@@ -439,6 +443,10 @@ namespace Neverer
             }
         }
 
+        /// <summary>
+        /// Selects the requested clue from the clue list, and deselects all others, then scrolls it into view
+        /// </summary>
+        /// <param name="clueDisplay"></param>
         private void SelectOnly(ClueDisplay clueDisplay)
         {
             foreach (ClueDisplay cdLoop in flpClues.Controls)
@@ -446,6 +454,7 @@ namespace Neverer
                 cdLoop.Selected = false;
             }
             clueDisplay.Selected = true;
+            flpClues.ScrollControlIntoView(clueDisplay);
             UpdatePreviewGrid();
         }
 
@@ -502,6 +511,11 @@ namespace Neverer
             SetBoxSize();
         }
 
+        /// <summary>
+        /// Creates a new crossword, prompting first if the current crossword has unsaved changes
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void newToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (unsavedChanges)
@@ -876,6 +890,12 @@ namespace Neverer
             Application.Exit();
         }
 
+        /// <summary>
+        /// Selects the clue intersecting with the supplied co-ordinates. If there are two, the second is selected.
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns>True if an intersecting clue was found and selected, otherwise False</returns>
         private bool SelectClueFromGridPos(int x, int y)
         {
             foreach (PlacedClue pc in this.crossword.placedClues)
@@ -1613,6 +1633,12 @@ namespace Neverer
                 bwDictionaryChecker.RunWorkerAsync();
             }
         }
+
+        /// <summary>
+        /// Run checks on clues in the background, looking for possible solutions
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void bwDictionaryChecker_DoWork(object sender, DoWorkEventArgs e)
         {
             while (__cluesToCheck) // Stays in loop so long as we keep changing stuff in the UI
@@ -1662,7 +1688,7 @@ namespace Neverer
                     }
 
                     // Create regular expression
-                    Regex reWord = new Regex(
+                    Regex reWord = pc.clue.regExp; /*new Regex(
                         "^"
                         + Regex.Replace(
                             pc.clue.answer.Replace("?", ".")
@@ -1670,7 +1696,7 @@ namespace Neverer
                             , "$0[" + Clue.NonCountingChars_Regex + "]*"
                         )
                         + "$"
-                    , RegexOptions.IgnoreCase);
+                    , RegexOptions.IgnoreCase);*/
 
                     // Clear any existing matches
                     pc.clearMatches();
@@ -1797,6 +1823,32 @@ namespace Neverer
                 dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = (System.Drawing.Color)dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag;
             }
             catch { }
+        }
+
+        /// <summary>
+        /// Loads a new regex searcher based on each clue intersecting with the selected cell, or a blank searcher if black cell chosen
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void regexSearchHereToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            List<RegexSearcher> allRE = new List<RegexSearcher>();
+
+            List<PlacedClue> matchingClues = FindCluesFromGridPos(__mouseCol, __mouseRow);
+            if ((matchingClues == null) || (matchingClues.Count == 0))
+            {
+                allRE.Add(new RegexSearcher(this, null));
+                allRE[0].Show();
+            }
+            else
+            {
+                foreach (PlacedClue pc in matchingClues)
+                {
+                    RegexSearcher re = new RegexSearcher(this, pc.clue);
+                    allRE.Add(re);
+                    re.Show();
+                }
+            }
         }
     }
 }

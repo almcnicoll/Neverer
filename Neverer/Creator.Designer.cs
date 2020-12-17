@@ -79,6 +79,9 @@
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
+            this.regexSearchHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
             this.msMain.SuspendLayout();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
@@ -349,23 +352,26 @@
             // cmsPuzzleGrid
             // 
             this.cmsPuzzleGrid.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.newClueHereToolStripMenuItem,
+            this.toolStripSeparator7,
             this.tsClearCell,
-            this.newClueHereToolStripMenuItem});
+            this.toolStripSeparator6,
+            this.regexSearchHereToolStripMenuItem});
             this.cmsPuzzleGrid.Name = "cmsPuzzleGrid";
-            this.cmsPuzzleGrid.Size = new System.Drawing.Size(154, 48);
+            this.cmsPuzzleGrid.Size = new System.Drawing.Size(213, 104);
             // 
             // tsClearCell
             // 
             this.tsClearCell.Name = "tsClearCell";
-            this.tsClearCell.Size = new System.Drawing.Size(153, 22);
+            this.tsClearCell.Size = new System.Drawing.Size(212, 22);
             this.tsClearCell.Text = "C&lear Cell";
             this.tsClearCell.Click += new System.EventHandler(this.tsClearCell_Click);
             // 
             // newClueHereToolStripMenuItem
             // 
             this.newClueHereToolStripMenuItem.Name = "newClueHereToolStripMenuItem";
-            this.newClueHereToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.newClueHereToolStripMenuItem.Text = "New Clue &Here";
+            this.newClueHereToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.newClueHereToolStripMenuItem.Text = "New Clue &Here...";
             this.newClueHereToolStripMenuItem.Click += new System.EventHandler(this.newClueHereToolStripMenuItem_Click);
             // 
             // lblClues
@@ -492,6 +498,23 @@
             this.flpClues.Size = new System.Drawing.Size(306, 293);
             this.flpClues.TabIndex = 11;
             // 
+            // regexSearchHereToolStripMenuItem
+            // 
+            this.regexSearchHereToolStripMenuItem.Name = "regexSearchHereToolStripMenuItem";
+            this.regexSearchHereToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.regexSearchHereToolStripMenuItem.Text = "Rege&x Search From Here...";
+            this.regexSearchHereToolStripMenuItem.Click += new System.EventHandler(this.regexSearchHereToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator6
+            // 
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(209, 6);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(209, 6);
+            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -579,6 +602,9 @@
         private System.Windows.Forms.ContextMenuStrip cmsPuzzleGrid;
         private System.Windows.Forms.ToolStripMenuItem tsClearCell;
         private System.Windows.Forms.ToolStripMenuItem newClueHereToolStripMenuItem;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
+        private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
+        private System.Windows.Forms.ToolStripMenuItem regexSearchHereToolStripMenuItem;
     }
 }
 

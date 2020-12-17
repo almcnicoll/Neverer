@@ -11,7 +11,7 @@ namespace Neverer.UtilityClass
     public class Clue
     {
         public const String BlankQuestion = "[blank clue]";
-        public static readonly String[] NonCountingChars = new String[] { " ", "-" };
+        public static readonly String[] NonCountingChars = new String[] { " ", "-", "'" };
         public static String NonCountingChars_Regex
         {
             get
@@ -53,6 +53,21 @@ namespace Neverer.UtilityClass
             {
                 regex.Regex reStrip = new regex.Regex("[^A-Za-z?]+");
                 return reStrip.Replace(__answer, "");
+            }
+        }
+        public regex.Regex regExp
+        {
+            get
+            {
+                return new regex.Regex(
+                        "^"
+                        + regex.Regex.Replace(
+                            this.answer.Replace("?", ".")
+                            , "."
+                            , "$0[" + Clue.NonCountingChars_Regex + "]*"
+                        )
+                        + "$"
+                    , regex.RegexOptions.IgnoreCase);
             }
         }
 

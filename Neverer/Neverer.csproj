@@ -27,8 +27,8 @@
     <InstallUrl>http://almcnicoll.co.uk/neverer/install/</InstallUrl>
     <CreateWebPageOnPublish>true</CreateWebPageOnPublish>
     <WebPage>publish.htm</WebPage>
-    <ApplicationRevision>4</ApplicationRevision>
-    <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
+    <ApplicationRevision>1</ApplicationRevision>
+    <ApplicationVersion>1.1.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
     <PublishWizardCompleted>true</PublishWizardCompleted>
     <BootstrapperEnabled>true</BootstrapperEnabled>
@@ -209,10 +209,10 @@
     <PublishFile Include="Resources\sowpods.txt">
       <Visible>False</Visible>
       <Group>Dictionaries</Group>
-      <TargetPath>
-      </TargetPath>
       <PublishState>Auto</PublishState>
       <IncludeHash>True</IncludeHash>
+      <TargetPath>
+      </TargetPath>
       <FileType>File</FileType>
     </PublishFile>
   </ItemGroup>
