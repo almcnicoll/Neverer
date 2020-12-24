@@ -121,11 +121,19 @@ namespace Neverer.UtilityClass
         [XmlIgnore()]
         public Guid id { get; set; }
 
-        public Clue blankClone()
+        public Clue blankClone(bool makeContiguous = true)
         {
             Clue c = new Clue();
-            regex.Regex reAllQuestionMarks = new regex.Regex("[^? -]");
-            c.answer = reAllQuestionMarks.Replace(answer, "?");
+            // Replace everything that's a letter with a question-mark
+            regex.Regex reAllQuestionMarks = new regex.Regex(String.Format("[^?{0}]", String.Join("", NonCountingChars)));
+            c.answer = reAllQuestionMarks.Replace(this.answer, "?");
+            if (makeContiguous)
+            {
+                // Lose any dividers (space, hyphen, etc.)
+                regex.Regex reNoDividers= new regex.Regex("[^?]");
+                c.answer = reNoDividers.Replace(c.answer, "");
+            }
+            // Make question blank
             c.question = BlankQuestion;
             return c;
         }

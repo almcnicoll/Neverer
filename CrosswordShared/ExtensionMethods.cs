@@ -209,6 +209,29 @@ namespace Neverer
             writer.RenderTagContents(tag);
             writer.CloseTag(tag);
         }
+
+        /// <summary>
+        /// Updates the dictionary entry if key exists, otherwise adds it
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="U"></typeparam>
+        /// <param name="dict"></param>
+        /// <param name="key"></param>
+        /// <param name="value"></param>
+        /// <returns>true if key added, false if key updated</returns>
+        public static Boolean AddOrUpdate<T, U>(this Dictionary<T, U> dict, T key, U value)
+        {
+            if (dict.ContainsKey(key))
+            {
+                dict[key] = value;
+                return false;
+            }
+            else
+            {
+                dict.Add(key, value);
+                return true;
+            }
+        }
     }
 
     /// <summary>

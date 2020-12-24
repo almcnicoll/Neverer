@@ -37,7 +37,7 @@ namespace CrosswordControls
             }
             set
             {
-                lblClueNumber.Text = value;
+                lblClueNumber.Text = value; // TODO - cross-thread error happening here
             }
         }
 

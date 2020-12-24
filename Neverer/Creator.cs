@@ -187,6 +187,10 @@ namespace Neverer
                             for (var i = 0; i < pc.clue.length; i++)
                             {
                                 int xx = pc.x + i; int yy = pc.y;
+                                // Failsafe - shouldn't happen, but occasionally we get a clue trying to display out of bounds
+                                if (xx>=crossword.cols) { continue; }
+                                if (yy >= crossword.rows) { continue; }
+                                // Now populate grid
                                 if (allLetters[xx, yy] == "")
                                 {
                                     allLetters[xx, yy] += pc.clue.letters[i].ToString();
@@ -727,6 +731,9 @@ namespace Neverer
 
         private void TryClueAdd(int x = 1, int y = 1)
         {
+            // TODO - refresh clue display on clue delete
+            // TODO - when mirror clue created, get rid of spaces etc.
+
             List<PlacedClue> added = new List<PlacedClue>();
             PlacedClue pc = getClue(x, y);
             if (pc != null)
@@ -1849,6 +1856,13 @@ namespace Neverer
                     re.Show();
                 }
             }
+        }
+
+        private void intersectionsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Statistics frmStats = new Statistics(this);
+            frmStats.tabCtrl.SelectTab(frmStats.tpIntersections);
+            frmStats.ShowDialog();
         }
     }
 }

@@ -62,8 +62,11 @@
             this.addToDictionaryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.dgvPuzzle = new System.Windows.Forms.DataGridView();
             this.cmsPuzzleGrid = new System.Windows.Forms.ContextMenuStrip(this.components);
-            this.tsClearCell = new System.Windows.Forms.ToolStripMenuItem();
             this.newClueHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.tsClearCell = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
+            this.regexSearchHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.lblClues = new System.Windows.Forms.Label();
             this.lblGrid = new System.Windows.Forms.Label();
             this.cmdAddClue = new System.Windows.Forms.Button();
@@ -79,9 +82,8 @@
             this.timerMessageReset = new System.Windows.Forms.Timer(this.components);
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
-            this.regexSearchHereToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator6 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
+            this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.intersectionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
@@ -94,6 +96,7 @@
             this.msMain.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.fileToolStripMenuItem,
             this.toolsToolStripMenuItem,
+            this.statsToolStripMenuItem,
             this.helpToolStripMenuItem});
             this.msMain.Location = new System.Drawing.Point(0, 0);
             this.msMain.Name = "msMain";
@@ -358,7 +361,19 @@
             this.toolStripSeparator6,
             this.regexSearchHereToolStripMenuItem});
             this.cmsPuzzleGrid.Name = "cmsPuzzleGrid";
-            this.cmsPuzzleGrid.Size = new System.Drawing.Size(213, 104);
+            this.cmsPuzzleGrid.Size = new System.Drawing.Size(213, 82);
+            // 
+            // newClueHereToolStripMenuItem
+            // 
+            this.newClueHereToolStripMenuItem.Name = "newClueHereToolStripMenuItem";
+            this.newClueHereToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.newClueHereToolStripMenuItem.Text = "New Clue &Here...";
+            this.newClueHereToolStripMenuItem.Click += new System.EventHandler(this.newClueHereToolStripMenuItem_Click);
+            // 
+            // toolStripSeparator7
+            // 
+            this.toolStripSeparator7.Name = "toolStripSeparator7";
+            this.toolStripSeparator7.Size = new System.Drawing.Size(209, 6);
             // 
             // tsClearCell
             // 
@@ -367,12 +382,17 @@
             this.tsClearCell.Text = "C&lear Cell";
             this.tsClearCell.Click += new System.EventHandler(this.tsClearCell_Click);
             // 
-            // newClueHereToolStripMenuItem
+            // toolStripSeparator6
             // 
-            this.newClueHereToolStripMenuItem.Name = "newClueHereToolStripMenuItem";
-            this.newClueHereToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
-            this.newClueHereToolStripMenuItem.Text = "New Clue &Here...";
-            this.newClueHereToolStripMenuItem.Click += new System.EventHandler(this.newClueHereToolStripMenuItem_Click);
+            this.toolStripSeparator6.Name = "toolStripSeparator6";
+            this.toolStripSeparator6.Size = new System.Drawing.Size(209, 6);
+            // 
+            // regexSearchHereToolStripMenuItem
+            // 
+            this.regexSearchHereToolStripMenuItem.Name = "regexSearchHereToolStripMenuItem";
+            this.regexSearchHereToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
+            this.regexSearchHereToolStripMenuItem.Text = "Rege&x Search From Here...";
+            this.regexSearchHereToolStripMenuItem.Click += new System.EventHandler(this.regexSearchHereToolStripMenuItem_Click);
             // 
             // lblClues
             // 
@@ -498,22 +518,20 @@
             this.flpClues.Size = new System.Drawing.Size(306, 293);
             this.flpClues.TabIndex = 11;
             // 
-            // regexSearchHereToolStripMenuItem
+            // statsToolStripMenuItem
             // 
-            this.regexSearchHereToolStripMenuItem.Name = "regexSearchHereToolStripMenuItem";
-            this.regexSearchHereToolStripMenuItem.Size = new System.Drawing.Size(212, 22);
-            this.regexSearchHereToolStripMenuItem.Text = "Rege&x Search From Here...";
-            this.regexSearchHereToolStripMenuItem.Click += new System.EventHandler(this.regexSearchHereToolStripMenuItem_Click);
+            this.statsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.intersectionsToolStripMenuItem});
+            this.statsToolStripMenuItem.Name = "statsToolStripMenuItem";
+            this.statsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
+            this.statsToolStripMenuItem.Text = "&Stats";
             // 
-            // toolStripSeparator6
+            // intersectionsToolStripMenuItem
             // 
-            this.toolStripSeparator6.Name = "toolStripSeparator6";
-            this.toolStripSeparator6.Size = new System.Drawing.Size(209, 6);
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(209, 6);
+            this.intersectionsToolStripMenuItem.Name = "intersectionsToolStripMenuItem";
+            this.intersectionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.intersectionsToolStripMenuItem.Text = "&Intersections";
+            this.intersectionsToolStripMenuItem.Click += new System.EventHandler(this.intersectionsToolStripMenuItem_Click);
             // 
             // Creator
             // 
@@ -605,6 +623,8 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
         private System.Windows.Forms.ToolStripMenuItem regexSearchHereToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem statsToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem intersectionsToolStripMenuItem;
     }
 }
 
