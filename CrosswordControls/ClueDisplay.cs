@@ -13,6 +13,64 @@ namespace CrosswordControls
         private bool __Selected = false;
         private String __clueText = "";
 
+        public void lblClueNumber_SetText(String value)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<String>(lblClueNumber_SetText), value);
+                return;
+            }
+            lblClueNumber.Text = value;
+        }
+        public void lblClueText_SetText(String value)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<String>(lblClueText_SetText), value);
+                return;
+            }
+            lblClueText.Text = value;
+        }
+        public void lblClueNumber_SetFont(Font value)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<Font>(lblClueNumber_SetFont), value);
+                return;
+            }
+            lblClueNumber.Font = value;
+        }
+        public void lblClueText_SetFont(Font value)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<Font>(lblClueText_SetFont), value);
+                return;
+            }
+            lblClueText.Font = value;
+        }
+        public void lblClueNumber_SetColors(Color value)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<Color>(lblClueNumber_SetColors), value);
+                return;
+            }
+            tlpMaster.BackColor = value;
+            lblClueNumber.BackColor = value;
+            lblClueText.BackColor = value;
+            this.BackColor = value;
+        }
+        public void chkRowSelect_SetChecked(Boolean value)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<Boolean>(chkRowSelect_SetChecked), value);
+                return;
+            }
+            chkRowSelect.Checked = value;
+        }
+
         public Color StatusColor
         {
             get
@@ -22,10 +80,7 @@ namespace CrosswordControls
             set
             {
                 __StatusColor = value;
-                tlpMaster.BackColor = __StatusColor;
-                lblClueNumber.BackColor = __StatusColor;
-                lblClueText.BackColor = __StatusColor;
-                this.BackColor = __StatusColor;
+                lblClueNumber_SetColors(value);
             }
         }
 
@@ -37,7 +92,8 @@ namespace CrosswordControls
             }
             set
             {
-                lblClueNumber.Text = value; // TODO - cross-thread error happening here
+                //lblClueNumber.Text = value; // TODO - cross-thread error happening here
+                lblClueNumber_SetText(value);
             }
         }
 
@@ -50,7 +106,7 @@ namespace CrosswordControls
             set
             {
                 __clueText = value;
-                lblClueText.Text = value;
+                lblClueText_SetText(value);
             }
         }
 
@@ -80,15 +136,16 @@ namespace CrosswordControls
             set
             {
                 __Selected = value;
-                chkRowSelect.Checked = __Selected;
+                chkRowSelect_SetChecked(__Selected);
                 if (__Selected)
                 {
-                    lblClueNumber.Font = new Font(lblClueNumber.Font, FontStyle.Bold);
-                    lblClueText.Font = new Font(lblClueText.Font, FontStyle.Bold);
-                } else
+                    lblClueNumber_SetFont(new Font(lblClueNumber.Font, FontStyle.Bold));
+                    lblClueText_SetFont(new Font(lblClueText.Font, FontStyle.Bold));
+                }
+                else
                 {
-                    lblClueNumber.Font = new Font(lblClueNumber.Font, FontStyle.Regular);
-                    lblClueText.Font = new Font(lblClueText.Font, FontStyle.Regular);
+                    lblClueNumber_SetFont(new Font(lblClueNumber.Font, FontStyle.Regular));
+                    lblClueText_SetFont(new Font(lblClueText.Font, FontStyle.Regular));
                 }
             }
         }
@@ -109,22 +166,6 @@ namespace CrosswordControls
         {
             InitializeComponent();
         }
-
-
-        /*private void lblClueNumber_Click(object sender, EventArgs e)
-        {
-            InvokeOnClick(this, e);
-        }
-
-        private void lblClueText_Click(object sender, EventArgs e)
-        {
-            InvokeOnClick(this, e);
-        }
-
-        private void chkRowSelect_Click(object sender, EventArgs e)
-        {
-            InvokeOnClick(this, e);
-        }*/
 
         private void lblClueText_DoubleClick(object sender, EventArgs e)
         {

@@ -300,7 +300,6 @@ namespace Neverer
 
         private void UpdatePreviewGrid()
         {
-            // TODO - This seems a slow & inefficient way to process changes, especially where the change is just a selection change
             this.Cursor = Cursors.WaitCursor;
             dgvPuzzle.SuspendLayout();
             ClueDisplay cd = GetSelectedClue();
@@ -731,9 +730,6 @@ namespace Neverer
 
         private void TryClueAdd(int x = 1, int y = 1)
         {
-            // TODO - refresh clue display on clue delete
-            // TODO - when mirror clue created, get rid of spaces etc.
-
             List<PlacedClue> added = new List<PlacedClue>();
             PlacedClue pc = getClue(x, y);
             if (pc != null)
@@ -841,22 +837,12 @@ namespace Neverer
             if (pcTmp != null)
             {
                 // Copy to original PlacedClue entry, to update crossword object and clue list
-                pcTmp.CopyTo(pc); // TODO - test this line for ClueDisplay usage
+                pcTmp.CopyTo(pc); // TODO - test this line for ClueDisplay usage (I'm not sure what this comment means any more)
                 //var junk = crossword.sortedClueList; // TODO - test this line for ClueDisplay usage
 
                 pc.status = ClueStatus.Unknown;
                 pc.changesChecked(false);
 
-                /*foreach (PlacedClue pcLoop in crossword.placedClues)
-                {
-                    if (pcLoop.UniqueID == pc.UniqueID)
-                    {
-                        // Copy values across, but set status to "Unknown" so we reevaluate it
-                        pcTmp.status = ClueStatus.Unknown;
-                        pcTmp.CopyTo(pcLoop);
-                        pcLoop.status = ClueStatus.Unknown;
-                    }
-                }*/
                 unsavedChanges = true;
                 ClueChanged("", new PlacedClueChangedEventArgs(pc));
             }
@@ -889,6 +875,7 @@ namespace Neverer
                     crossword.placedClues.RemoveAt(i);
                 }
             }
+            UpdatePreviewGrid();
             unsavedChanges = true;
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
+using System.Reflection;
 
 namespace Neverer.UtilityClass
 {
@@ -185,6 +186,56 @@ namespace Neverer.UtilityClass
                 if (lookup.ContainsKey(o))
                 {
                     pc.placeNumber = lookup[o];
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates a clone of the current crossword
+        /// </summary>
+        /// <returns>Cloned <see cref="Crossword"/> object</returns>
+        public Crossword clone() {
+            // Produce a new crossword from the current one
+            Crossword c = new Crossword();
+            this.CopyTo(c);
+            return c;
+        }
+
+        /// <summary>
+        /// Copies the crossword to another crossword object, essentially creating a clone
+        /// </summary>
+        /// <param name="target">The target <see cref="Crossword"/> object of the copy operation</param>
+        public void CopyTo(Crossword target)
+        {
+            // TODO - check this works - when it does, we can use it for AutoSave functionality
+
+            // Copy everything from this crossword to the specified one
+            PropertyInfo[] properties = typeof(Crossword).GetProperties();
+            // Loop through all properties
+            foreach (PropertyInfo property in properties)
+            {
+                // Don't copy XmlIgnore properties or read-only properties
+                if (
+                    (!property.IsDefined(typeof(XmlIgnoreAttribute)))
+                    &&
+                    (property.CanWrite)
+                    )
+                {
+                    // Handle certain named properties differently, but by default just copy the values across
+                    switch (property.Name)
+                    {
+                        case "placedClues": // Deep-cloned copy, not refs to the original objects
+                            target.placedClues = new List<PlacedClue>();
+                            foreach(PlacedClue pc in this.placedClues)
+                            {
+                                target.placedClues.Add(pc.clone());
+                            }
+                            break;
+                        default:
+                            var pValue = property.GetValue(this);
+                            property.SetValue(target, pValue);
+                            break;
+                    }
                 }
             }
         }

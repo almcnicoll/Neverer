@@ -181,7 +181,6 @@ namespace Neverer.UtilityClass
             __uncheckedChanges = !isChecked;
         }
 
-
         // Events
         public event EventHandler<ClueStatusChangedEventArgs> ClueStatusChanged;
         public event EventHandler<EventArgs> ClueDefinitionChanged;
@@ -216,19 +215,34 @@ namespace Neverer.UtilityClass
                 return __UniqueID;
             }
         }
-        public void CopyTo(PlacedClue pcDest)
+
+        /// <summary>
+        /// Copies the <see cref="PlacedClue"/> object to another, essentially creating a clone
+        /// </summary>
+        /// <param name="target">The target <see cref="PlacedClue"/> object of the copy operation</param>
+        public void CopyTo(PlacedClue target)
         {
-            pcDest.__pauseEvents = true; // Don't repaint on every property-copy
-            pcDest.orientation = orientation;
-            pcDest.placeNumber = __placeNumber;
-            pcDest.__UniqueID = __UniqueID;
-            //pcDest.placeDescriptor = __placeDescriptor;
-            pcDest.x = x;
-            pcDest.y = y;
-            pcDest.status = status;
-            pcDest.__pauseEvents = false;
-            clue.CopyTo(pcDest.clue);
-            pcDest.Changed();
+            target.__pauseEvents = true; // Don't repaint on every property-copy
+            target.orientation = orientation;
+            target.placeNumber = __placeNumber;
+            target.__UniqueID = __UniqueID;
+            //target.placeDescriptor = __placeDescriptor;
+            target.x = x;
+            target.y = y;
+            target.status = status;
+            target.__pauseEvents = false;
+            clue.CopyTo(target.clue);
+            target.Changed();
+        }
+        /// <summary>
+        /// Creates a clone of the current clue
+        /// </summary>
+        /// <returns>Cloned <see cref="PlacedClue"/> object</returns>
+        public PlacedClue clone()
+        {
+            PlacedClue tmp = new PlacedClue();
+            this.CopyTo(tmp);
+            return tmp;
         }
 
         public bool Overlaps(int col, int row) // row & col are zero-based
