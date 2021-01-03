@@ -23,26 +23,36 @@ namespace Neverer.UtilityClass
 
     [Serializable()]
     //[XmlType(TypeName = "Neverer.UtilityClass.CrosswordDictionary")]
-    public class CrosswordDictionary //: SerializableDictionary<String, List<String>>
+    public class CrosswordDictionary : IWordSource
     {
+        // Constants
         public const String importSuffix = ".imported.dic";
 
-        public String fileName { get; set; }
-        public bool enabled { get; set; }
-        public SerializableDictionary<String, List<String>> entries { get; set; }
-        private DateTime? __lastUpdated = null;
-        public String dictionaryName { get; set; }
-
-        public DateTime lastUpdated
+        // Properties
+        public String FileName { get; set; }
+        public bool Enabled { get; set; }
+        public SerializableDictionary<String, List<String>> Entries { get; set; }
+        public IEnumerable<String> Keys
         {
             get
             {
-                if (!__lastUpdated.HasValue) { __lastUpdated = DateTime.Now; }
-                return __lastUpdated.Value;
+                return Entries.Keys;
+            }
+        }
+
+        private DateTime? __LastUpdated = null;
+        public String DictionaryName { get; set; }
+        
+        public DateTime LastUpdated
+        {
+            get
+            {
+                if (!__LastUpdated.HasValue) { __LastUpdated = DateTime.Now; }
+                return __LastUpdated.Value;
             }
             set
             {
-                __lastUpdated = value;
+                __LastUpdated = value;
             }
         }
 
@@ -54,24 +64,24 @@ namespace Neverer.UtilityClass
         {
             // NB - this constructor does not load a dictionary - it creates a blank one with a filename
             // To load a dictionary, use the static loader defined below
-            this.fileName = fileName;
+            this.FileName = fileName;
             SetDefaultValues();
         }
         private void SetDefaultValues()
         {
-            enabled = true;
-            lastUpdated = DateTime.Now;
-            entries = new SerializableDictionary<String, List<String>>();
-            if ((fileName != null) && (fileName != ""))
+            Enabled = true;
+            LastUpdated = DateTime.Now;
+            Entries = new SerializableDictionary<String, List<String>>();
+            if ((FileName != null) && (FileName != ""))
             {
-                dictionaryName = Path.GetFileNameWithoutExtension(fileName);
+                DictionaryName = Path.GetFileNameWithoutExtension(FileName);
                 Save(); // In case there's any new class changes since last save
             }
         }
 
         public override String ToString()
         {
-            return ((dictionaryName == null) ? "Untitled" : dictionaryName);
+            return ((DictionaryName == null) ? "Untitled" : DictionaryName);
         }
 
         public static CrosswordDictionary Load(String fileName, DictFileType fileType = DictFileType.XML)
@@ -95,7 +105,7 @@ namespace Neverer.UtilityClass
                 String[] allWords = File.ReadAllLines(fileName);
                 foreach (String word in allWords)
                 {
-                    cd.entries.Add(word, new List<String>());
+                    cd.Entries.Add(word, new List<String>());
                 }
                 cd.Save();
                 return cd;
@@ -128,7 +138,7 @@ namespace Neverer.UtilityClass
                     using (XmlReader reader = new XmlTextReader(read))
                     {
                         cd = (CrosswordDictionary)serializer.Deserialize(reader);
-                        cd.fileName = fileName;
+                        cd.FileName = fileName;
                         reader.Close();
                     }
 
@@ -146,9 +156,9 @@ namespace Neverer.UtilityClass
 
         public void Save()
         {
-            if (fileName == null) { throw new Exception("No filename specified when saving dictionary."); }
-            __lastUpdated = DateTime.Now;
-            this.SaveToXML(fileName);
+            if (FileName == null) { throw new Exception("No filename specified when saving dictionary."); }
+            __LastUpdated = DateTime.Now;
+            this.SaveToXML(FileName);
         }
     }
 }

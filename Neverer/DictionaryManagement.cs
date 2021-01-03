@@ -54,6 +54,7 @@ namespace Neverer
 
         private void cmdAddLocal_Click(object sender, EventArgs e)
         {
+            // TODO - update this to WordSources code
             DialogResult dr = ofdOpenDictionary.ShowDialog();
             switch (dr)
             {
@@ -61,7 +62,7 @@ namespace Neverer
                     foreach (String fileName in ofdOpenDictionary.FileNames)
                     {
                         CrosswordDictionary cd = CrosswordDictionary.Load(fileName, DictFileType.XML);
-                        cd.enabled = true;
+                        cd.Enabled = true;
                         clbDictionaries.Items.Add(cd);
                         caller.currentSettings.DictionaryFiles[DictType.Custom].Add(fileName);
                         caller.currentSettings.Save();

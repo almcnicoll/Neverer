@@ -69,10 +69,10 @@ namespace Neverer
 
                 for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
                 {
-                    List<CrosswordDictionary> dicts = __callingForm.AllDictionaries[dt];
-                    foreach (CrosswordDictionary dict in dicts)
+                    List<IWordSource> dicts = __callingForm.AllDictionaries[dt];
+                    foreach (IWordSource dict in dicts)
                     {
-                        List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.entries
+                        List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.Entries
                                                                               where re.IsMatch(kvp.Key)
                                                                               select kvp).ToList();
                         foreach (KeyValuePair<String, List<String>> kvp in possibles)

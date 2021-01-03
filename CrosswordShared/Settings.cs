@@ -191,7 +191,7 @@ namespace Neverer
         }
         // New property to replace old "DictionaryFiles" key
         // Added new rather than replaced old property to ensure backward-compatibility
-        [Serial.XmlElement("Dictionaries")]
+        //[Serial.XmlElement("Dictionaries")]
         /*public SerializableDictionary<Guid, List<String>> Dictionaries
         {
             get

@@ -34,6 +34,7 @@ namespace Neverer
         private List<CrosswordControls.ClueDisplay> __clueDisplays = new List<CrosswordControls.ClueDisplay>();
 
         public Settings currentSettings = new Settings();
+        public WordSources currentWordSources = new WordSources();
 
         public CrosswordDictionaryCollection AllDictionaries = new CrosswordDictionaryCollection();
 
@@ -56,6 +57,29 @@ namespace Neverer
             currentSettings.FileListChanged += RepopulateRecentFiles; // Redo menu if list of recent files changes
             currentSettings.Set("Version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
             currentSettings.Save();
+
+            // Get word sources
+            currentWordSources = WordSources.Load();
+            currentWordSources.Save();
+
+            // Move any dictionary entries from Settings to WordSources file
+            if ((currentSettings.DictionaryFiles != null) && (currentSettings.DictionaryFiles.Keys.Count > 0))
+            {
+                foreach (DictType keyType in currentSettings.DictionaryFiles.Keys)
+                {
+                    foreach (String dictFile in currentSettings.DictionaryFiles[keyType])
+                    {
+                        if (!currentWordSources.Dictionaries.Contains(dictFile))
+                        {
+                            currentWordSources.Dictionaries.Add(dictFile);
+                        }
+                    }
+                }
+                currentWordSources.Save();
+                currentSettings.DictionaryFiles.Clear();
+                currentSettings.DictionaryFiles = null;
+                currentSettings.Save();
+            }
 
             // Repopulate Recent Files
             RepopulateRecentFiles();
@@ -188,7 +212,7 @@ namespace Neverer
                             {
                                 int xx = pc.x + i; int yy = pc.y;
                                 // Failsafe - shouldn't happen, but occasionally we get a clue trying to display out of bounds
-                                if (xx>=crossword.cols) { continue; }
+                                if (xx >= crossword.cols) { continue; }
                                 if (yy >= crossword.rows) { continue; }
                                 // Now populate grid
                                 if (allLetters[xx, yy] == "")
@@ -1396,42 +1420,48 @@ namespace Neverer
 
         private bool LoadDictionaries() //List<String> builtInFileNames = null, List<String> customFileNames = null)
         {
-            String dictionaryPath = currentSettings.DefaultFolder;
-            SerializableDictionary<DictType, List<String>> dictFiles = currentSettings.DictionaryFiles;
-            if (dictFiles.RetrieveIfKeyExists(DictType.Default, new List<String>()).Count == 0)
+            // TODO - check conversion this code to WordSources (mostly done if not 100%)
+            String dictionaryPath = WordSources.DefaultFolder;
+            List<String> allDictFiles = currentWordSources.Dictionaries;
+            // Default dictionary if not set
+            if (allDictFiles.Count == 0)
             {
-                dictFiles.AddIfNotExists(DictType.Default, new List<String>());
                 String defaultDictPath = Path.Combine(dictionaryPath, "default.nev.dic");
                 if (File.Exists(defaultDictPath))
                 {
-                    dictFiles[DictType.Default].Add(defaultDictPath);
-                    currentSettings.DictionaryFiles = dictFiles;
-                    currentSettings.Save();
+                    allDictFiles.Add(defaultDictPath);
+                    currentWordSources.Dictionaries = allDictFiles;
+                    currentWordSources.Save();
                 }
             }
-            if (dictFiles.RetrieveIfKeyExists(DictType.Custom, new List<String>()).Count == 0)
+            /*
+            if (allDictFiles.RetrieveIfKeyExists(DictType.Custom, new List<String>()).Count == 0)
             {
-                dictFiles.AddIfNotExists(DictType.Custom, new List<String>());
+                allDictFiles.AddIfNotExists(DictType.Custom, new List<String>());
                 String customDictPath = Path.Combine(dictionaryPath, "custom.nev.dic");
                 if (File.Exists(customDictPath))
                 {
-                    dictFiles[DictType.Custom].Add(customDictPath);
-                    currentSettings.DictionaryFiles = dictFiles;
+                    allDictFiles[DictType.Custom].Add(customDictPath);
+                    currentSettings.DictionaryFiles = allDictFiles;
                     currentSettings.Save();
                 }
             }
+            */
             // Built-in
-            if (dictFiles[DictType.Default].Count == 0)
+            if (allDictFiles.Count == 0)
             {
                 CrosswordDictionary cd = new CrosswordDictionary(Path.Combine(dictionaryPath, "default.nev.dic"));
                 cd.Save();
-                AllDictionaries.Add(DictType.Default, new List<CrosswordDictionary> { cd });
+                AllDictionaries.Add(DictType.Default, new List<IWordSource> { cd });
             }
             else
             {
-                AllDictionaries.Add(DictType.Default, new List<CrosswordDictionary>());
                 CrosswordDictionary cdTmp;
-                foreach (String fileName in dictFiles[DictType.Default])
+                WordList wlTmp;
+                
+                if (!AllDictionaries.ContainsKey(DictType.Default)) { AllDictionaries.Add(DictType.Default, new List<IWordSource>()); }
+
+                foreach (String fileName in allDictFiles)
                 {
                     String ext = Path.GetExtension(fileName);
                     switch (ext)
@@ -1441,35 +1471,15 @@ namespace Neverer
                             cdTmp = CrosswordDictionary.Load(fileName, DictFileType.XML);
                             AllDictionaries[DictType.Default].Add(cdTmp);
                             break;
-                        default:
-                            cdTmp = null;
-                            cdTmp = CrosswordDictionary.Load(fileName, DictFileType.Plaintext);
-                            AllDictionaries[DictType.Default].Add(cdTmp);
-                            break;
-                    }
-
-                }
-            }
-            // Custom
-            if (dictFiles[DictType.Custom].Count == 0)
-            {
-                CrosswordDictionary cd = new CrosswordDictionary(Path.Combine(dictionaryPath, "custom.nev.dic"));
-                cd.Save();
-                AllDictionaries.Add(DictType.Custom, new List<CrosswordDictionary> { cd });
-            }
-            else
-            {
-                AllDictionaries.Add(DictType.Custom, new List<CrosswordDictionary>());
-                foreach (String fileName in dictFiles[DictType.Custom])
-                {
-                    String ext = Path.GetExtension(fileName);
-                    switch (ext)
-                    {
-                        case ".dic":
-                            AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.XML));
+                        case ".txt":
+                            wlTmp = new WordList();
+                            wlTmp.LoadFromFile(fileName);
+                            AllDictionaries[DictType.Default].Add(wlTmp);
                             break;
                         default:
-                            AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(fileName, DictFileType.Plaintext));
+                            wlTmp = new WordList();
+                            wlTmp.LoadFromFile(fileName);
+                            AllDictionaries[DictType.Default].Add(wlTmp);
                             break;
                     }
 
@@ -1481,6 +1491,7 @@ namespace Neverer
 
         private void quickImportDictionaryToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            // Convert this code to WordSources
             DialogResult dr = dlgDictOpen.ShowDialog();
             if (dr == DialogResult.OK)
             {
@@ -1512,6 +1523,7 @@ namespace Neverer
         private void Creator_FormClosing(object sender, FormClosingEventArgs e)
         {
             if (currentSettings != null) { currentSettings.Save(); }
+            if (currentWordSources != null) { currentWordSources.Save(); }
         }
 
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1552,21 +1564,21 @@ namespace Neverer
             }
 
             // Retrieve user dictionary (1st custom)
-            CrosswordDictionary cd = AllDictionaries[DictType.Custom][0];
+            IWordSource ws = AllDictionaries[DictType.Custom][0];
 
             // See if there is a matching entry already
-            if (cd.entries.ContainsKey(word))
+            if (ws.Entries.ContainsKey(word))
             {
                 // See if there's a definition already
-                if (cd.entries[word].Count == 0)
+                if (ws.Entries[word].Count == 0)
                 {
-                    cd.entries[word].Add(pc.clue.question);
+                    ws.Entries[word].Add(pc.clue.question);
                 }
                 else
                 {
                     DictionaryClueList dclPrompt = new DictionaryClueList();
                     dclPrompt.ClueChoice = new List<Clue>();
-                    foreach (String clueOption in cd.entries[word])
+                    foreach (String clueOption in ws.Entries[word])
                     {
                         dclPrompt.ClueChoice.Add(new Clue(clueOption, word));
                     }
@@ -1577,17 +1589,17 @@ namespace Neverer
                         if (dclPrompt.CreateNew.Value == true)
                         {
                             // Add new clue entry to dictionary
-                            cd.entries[word].Add(pc.clue.question);
+                            ws.Entries[word].Add(pc.clue.question);
                         }
                         else
                         {
                             // Update the selected clue
-                            for (int i = 0; i < cd.entries[word].Count; i++)
+                            for (int i = 0; i < ws.Entries[word].Count; i++)
                             {
-                                if (cd.entries[word][i] == dclPrompt.SelectedClue.question) { cd.entries[word][i] = pc.clue.question; }
+                                if (ws.Entries[word][i] == dclPrompt.SelectedClue.question) { ws.Entries[word][i] = pc.clue.question; }
                             }
                         }
-                        cd.Save();
+                        ws.Save();
                     }
                     else
                     {
@@ -1599,9 +1611,9 @@ namespace Neverer
             else
             {
                 // Just add it!
-                cd.entries.Add(word, new List<String>() { pc.clue.question });
+                ws.Entries.Add(word, new List<String>() { pc.clue.question });
             }
-            cd.Save();
+            ws.Save();
             tsslMessage.Text = String.Format("Saved clue for {0}", word);
 
             timerMessageReset.Enabled = false;
@@ -1698,10 +1710,11 @@ namespace Neverer
                     // Loop through dictionaries, looking for matches
                     for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
                     {
-                        List<CrosswordDictionary> dicts = AllDictionaries[dt];
+                        if (!AllDictionaries.ContainsKey(dt)) { continue; } // Mayhaps we have no dicts of this type
+                        List<IWordSource> dicts = AllDictionaries[dt];
                         foreach (CrosswordDictionary dict in dicts)
                         {
-                            List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.entries
+                            List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.Entries
                                                                                   where reWord.IsMatch(kvp.Key)
                                                                                   select kvp).ToList();
                             foreach (KeyValuePair<String, List<String>> kvp in possibles)

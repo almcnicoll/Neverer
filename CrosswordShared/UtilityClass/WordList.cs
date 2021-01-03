@@ -4,13 +4,19 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 
+
+// TODO - create an Interface that covers this and CrosswordDictionary, so that Creator.AllDictionaries can contain both
 namespace Neverer.UtilityClass
 {
-    class WordList
+    public class WordList : IWordSource
     {
+        private DateTime? __LastUpdated = null;
+        public String DictionaryName { get; set; }
+
         public ObservableCollection<String> Words { get; set; }
+        private SerializableDictionary<String, List<String>> __Definitions = null;
         public bool Readonly { get; set; }
-        public String Filename { get; set; }
+        public String FileName { get; set; }
         public bool Autosave { get; set; }
         public bool Enabled { get; set; }
 
@@ -18,7 +24,7 @@ namespace Neverer.UtilityClass
         {
             this.Readonly = true;
             this.Autosave = false;
-            this.Filename = null;
+            this.FileName = null;
             this.Enabled = true;
             this.Words = new ObservableCollection<String>();
             this.Words.CollectionChanged += Words_CollectionChanged;
@@ -28,7 +34,7 @@ namespace Neverer.UtilityClass
             this.Readonly = Readonly;
             this.Autosave = Autosave;
             this.Enabled = Enabled;
-            this.Filename = filename;
+            this.FileName = filename;
             try
             {
                 this.LoadFromFile(filename);
@@ -44,14 +50,53 @@ namespace Neverer.UtilityClass
             this.Readonly = true;
             this.Autosave = false;
             this.Enabled = true;
-            this.Filename = null;
+            this.FileName = null;
             this.Words = Words;
             this.Words.CollectionChanged += Words_CollectionChanged;
+        }
+
+        public IEnumerable<String> Keys
+        {
+            get
+            {
+                return Words;
+            }
+        }
+
+        private void populateDictionaryCache()
+        {
+            __Definitions = new SerializableDictionary<String, List<String>>();
+            foreach (String word in Words)
+            {
+                __Definitions.Add(word, new List<String>());
+            }
+        }
+        public SerializableDictionary<String, List<String>> Entries
+        {
+            get
+            {
+                if (__Definitions == null) { populateDictionaryCache(); }
+                return __Definitions;
+            }
+        }
+        public DateTime LastUpdated
+        {
+            get
+            {
+                if (!__LastUpdated.HasValue) { __LastUpdated = DateTime.Now; }
+                return __LastUpdated.Value;
+            }
+            set
+            {
+                __LastUpdated = value;
+            }
         }
 
 
         private void Words_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            // Invalidate Dictionary Cache
+            __Definitions = null;
             // If collection changes and Autosave is true, save now
             if (this.Autosave)
             {
@@ -65,11 +110,11 @@ namespace Neverer.UtilityClass
             {
                 throw new Exception("Cannot save to a readonly wordlist");
             }
-            if (this.Filename == null)
+            if (this.FileName == null)
             {
                 throw new Exception("Cannot save without a filename being set");
             }
-            SaveToFile(this.Filename);
+            SaveToFile(this.FileName);
         }
 
         public void SaveToFile(String filename, bool persistFilename = true)
@@ -78,7 +123,7 @@ namespace Neverer.UtilityClass
             FileInfo fi = new FileInfo(filename);
             Directory.CreateDirectory(fi.DirectoryName);
             // If persistFilename is true, this is our new filename for the wordlist, even if we already have one
-            if (persistFilename) { this.Filename = filename; }
+            if (persistFilename) { this.FileName = filename; }
             TextWriter tw = new StreamWriter(filename);
             IEnumerable<String> sorted = (from String s in Words orderby s select s);
             foreach (String s in sorted)
@@ -100,7 +145,7 @@ namespace Neverer.UtilityClass
             this.Words.Clear();
             this.Words = new ObservableCollection<String>(File.ReadAllLines(filename));
             // If persistFilename is true, this is our new filename for the wordlist, even if we already have one
-            if (persistFilename) { this.Filename = filename; }
+            if (persistFilename) { this.FileName = filename; }
             this.Autosave = Autosave;
             this.Enabled = Enabled;
         }

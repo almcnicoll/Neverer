@@ -218,10 +218,10 @@
     <PublishFile Include="Resources\sowpods.txt">
       <Visible>False</Visible>
       <Group>Dictionaries</Group>
-      <PublishState>Auto</PublishState>
-      <IncludeHash>True</IncludeHash>
       <TargetPath>
       </TargetPath>
+      <PublishState>Auto</PublishState>
+      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
   </ItemGroup>

@@ -8,11 +8,17 @@ namespace Neverer
     [Serializable]
     public class WordSources
     {
-        List<String> Dictionaries { get; set; }
-        List<String> WordLists { get; set; }
+        public List<String> Dictionaries { get; set; }
+        public List<String> WordLists { get; set; }
         int DefaultDictionaryIndex { get; set; } = 0;
         int DefaultWordListIndex { get; set; } = 0;
 
+
+        public WordSources()
+        {
+            this.Dictionaries = new List<String>();
+            this.WordLists = new List<String>();
+        }
 
         /// <summary>
         /// Returns the default folder to which this object should be serialized
@@ -67,11 +73,11 @@ namespace Neverer
             if (fileName == null) { fileName = Path.Combine(WordSources.DefaultFolder, WordSources.DefaultFilename); }
             if (!File.Exists(fileName))
             {
-                Settings ss = new Settings();
-                ss.Save();
+                WordSources ws = new WordSources();
+                ws.Save();
             }
-            WordSources s = ExtensionMethods.LoadFromXML<WordSources>(fileName);
-            return s;
+            WordSources w = ExtensionMethods.LoadFromXML<WordSources>(fileName);
+            return w;
         }
 
     }
