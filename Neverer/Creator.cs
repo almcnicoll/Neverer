@@ -77,7 +77,7 @@ namespace Neverer
                 }
                 currentWordSources.Save();
                 currentSettings.DictionaryFiles.Clear();
-                currentSettings.DictionaryFiles = null;
+                currentSettings.DictionaryFiles = new SerializableDictionary<DictType, List<String>>();
                 currentSettings.Save();
             }
 
@@ -1567,18 +1567,18 @@ namespace Neverer
             IWordSource ws = AllDictionaries[DictType.Custom][0];
 
             // See if there is a matching entry already
-            if (ws.Entries.ContainsKey(word))
+            if (ws.entries.ContainsKey(word))
             {
                 // See if there's a definition already
-                if (ws.Entries[word].Count == 0)
+                if (ws.entries[word].Count == 0)
                 {
-                    ws.Entries[word].Add(pc.clue.question);
+                    ws.entries[word].Add(pc.clue.question);
                 }
                 else
                 {
                     DictionaryClueList dclPrompt = new DictionaryClueList();
                     dclPrompt.ClueChoice = new List<Clue>();
-                    foreach (String clueOption in ws.Entries[word])
+                    foreach (String clueOption in ws.entries[word])
                     {
                         dclPrompt.ClueChoice.Add(new Clue(clueOption, word));
                     }
@@ -1589,14 +1589,14 @@ namespace Neverer
                         if (dclPrompt.CreateNew.Value == true)
                         {
                             // Add new clue entry to dictionary
-                            ws.Entries[word].Add(pc.clue.question);
+                            ws.entries[word].Add(pc.clue.question);
                         }
                         else
                         {
                             // Update the selected clue
-                            for (int i = 0; i < ws.Entries[word].Count; i++)
+                            for (int i = 0; i < ws.entries[word].Count; i++)
                             {
-                                if (ws.Entries[word][i] == dclPrompt.SelectedClue.question) { ws.Entries[word][i] = pc.clue.question; }
+                                if (ws.entries[word][i] == dclPrompt.SelectedClue.question) { ws.entries[word][i] = pc.clue.question; }
                             }
                         }
                         ws.Save();
@@ -1611,7 +1611,7 @@ namespace Neverer
             else
             {
                 // Just add it!
-                ws.Entries.Add(word, new List<String>() { pc.clue.question });
+                ws.entries.Add(word, new List<String>() { pc.clue.question });
             }
             ws.Save();
             tsslMessage.Text = String.Format("Saved clue for {0}", word);
@@ -1714,7 +1714,7 @@ namespace Neverer
                         List<IWordSource> dicts = AllDictionaries[dt];
                         foreach (CrosswordDictionary dict in dicts)
                         {
-                            List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.Entries
+                            List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.entries
                                                                                   where reWord.IsMatch(kvp.Key)
                                                                                   select kvp).ToList();
                             foreach (KeyValuePair<String, List<String>> kvp in possibles)
@@ -1825,11 +1825,23 @@ namespace Neverer
 
         private void dgvPuzzle_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
         {
-            try
+            if (dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag == null)
             {
-                dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = (System.Drawing.Color)dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag;
+                UpdatePreviewGrid();
             }
-            catch { }
+            else
+            {
+                try
+                {
+                    dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = (System.Drawing.Color)dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag;
+                }
+                catch (Exception ex)
+                {
+                    // Was thrown if Style.Tag == null and therefore cannot be cast to a System.Drawing.Color, although we now trap that in the if() above
+                    // We don't know what colour to revert to, so don't
+                    UpdatePreviewGrid();
+                }
+            }
         }
 
         /// <summary>

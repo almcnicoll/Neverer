@@ -72,7 +72,7 @@ namespace Neverer
                     List<IWordSource> dicts = __callingForm.AllDictionaries[dt];
                     foreach (IWordSource dict in dicts)
                     {
-                        List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.Entries
+                        List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.entries
                                                                               where re.IsMatch(kvp.Key)
                                                                               select kvp).ToList();
                         foreach (KeyValuePair<String, List<String>> kvp in possibles)

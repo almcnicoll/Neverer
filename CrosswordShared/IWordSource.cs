@@ -8,14 +8,14 @@ namespace Neverer.UtilityClass
 {
     public interface IWordSource
     {
-        String FileName { get; set; }
-        bool Enabled { get; set; }
-        SerializableDictionary<String, List<String>> Entries { get; }
-        IEnumerable<String> Keys { get; }
+        String fileName { get; set; }
+        bool enabled { get; set; }
+        SerializableDictionary<String, List<String>> entries { get; }
+        IEnumerable<String> keys { get; }
 
-        String DictionaryName { get; set; }
+        String dictionaryName { get; set; }
 
-        DateTime LastUpdated { get; set; }
+        DateTime lastUpdated { get; set; }
 
         void Save();
     }

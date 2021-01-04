@@ -31,13 +31,13 @@ namespace Neverer.UtilityClass
                 foreach (IWordSource ws in this[dt])
                 {
                     // Only peruse enabled dictionaries
-                    if (!ws.Enabled) { continue; }
+                    if (!ws.enabled) { continue; }
 
                     // Cap results at maximum minus any already retrieved
                     int maxMatches = maxResults - results.Keys.Count;
 
                     // Retrieve matching keys
-                    List<String> keys = (from KeyValuePair<String, List<String>> kvp in ws.Entries
+                    List<String> keys = (from KeyValuePair<String, List<String>> kvp in ws.entries
                                          where kvp.Key.MatchesRegex(pattern)
                                          select kvp.Key).Take(maxMatches).ToList();
 
@@ -45,7 +45,7 @@ namespace Neverer.UtilityClass
                     foreach (String k in keys)
                     {
                         if (!results.ContainsKey(k)) { results.Add(k, new List<String>()); }
-                        results[k].AddRange(ws.Entries[k]);
+                        results[k].AddRange(ws.entries[k]);
                     }
 
                     // Stop if we've got enough results

@@ -29,21 +29,21 @@ namespace Neverer.UtilityClass
         public const String importSuffix = ".imported.dic";
 
         // Properties
-        public String FileName { get; set; }
-        public bool Enabled { get; set; }
-        public SerializableDictionary<String, List<String>> Entries { get; set; }
-        public IEnumerable<String> Keys
+        public String fileName { get; set; }
+        public bool enabled { get; set; }
+        public SerializableDictionary<String, List<String>> entries { get; set; }
+        public IEnumerable<String> keys
         {
             get
             {
-                return Entries.Keys;
+                return entries.Keys;
             }
         }
 
         private DateTime? __LastUpdated = null;
-        public String DictionaryName { get; set; }
+        public String dictionaryName { get; set; }
         
-        public DateTime LastUpdated
+        public DateTime lastUpdated
         {
             get
             {
@@ -64,24 +64,24 @@ namespace Neverer.UtilityClass
         {
             // NB - this constructor does not load a dictionary - it creates a blank one with a filename
             // To load a dictionary, use the static loader defined below
-            this.FileName = fileName;
+            this.fileName = fileName;
             SetDefaultValues();
         }
         private void SetDefaultValues()
         {
-            Enabled = true;
-            LastUpdated = DateTime.Now;
-            Entries = new SerializableDictionary<String, List<String>>();
-            if ((FileName != null) && (FileName != ""))
+            enabled = true;
+            lastUpdated = DateTime.Now;
+            entries = new SerializableDictionary<String, List<String>>();
+            if ((fileName != null) && (fileName != ""))
             {
-                DictionaryName = Path.GetFileNameWithoutExtension(FileName);
+                dictionaryName = Path.GetFileNameWithoutExtension(fileName);
                 Save(); // In case there's any new class changes since last save
             }
         }
 
         public override String ToString()
         {
-            return ((DictionaryName == null) ? "Untitled" : DictionaryName);
+            return ((dictionaryName == null) ? "Untitled" : dictionaryName);
         }
 
         public static CrosswordDictionary Load(String fileName, DictFileType fileType = DictFileType.XML)
@@ -105,7 +105,7 @@ namespace Neverer.UtilityClass
                 String[] allWords = File.ReadAllLines(fileName);
                 foreach (String word in allWords)
                 {
-                    cd.Entries.Add(word, new List<String>());
+                    cd.entries.Add(word, new List<String>());
                 }
                 cd.Save();
                 return cd;
@@ -138,7 +138,7 @@ namespace Neverer.UtilityClass
                     using (XmlReader reader = new XmlTextReader(read))
                     {
                         cd = (CrosswordDictionary)serializer.Deserialize(reader);
-                        cd.FileName = fileName;
+                        cd.fileName = fileName;
                         reader.Close();
                     }
 
@@ -156,9 +156,9 @@ namespace Neverer.UtilityClass
 
         public void Save()
         {
-            if (FileName == null) { throw new Exception("No filename specified when saving dictionary."); }
+            if (fileName == null) { throw new Exception("No filename specified when saving dictionary."); }
             __LastUpdated = DateTime.Now;
-            this.SaveToXML(FileName);
+            this.SaveToXML(fileName);
         }
     }
 }

@@ -135,12 +135,22 @@ namespace Neverer
                 SettingValue sv = this[key];
                 if (typeof(T) != sv.ValueType)
                 {
-                    if (sv.ValueType == null) { throw new Exception(String.Format("Could not retrieve Setting \"{0}\" (type {1}) as type {2}", key, "null", typeof(T).ToString())); }
-                    throw new Exception(String.Format("Could not retrieve Setting \"{0}\" (type {1}) as type {2}", key, sv.ValueType.ToString(), typeof(T).ToString()));
+                    if (sv.ValueType == null)
+                    {
+                        return (T)Activator.CreateInstance(typeof(T));
+                        //return default(T);
+                        //throw new Exception(String.Format("Could not retrieve Setting \"{0}\" (type {1}) as type {2}", key, "null", typeof(T).ToString()));
+                    }
+                    else
+                    {
+                        return (T)Activator.CreateInstance(typeof(T));
+                        //return default(T);
+                        //throw new Exception(String.Format("Could not retrieve Setting \"{0}\" (type {1}) as type {2}", key, sv.ValueType.ToString(), typeof(T).ToString()));
+                    }
                 }
                 if (sv.Serialized)
                 {
-                    if (sv.Value == null) { return default(T); }
+                    if (sv.Value == null) { return (T)Activator.CreateInstance(typeof(T)); }
                     return (T)sv.Value.DeserializeObject<T>();
                 }
                 else
@@ -175,11 +185,13 @@ namespace Neverer
             get
             {
                 SerializableDictionary<DictType, List<String>> returnVal;
+                //returnVal = this.Get<SerializableDictionary<DictType, List<String>>>(Settings.keyDictionaryFiles);
                 returnVal = this.Get<SerializableDictionary<DictType, List<String>>>(Settings.keyDictionaryFiles);
                 if (returnVal == null)
                 {
                     // Initialise if null
                     returnVal = new SerializableDictionary<DictType, List<String>>();
+                    if (this.DictionaryFiles == null) { this.DictionaryFiles = new SerializableDictionary<DictType, List<String>>(); }
                     this.DictionaryFiles.Add(DictType.Default, new List<String>());
                 }
                 return returnVal;

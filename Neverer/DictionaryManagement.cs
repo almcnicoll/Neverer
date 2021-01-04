@@ -62,7 +62,7 @@ namespace Neverer
                     foreach (String fileName in ofdOpenDictionary.FileNames)
                     {
                         CrosswordDictionary cd = CrosswordDictionary.Load(fileName, DictFileType.XML);
-                        cd.Enabled = true;
+                        cd.enabled = true;
                         clbDictionaries.Items.Add(cd);
                         caller.currentSettings.DictionaryFiles[DictType.Custom].Add(fileName);
                         caller.currentSettings.Save();

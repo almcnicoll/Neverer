@@ -11,21 +11,21 @@ namespace Neverer.UtilityClass
     public class WordList : IWordSource
     {
         private DateTime? __LastUpdated = null;
-        public String DictionaryName { get; set; }
+        public String dictionaryName { get; set; }
 
         public ObservableCollection<String> Words { get; set; }
         private SerializableDictionary<String, List<String>> __Definitions = null;
         public bool Readonly { get; set; }
-        public String FileName { get; set; }
+        public String fileName { get; set; }
         public bool Autosave { get; set; }
-        public bool Enabled { get; set; }
+        public bool enabled { get; set; }
 
         public WordList()
         {
             this.Readonly = true;
             this.Autosave = false;
-            this.FileName = null;
-            this.Enabled = true;
+            this.fileName = null;
+            this.enabled = true;
             this.Words = new ObservableCollection<String>();
             this.Words.CollectionChanged += Words_CollectionChanged;
         }
@@ -33,8 +33,8 @@ namespace Neverer.UtilityClass
         {
             this.Readonly = Readonly;
             this.Autosave = Autosave;
-            this.Enabled = Enabled;
-            this.FileName = filename;
+            this.enabled = Enabled;
+            this.fileName = filename;
             try
             {
                 this.LoadFromFile(filename);
@@ -49,13 +49,13 @@ namespace Neverer.UtilityClass
         {
             this.Readonly = true;
             this.Autosave = false;
-            this.Enabled = true;
-            this.FileName = null;
+            this.enabled = true;
+            this.fileName = null;
             this.Words = Words;
             this.Words.CollectionChanged += Words_CollectionChanged;
         }
 
-        public IEnumerable<String> Keys
+        public IEnumerable<String> keys
         {
             get
             {
@@ -71,7 +71,7 @@ namespace Neverer.UtilityClass
                 __Definitions.Add(word, new List<String>());
             }
         }
-        public SerializableDictionary<String, List<String>> Entries
+        public SerializableDictionary<String, List<String>> entries
         {
             get
             {
@@ -79,7 +79,7 @@ namespace Neverer.UtilityClass
                 return __Definitions;
             }
         }
-        public DateTime LastUpdated
+        public DateTime lastUpdated
         {
             get
             {
@@ -110,11 +110,11 @@ namespace Neverer.UtilityClass
             {
                 throw new Exception("Cannot save to a readonly wordlist");
             }
-            if (this.FileName == null)
+            if (this.fileName == null)
             {
                 throw new Exception("Cannot save without a filename being set");
             }
-            SaveToFile(this.FileName);
+            SaveToFile(this.fileName);
         }
 
         public void SaveToFile(String filename, bool persistFilename = true)
@@ -123,7 +123,7 @@ namespace Neverer.UtilityClass
             FileInfo fi = new FileInfo(filename);
             Directory.CreateDirectory(fi.DirectoryName);
             // If persistFilename is true, this is our new filename for the wordlist, even if we already have one
-            if (persistFilename) { this.FileName = filename; }
+            if (persistFilename) { this.fileName = filename; }
             TextWriter tw = new StreamWriter(filename);
             IEnumerable<String> sorted = (from String s in Words orderby s select s);
             foreach (String s in sorted)
@@ -145,9 +145,9 @@ namespace Neverer.UtilityClass
             this.Words.Clear();
             this.Words = new ObservableCollection<String>(File.ReadAllLines(filename));
             // If persistFilename is true, this is our new filename for the wordlist, even if we already have one
-            if (persistFilename) { this.FileName = filename; }
+            if (persistFilename) { this.fileName = filename; }
             this.Autosave = Autosave;
-            this.Enabled = Enabled;
+            this.enabled = Enabled;
         }
     }
 }
