@@ -2,6 +2,7 @@
 using Neverer.UtilityClass;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows.Forms;
 
@@ -38,30 +39,30 @@ namespace Neverer
         {
             // Create stats dictionary
             stats.AddOrUpdate(tpIntersections.Name, new Dictionary<String, Decimal>());
-            
+
             // Calculate all intersecting clues
             foreach (PlacedClueWithStats pcws in clues)
             {
                 pcws.intersections = (from PlacedClueWithStats pcwsTmp in clues
                                       where pcwsTmp.UniqueID != pcws.UniqueID
                                       && pcwsTmp.orientation != pcws.orientation
-                                      && pcwsTmp.y <= pcws.y && pcwsTmp.y >= pcws.y
-                                      && pcwsTmp.x <= pcws.x && pcwsTmp.x >= pcws.x
+                                      && pcwsTmp.y <= pcws.y + pcws.height - 1 && pcwsTmp.y >= pcws.y
+                                      && pcwsTmp.x <= pcws.x + pcws.width - 1 && pcwsTmp.x >= pcws.x
                                       select pcwsTmp).Count();
-                
             }
 
             // Calculate intersection-related stats
             stats[tpIntersections.Name].Add("Min intersections", (from PlacedClueWithStats pcws in clues
-                                                                select pcws.intersections).Min());
+                                                                  select pcws.intersections).Min());
             stats[tpIntersections.Name].Add("Max intersections", (from PlacedClueWithStats pcws in clues
-                                                                select pcws.intersections).Max());
+                                                                  select pcws.intersections).Max());
             stats[tpIntersections.Name].Add("Max intersects / letter", (from PlacedClueWithStats pcws in clues
                                                                         select pcws.intersections / pcws.clue.length).Max());
             stats[tpIntersections.Name].Add("Min intersects / letter", (from PlacedClueWithStats pcws in clues
                                                                         select pcws.intersections / pcws.clue.length).Min());
 
             // Populate stats into grid
+            // TODO - this is not populating for some reason
             dgvIntersectionStats.SuspendLayout();
             dgvIntersectionStats.Columns.Clear();
             dgvIntersectionStats.Columns.Add("Key", "Statistic");
@@ -88,6 +89,7 @@ namespace Neverer
                 ClueDisplay cd = new ClueDisplay();
                 cd.Clue = pcws;
                 flpClues.Controls.Add(cd);
+                Debug.WriteLine("pcwsTmp.intersections == " + pcws.intersections);
             }
         }
     }

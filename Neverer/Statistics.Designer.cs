@@ -52,11 +52,11 @@
             this.tabCtrl.Size = new System.Drawing.Size(800, 450);
             this.tabCtrl.TabIndex = 0;
             // 
-            // tabPage1
+            // tpIntersections
             // 
             this.tpIntersections.Controls.Add(this.splitContainerIntersections);
             this.tpIntersections.Location = new System.Drawing.Point(4, 22);
-            this.tpIntersections.Name = "tabPage1";
+            this.tpIntersections.Name = "tpIntersections";
             this.tpIntersections.Padding = new System.Windows.Forms.Padding(3);
             this.tpIntersections.Size = new System.Drawing.Size(792, 424);
             this.tpIntersections.TabIndex = 0;
@@ -82,20 +82,24 @@
             // 
             // flpClues
             // 
-            this.flpClues.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.flpClues.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.flpClues.AutoScroll = true;
+            this.flpClues.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flpClues.Location = new System.Drawing.Point(0, 0);
             this.flpClues.Name = "flpClues";
             this.flpClues.Size = new System.Drawing.Size(262, 418);
             this.flpClues.TabIndex = 1;
             // 
-            // dataGridView1
+            // dgvIntersectionStats
             // 
             this.dgvIntersectionStats.AllowUserToAddRows = false;
             this.dgvIntersectionStats.AllowUserToDeleteRows = false;
             this.dgvIntersectionStats.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dgvIntersectionStats.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dgvIntersectionStats.Location = new System.Drawing.Point(0, 0);
-            this.dgvIntersectionStats.Name = "dataGridView1";
+            this.dgvIntersectionStats.Name = "dgvIntersectionStats";
             this.dgvIntersectionStats.ReadOnly = true;
             this.dgvIntersectionStats.Size = new System.Drawing.Size(520, 418);
             this.dgvIntersectionStats.TabIndex = 0;

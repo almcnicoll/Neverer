@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Xml.Serialization;
 
 namespace Neverer.UtilityClass
 {
@@ -52,6 +53,24 @@ namespace Neverer.UtilityClass
         private bool __uncheckedChanges = true;
         private bool __pauseEvents = false;
 
+        [XmlIgnore()]
+        public int height
+        {
+            get
+            {
+                if (this.orientation == AD.Across) { return 1; }
+                return this.clue.length;
+            }
+        }
+        [XmlIgnore()]
+        public int width
+        {
+            get
+            {
+                if (this.orientation == AD.Down) { return 1; }
+                return this.clue.length;
+            }
+        }
         public static int GetOrder(int row, int col)
         {
             return (row * 1000) + col;
