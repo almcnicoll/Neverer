@@ -88,6 +88,7 @@
             this.flpClues.AutoScroll = true;
             this.flpClues.FlowDirection = System.Windows.Forms.FlowDirection.TopDown;
             this.flpClues.Location = new System.Drawing.Point(0, 0);
+            this.flpClues.Margin = new System.Windows.Forms.Padding(0);
             this.flpClues.Name = "flpClues";
             this.flpClues.Size = new System.Drawing.Size(262, 418);
             this.flpClues.TabIndex = 1;
@@ -96,11 +97,17 @@
             // 
             this.dgvIntersectionStats.AllowUserToAddRows = false;
             this.dgvIntersectionStats.AllowUserToDeleteRows = false;
+            this.dgvIntersectionStats.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dgvIntersectionStats.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.AllCells;
+            this.dgvIntersectionStats.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.AllCells;
             this.dgvIntersectionStats.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvIntersectionStats.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.dgvIntersectionStats.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this.dgvIntersectionStats.Location = new System.Drawing.Point(0, 0);
             this.dgvIntersectionStats.Name = "dgvIntersectionStats";
             this.dgvIntersectionStats.ReadOnly = true;
+            this.dgvIntersectionStats.RowHeadersVisible = false;
             this.dgvIntersectionStats.Size = new System.Drawing.Size(520, 418);
             this.dgvIntersectionStats.TabIndex = 0;
             // 

@@ -32,6 +32,7 @@
             this.chkRowSelect = new System.Windows.Forms.CheckBox();
             this.lblClueNumber = new System.Windows.Forms.Label();
             this.lblClueText = new System.Windows.Forms.Label();
+            this.lblStat = new System.Windows.Forms.Label();
             this.tlpMaster.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -52,6 +53,7 @@
             this.tlpMaster.Name = "tlpMaster";
             this.tlpMaster.RowCount = 1;
             this.tlpMaster.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.tlpMaster.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
             this.tlpMaster.Size = new System.Drawing.Size(345, 24);
             this.tlpMaster.TabIndex = 3;
             // 
@@ -98,10 +100,27 @@
             this.lblClueText.DoubleClick += new System.EventHandler(this.lblClueText_DoubleClick);
             this.lblClueText.MouseClick += new System.Windows.Forms.MouseEventHandler(this.lblClueText_MouseClick);
             // 
+            // lblStat
+            // 
+            this.lblStat.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblStat.BackColor = System.Drawing.SystemColors.ControlText;
+            this.lblStat.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.lblStat.ForeColor = System.Drawing.SystemColors.Control;
+            this.lblStat.Location = new System.Drawing.Point(309, 0);
+            this.lblStat.Name = "lblStat";
+            this.lblStat.Size = new System.Drawing.Size(33, 24);
+            this.lblStat.TabIndex = 6;
+            this.lblStat.Text = "...";
+            this.lblStat.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.lblStat.UseMnemonic = false;
+            this.lblStat.Visible = false;
+            // 
             // ClueDisplay
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.lblStat);
             this.Controls.Add(this.tlpMaster);
             this.Name = "ClueDisplay";
             this.Size = new System.Drawing.Size(345, 24);
@@ -117,5 +136,6 @@
         private System.Windows.Forms.Label lblClueText;
         private System.Windows.Forms.Label lblClueNumber;
         private System.Windows.Forms.CheckBox chkRowSelect;
+        private System.Windows.Forms.Label lblStat;
     }
 }

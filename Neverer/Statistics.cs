@@ -51,25 +51,33 @@ namespace Neverer
                                       select pcwsTmp).Count();
             }
 
-            // Calculate intersection-related stats
-            stats[tpIntersections.Name].Add("Min intersections", (from PlacedClueWithStats pcws in clues
-                                                                  select pcws.intersections).Min());
-            stats[tpIntersections.Name].Add("Max intersections", (from PlacedClueWithStats pcws in clues
-                                                                  select pcws.intersections).Max());
-            stats[tpIntersections.Name].Add("Max intersects / letter", (from PlacedClueWithStats pcws in clues
-                                                                        select pcws.intersections / pcws.clue.length).Max());
-            stats[tpIntersections.Name].Add("Min intersects / letter", (from PlacedClueWithStats pcws in clues
-                                                                        select pcws.intersections / pcws.clue.length).Min());
+            if (clues.Count == 0)
+            {
+                stats[tpIntersections.Name].Add("No clues populated", 0);
+            }
+            else
+            {
+                // Calculate intersection-related stats
+                stats[tpIntersections.Name].Add("Min intersections", (from PlacedClueWithStats pcws in clues
+                                                                      select pcws.intersections).Min());
+                stats[tpIntersections.Name].Add("Max intersections", (from PlacedClueWithStats pcws in clues
+                                                                      select pcws.intersections).Max());
+                stats[tpIntersections.Name].Add("Max intersects / letter", (from PlacedClueWithStats pcws in clues
+                                                                            select pcws.intersections / pcws.clue.length).Max());
+                stats[tpIntersections.Name].Add("Min intersects / letter", (from PlacedClueWithStats pcws in clues
+                                                                            select pcws.intersections / pcws.clue.length).Min());
+            }
 
             // Populate stats into grid
             // TODO - this is not populating for some reason
             dgvIntersectionStats.SuspendLayout();
             dgvIntersectionStats.Columns.Clear();
-            dgvIntersectionStats.Columns.Add("Key", "Statistic");
-            dgvIntersectionStats.Columns.Add("Value", "Value");
-            dgvIntersectionStats.ResumeLayout();
+            //dgvIntersectionStats.Columns.Add("Key", "Statistic");
+            //dgvIntersectionStats.Columns.Add("Value", "Value");
             dgvIntersectionStats.DataSource = null;
-            dgvIntersectionStats.DataSource = stats[tpIntersections.Name];
+            dgvIntersectionStats.ResumeLayout();
+            dgvIntersectionStats.DataSource = (from kvp in stats[tpIntersections.Name]
+                                              select new CrosswordStatistic(kvp.Key,kvp.Value)).ToArray();
 
             // Clear FlowLayoutPanel
             foreach (Control ctrl in flpClues.Controls)
@@ -88,6 +96,7 @@ namespace Neverer
             {
                 ClueDisplay cd = new ClueDisplay();
                 cd.Clue = pcws;
+                cd.Statistic = pcws.intersections;
                 flpClues.Controls.Add(cd);
                 Debug.WriteLine("pcwsTmp.intersections == " + pcws.intersections);
             }

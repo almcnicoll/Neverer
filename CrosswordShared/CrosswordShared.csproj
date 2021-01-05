@@ -69,6 +69,7 @@
     <Compile Include="UtilityClass\PlacedClueWithStats.cs" />
     <Compile Include="UtilityClass\Position.cs" />
     <Compile Include="UtilityClass\RemoteCrosswordDictionary.cs" />
+    <Compile Include="UtilityClass\CrosswordStatistic.cs" />
     <Compile Include="UtilityClass\WordList.cs" />
     <Compile Include="WordSources.cs" />
   </ItemGroup>

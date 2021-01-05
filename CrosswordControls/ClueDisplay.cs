@@ -12,6 +12,44 @@ namespace CrosswordControls
         private PlacedClue __Clue = null;
         private bool __Selected = false;
         private String __clueText = "";
+        private Object __statistic = null;
+        public Object Statistic
+        {
+            get
+            {
+                return __statistic;
+            }
+            set
+            {
+                __statistic = value;
+                if (__statistic == null)
+                {
+                    if (InvokeRequired)
+                    {
+                        Invoke(new Action<Boolean, String>(lblStat_Set), false, "");
+
+                    }
+                    else
+                    {
+                        lblStat.Visible = false;
+                        lblStat.Text = "";
+                    }
+                }
+                else
+                {
+                    if (InvokeRequired)
+                    {
+                        Invoke(new Action<Boolean, String>(lblStat_Set), true, __statistic.ToString());
+
+                    }
+                    else
+                    {
+                        lblStat.Text = __statistic.ToString();
+                        lblStat.Visible = true;
+                    }
+                }
+            }
+        }
 
         public void lblClueNumber_SetText(String value)
         {
@@ -71,6 +109,16 @@ namespace CrosswordControls
             chkRowSelect.Checked = value;
         }
 
+        public void lblStat_Set(Boolean isVisible, String value)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action<Boolean, String>(lblStat_Set), isVisible, value);
+                return;
+            }
+            lblStat.Text = value;
+            lblStat.Visible = isVisible;
+        }
         public Color StatusColor
         {
             get
