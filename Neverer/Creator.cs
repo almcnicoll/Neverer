@@ -58,6 +58,9 @@ namespace Neverer
             currentSettings.Set("Version", Assembly.GetExecutingAssembly().GetName().Version.ToString());
             currentSettings.Save();
 
+            // Auto-saving etc.
+            keepAutoBackupToolStripMenuItem.Checked = currentSettings.AutoSaveOnTimer;
+
             // Get word sources
             currentWordSources = WordSources.Load();
             currentWordSources.Save();
@@ -1458,7 +1461,7 @@ namespace Neverer
             {
                 CrosswordDictionary cdTmp;
                 WordList wlTmp;
-                
+
                 if (!AllDictionaries.ContainsKey(DictType.Default)) { AllDictionaries.Add(DictType.Default, new List<IWordSource>()); }
 
                 foreach (String fileName in allDictFiles)
@@ -1875,6 +1878,20 @@ namespace Neverer
             Statistics frmStats = new Statistics(this);
             frmStats.tabCtrl.SelectTab(frmStats.tpIntersections);
             frmStats.ShowDialog();
+        }
+
+        private void timerBackup_Tick(object sender, EventArgs e)
+        {
+            if (currentSettings.AutoSaveOnTimer && (crossword != null))
+            {
+                currentSettings.PerformAutosave(crossword);
+            }
+        }
+
+        private void keepAutoBackupToolStripMenuItem_CheckStateChanged(object sender, EventArgs e)
+        {
+            currentSettings.AutoSaveOnTimer = keepAutoBackupToolStripMenuItem.Checked;
+            currentSettings.Save();
         }
     }
 }

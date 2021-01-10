@@ -232,8 +232,11 @@ namespace Neverer.UtilityClass
                             }
                             break;
                         default:
-                            var pValue = property.GetValue(this);
-                            property.SetValue(target, pValue);
+                            if (property.CanWrite && property.CanRead)
+                            {
+                                var pValue = property.GetValue(this);
+                                property.SetValue(target, pValue);
+                            }
                             break;
                     }
                 }

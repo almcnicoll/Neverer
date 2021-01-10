@@ -115,7 +115,7 @@ namespace Neverer
         //public const String keyDictionaries = "Dictionaries"; // XML dictionaries
         //public const String keyWordLists = "WordLists"; // plaintext files
 
-        Crossword AutoSave = null;
+        public Boolean AutoSaveOnTimer = true;
 
         public Settings()
         {
@@ -275,6 +275,9 @@ namespace Neverer
             }
         }
 
+        [Serial.XmlElement("autoSaveBackup")]
+        public Crossword autoSaveBackup { get; set; }
+
         public Exception Save(String fileName = null)
         {
             if (fileName == null) { fileName = DefaultFilename; }
@@ -316,10 +319,15 @@ namespace Neverer
             SHAddToRecentDocs(2, path);
         }
 
-        // TODO - autosave of currently edited crossword, populated on timer and removed every time crossword is saved, autoloaded on load when present
-        public void Autosave()
+        /// <summary>
+        /// Performs an autosave of the current crossword
+        /// </summary>
+        /// <param name="source">The crossword to back up</param>
+        public void PerformAutosave(Crossword source)
         {
-
+            this.autoSaveBackup = source.clone();
+            // TODO - this is not yet saving successfully
+            this.Save();
         }
     }
 }

@@ -43,6 +43,7 @@ namespace Neverer
             // Calculate all intersecting clues
             foreach (PlacedClueWithStats pcws in clues)
             {
+                //TODO - some of these are calculating correctly, but most are not (most evaluate to zero)
                 pcws.intersections = (from PlacedClueWithStats pcwsTmp in clues
                                       where pcwsTmp.UniqueID != pcws.UniqueID
                                       && pcwsTmp.orientation != pcws.orientation
@@ -69,7 +70,6 @@ namespace Neverer
             }
 
             // Populate stats into grid
-            // TODO - this is not populating for some reason
             dgvIntersectionStats.SuspendLayout();
             dgvIntersectionStats.Columns.Clear();
             //dgvIntersectionStats.Columns.Add("Key", "Statistic");
