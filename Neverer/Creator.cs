@@ -1838,7 +1838,7 @@ namespace Neverer
                 {
                     dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = (System.Drawing.Color)dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag;
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
                     // Was thrown if Style.Tag == null and therefore cannot be cast to a System.Drawing.Color, although we now trap that in the if() above
                     // We don't know what colour to revert to, so don't
@@ -1892,6 +1892,12 @@ namespace Neverer
         {
             currentSettings.AutoSaveOnTimer = keepAutoBackupToolStripMenuItem.Checked;
             currentSettings.Save();
+        }
+
+        private void anagramCreatorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            AnagramCreator ac = new AnagramCreator(this);
+            ac.Show();
         }
     }
 }

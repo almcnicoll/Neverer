@@ -36,6 +36,7 @@
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveAsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.keepAutoBackupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.exportExcelToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.emptyGridToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -85,7 +86,7 @@
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
             this.timerBackup = new System.Windows.Forms.Timer(this.components);
-            this.keepAutoBackupToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.anagramCreatorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
@@ -156,6 +157,14 @@
             this.saveAsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.saveAsToolStripMenuItem.Text = "Save &As...";
             this.saveAsToolStripMenuItem.Click += new System.EventHandler(this.saveAsToolStripMenuItem_Click);
+            // 
+            // keepAutoBackupToolStripMenuItem
+            // 
+            this.keepAutoBackupToolStripMenuItem.CheckOnClick = true;
+            this.keepAutoBackupToolStripMenuItem.Name = "keepAutoBackupToolStripMenuItem";
+            this.keepAutoBackupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.keepAutoBackupToolStripMenuItem.Text = "Keep AutoBackup";
+            this.keepAutoBackupToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.keepAutoBackupToolStripMenuItem_CheckStateChanged);
             // 
             // toolStripSeparator1
             // 
@@ -247,6 +256,7 @@
             this.dictionaryManagementToolStripMenuItem,
             this.quickImportDictionaryToolStripMenuItem,
             this.toolStripSeparator4,
+            this.anagramCreatorToolStripMenuItem,
             this.regularExpressionSearchToolStripMenuItem,
             this.toolStripSeparator5,
             this.optionsToolStripMenuItem});
@@ -257,44 +267,46 @@
             // dictionaryToolStripMenuItem
             // 
             this.dictionaryToolStripMenuItem.Name = "dictionaryToolStripMenuItem";
-            this.dictionaryToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.dictionaryToolStripMenuItem.Size = new System.Drawing.Size(293, 22);
             this.dictionaryToolStripMenuItem.Text = "&Dictionary...";
             // 
             // dictionaryManagementToolStripMenuItem
             // 
             this.dictionaryManagementToolStripMenuItem.Name = "dictionaryManagementToolStripMenuItem";
-            this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.dictionaryManagementToolStripMenuItem.Size = new System.Drawing.Size(293, 22);
             this.dictionaryManagementToolStripMenuItem.Text = "Dictionary &Management...";
             this.dictionaryManagementToolStripMenuItem.Click += new System.EventHandler(this.dictionaryManagementToolStripMenuItem_Click);
             // 
             // quickImportDictionaryToolStripMenuItem
             // 
             this.quickImportDictionaryToolStripMenuItem.Name = "quickImportDictionaryToolStripMenuItem";
-            this.quickImportDictionaryToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.quickImportDictionaryToolStripMenuItem.Size = new System.Drawing.Size(293, 22);
             this.quickImportDictionaryToolStripMenuItem.Text = "&Quick Import Dictionary...";
             this.quickImportDictionaryToolStripMenuItem.Click += new System.EventHandler(this.quickImportDictionaryToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(217, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(290, 6);
             // 
             // regularExpressionSearchToolStripMenuItem
             // 
             this.regularExpressionSearchToolStripMenuItem.Name = "regularExpressionSearchToolStripMenuItem";
-            this.regularExpressionSearchToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.regularExpressionSearchToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.X)));
+            this.regularExpressionSearchToolStripMenuItem.Size = new System.Drawing.Size(293, 22);
             this.regularExpressionSearchToolStripMenuItem.Text = "Regular E&xpression Search...";
             this.regularExpressionSearchToolStripMenuItem.Click += new System.EventHandler(this.regularExpressionSearchToolStripMenuItem_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(217, 6);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(290, 6);
             // 
             // optionsToolStripMenuItem
             // 
             this.optionsToolStripMenuItem.Name = "optionsToolStripMenuItem";
-            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(220, 22);
+            this.optionsToolStripMenuItem.Size = new System.Drawing.Size(293, 22);
             this.optionsToolStripMenuItem.Text = "&Options...";
             this.optionsToolStripMenuItem.Click += new System.EventHandler(this.optionsToolStripMenuItem_Click);
             // 
@@ -309,7 +321,7 @@
             // intersectionsToolStripMenuItem
             // 
             this.intersectionsToolStripMenuItem.Name = "intersectionsToolStripMenuItem";
-            this.intersectionsToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.intersectionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.intersectionsToolStripMenuItem.Text = "&Intersections";
             this.intersectionsToolStripMenuItem.Click += new System.EventHandler(this.intersectionsToolStripMenuItem_Click);
             // 
@@ -542,13 +554,14 @@
             this.timerBackup.Interval = 10000;
             this.timerBackup.Tick += new System.EventHandler(this.timerBackup_Tick);
             // 
-            // keepAutoBackupToolStripMenuItem
+            // anagramCreatorToolStripMenuItem
             // 
-            this.keepAutoBackupToolStripMenuItem.CheckOnClick = true;
-            this.keepAutoBackupToolStripMenuItem.Name = "keepAutoBackupToolStripMenuItem";
-            this.keepAutoBackupToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.keepAutoBackupToolStripMenuItem.Text = "Keep AutoBackup";
-            this.keepAutoBackupToolStripMenuItem.CheckStateChanged += new System.EventHandler(this.keepAutoBackupToolStripMenuItem_CheckStateChanged);
+            this.anagramCreatorToolStripMenuItem.Name = "anagramCreatorToolStripMenuItem";
+            this.anagramCreatorToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)(((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Shift) 
+            | System.Windows.Forms.Keys.A)));
+            this.anagramCreatorToolStripMenuItem.Size = new System.Drawing.Size(293, 22);
+            this.anagramCreatorToolStripMenuItem.Text = "&Anagram Creator...";
+            this.anagramCreatorToolStripMenuItem.Click += new System.EventHandler(this.anagramCreatorToolStripMenuItem_Click);
             // 
             // Creator
             // 
@@ -644,6 +657,7 @@
         private System.Windows.Forms.ToolStripMenuItem intersectionsToolStripMenuItem;
         private System.Windows.Forms.Timer timerBackup;
         private System.Windows.Forms.ToolStripMenuItem keepAutoBackupToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem anagramCreatorToolStripMenuItem;
     }
 }
 

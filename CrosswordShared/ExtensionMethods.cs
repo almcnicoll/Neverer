@@ -8,6 +8,7 @@ using System.Windows.Forms;
 using System.Xml;
 using System.Xml.Serialization;
 using Excel = Microsoft.Office.Interop.Excel;
+using System.Text;
 
 namespace Neverer
 {
@@ -232,6 +233,58 @@ namespace Neverer
                 return true;
             }
         }
+
+        /// <summary>
+        /// Checks if string is empty, optionally trimming before evaluating
+        /// </summary>
+        /// <param name="s">The string to evaluate</param>
+        /// <param name="TrimFirst">Whether to trim leading and trailing spaces before checking for blank string</param>
+        /// <returns>Returns true if string is null or empty</returns>
+        public static Boolean isEmpty(this String s, Boolean TrimFirst = false)
+        {
+            if (s == null) { return true; }
+            if (TrimFirst) { s = s.Trim(); }
+            if (s == "") { return true; }
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the given <see cref="ICollection"/> is empty
+        /// </summary>
+        /// <typeparam name="T">The content-type of the collection</typeparam>
+        /// <param name="list">The collection</param>
+        /// <returns>True if collection is null or empty</returns>
+        public static Boolean isEmpty<T>(this ICollection<T> list)
+        {
+            if (list == null) { return true; }
+            return (list.Count == 0);
+        }
+
+        /// <summary>
+        /// Produces a byte array from the string, using UTF8 encoding
+        /// </summary>
+        /// <param name="s">The string to split</param>
+        /// <returns>Byte array, or null if the string is null</returns>
+        public static Byte[] getBytesUTF8(this String s)
+        {
+            if (s == null) { return null; }
+            UTF8Encoding enc = new UTF8Encoding();
+            return enc.GetBytes(s);
+        }
+
+        /// <summary>
+        /// Makes a string from the given byte-array, using UTF8 encoding
+        /// </summary>
+        /// <param name="b">Byte array to convert</param>
+        /// <returns>String, or null if byte array is null</returns>
+        public static String makeStringUTF8(this Byte[] b)
+        {
+            if (b == null) { return null; }
+            UTF8Encoding enc = new UTF8Encoding();
+            return enc.GetString(b);
+        }
+
+
     }
 
     /// <summary>
@@ -280,5 +333,6 @@ namespace Neverer
                 return method();
             }
         }
+
     }
 }
