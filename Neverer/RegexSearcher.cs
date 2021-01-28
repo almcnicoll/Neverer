@@ -69,6 +69,7 @@ namespace Neverer
 
                 for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
                 {
+                    if (!__callingForm.AllDictionaries.ContainsKey(dt)) { continue; }
                     List<IWordSource> dicts = __callingForm.AllDictionaries[dt];
                     foreach (IWordSource dict in dicts)
                     {

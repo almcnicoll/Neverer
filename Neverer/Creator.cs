@@ -1566,8 +1566,20 @@ namespace Neverer
                 return;
             }
 
-            // Retrieve user dictionary (1st custom)
-            IWordSource ws = AllDictionaries[DictType.Custom][0];
+            // Retrieve user dictionary (1st custom, then 1st default - think about a better way to do this)
+            IWordSource ws;
+            if (AllDictionaries.ContainsKey(DictType.Custom) && (AllDictionaries[DictType.Custom].Count > 0)) {
+                ws = AllDictionaries[DictType.Custom][0];
+            } else
+            {
+                if (AllDictionaries.ContainsKey(DictType.Default) && (AllDictionaries[DictType.Default].Count > 0)) {
+                    ws = AllDictionaries[DictType.Default][0];
+                } else
+                {
+                    MessageBox.Show("There are no dictionaries available to add to.");
+                    return;
+                }
+            }
 
             // See if there is a matching entry already
             if (ws.entries.ContainsKey(word))

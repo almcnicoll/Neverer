@@ -18,6 +18,7 @@ namespace Neverer.UtilityClass
 
             LetterSubstitutionSet ls = new LetterSubstitutionSet();
 
+            // TODO - "Collection was modified" firing here
             foreach (PlacedClue pc2 in otherClues)
             {
                 System.Drawing.Point? overlap = pc.GetOverlap(pc2);
