@@ -1962,11 +1962,11 @@ namespace Neverer
                 }
                 // Now allow for non-counting characters:
                 //  every one of these occurring before the relevant part of the string should increase pos by 1
-                int cumulative = 0;int nonCountings = 0;
+                int cumulative = 0; int nonCountings = 0;
                 foreach (int part in pc.clue.pattern)
                 {
                     cumulative += part;
-                    if(cumulative<=pos) { nonCountings += 1; }
+                    if (cumulative <= pos) { nonCountings += 1; }
                 }
                 pos += nonCountings;
                 StringBuilder sb = new StringBuilder(pc.clue.answer);
@@ -2018,6 +2018,34 @@ namespace Neverer
             foreach (PlacedClue pc in intersections)
             {
                 ClearClue(pc);
+            }
+        }
+
+        //TODO - abstract contents of BackgroundWorker DoWork into a "CheckClues" function
+        //TODO - then make the folowing function run automatically instead of on demand
+        /// <summary>
+        /// Look through all the clues, seeing where their possible matches narrow down choices in other clues
+        /// </summary>
+        private void CheckCluesRefined()
+        {
+            // Push all incomplete clues with at least one match onto the stack
+            // Push all incomplete clues with at least one match onto the stack
+            Stack<PlacedClue> clueStack = new Stack<PlacedClue>();
+            foreach (PlacedClue pc in crossword.placedClues)
+            {
+                if (
+                    (!pc.status.HasFlag(ClueStatus.AnswerComplete)) &&
+                    (pc.status.HasFlag(ClueStatus.HasMatches))
+                    )
+                {
+                    clueStack.Push(pc);
+                }
+            }
+
+            while(clueStack.Count>0)
+            {
+                PlacedClue target = clueStack.Pop();
+                // Analyse this clue, including adding back to the stack any other clues that have been affected
             }
         }
     }

@@ -117,7 +117,8 @@ namespace Neverer.UtilityClass
         private int lowMatchesTrigger = 5;
 
         private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
-
+        private bool __refinedChanges = true;
+        private regex.Regex __refinedRegex = null;
 
         [XmlIgnore()]
         public int height
@@ -184,6 +185,18 @@ namespace Neverer.UtilityClass
             get
             {
                 return clue.ToString();
+            }
+        }
+
+        public regex.Regex refinedRegex
+        {
+            get
+            {
+                if (__refinedChanges)
+                {
+                    recalculateRefinedRegex();
+                }
+                return __refinedRegex;
             }
         }
 
@@ -421,7 +434,12 @@ namespace Neverer.UtilityClass
             return null;
         }
 
-        public void RefinePattern(String overlay)
+        /// <summary>
+        /// Filters the list of "refined matches" by a further string-pattern
+        /// </summary>
+        /// <param name="overlay">String of letters or question marks indicating the character mask</param>
+        /// <returns>True if the operation changed the number of possible matches</returns>
+        public bool RefinePattern(String overlay)
         {
             regex.Regex reStrip = new regex.Regex("[^A-Za-z?]+");
             overlay = reStrip.Replace(overlay, "");
@@ -440,11 +458,111 @@ namespace Neverer.UtilityClass
 
             // Now refine the matches further
             regex.Regex re = Clue.toRegExp(refinedLetters);
+            return RefinePattern(re);
+        }
+
+        /// <summary>
+        /// Filters the list of "refined matches" by limiting the specified cell to a set list of characters
+        /// </summary>
+        /// <param name="x">The x coordinate of the cell</param>
+        /// <param name="y">The y coordinate of the cell</param>
+        /// <param name="possibleLetters">An array of the possible letters for this slot</param>
+        /// <returns>True if the operation changed the number of possible matches</returns>
+        public bool RefinePattern(int x, int y, char[] possibleLetters)
+        {
+            int pos; // Zero-based position within the clue of the specified cell
+            switch (this.orientation)
+            {
+                case AD.Across:
+                    if (
+                        (y == this.y) &&
+                        (x >= this.x) &&
+                        (x < this.x + this.clue.length)
+                        )
+                    {
+                        pos = x - this.x;
+                    }
+                    else
+                    {
+                        // Doesn't intersect
+                        return false;
+                    }
+                    break;
+                case AD.Down:
+                    if (
+                        (x == this.x) &&
+                        (y >= this.y) &&
+                        (y < this.y + this.clue.length)
+                        )
+                    {
+                        pos = y - this.y;
+                    }
+                    else
+                    {
+                        // Doesn't intersect
+                        return false;
+                    }
+                    break;
+                default:
+                    return false;
+            }
+            String pattern = "";
+            for (int i = 0; i < pos; i++)
+            {
+                pattern += ".[" + Clue.NonCountingChars_Regex + "]*";
+            }
+            regex.Regex overlay = new regex.Regex(pattern, regex.RegexOptions.IgnoreCase);
+            return RefinePattern(overlay);
+            //TODO - this whole refinedMatches business probably wants each PlacedClue to have an array of Hashset<char> that tracks what each cell could potentially be - that would be a neater way to do what we've got here
+        }
+
+        /// <summary>
+        /// Filters the list of "refined matches" by a regular expression
+        /// </summary>
+        /// <param name="overlay">Regex indicating the character mask</param>
+        /// <returns>True if the operation changed the number of possible matches</returns>
+        public bool RefinePattern(regex.Regex overlay)
+        {
+            bool refinementsMade = false;
+            // Now refine the matches further
             List<String> keys = new List<String>(__refinedMatches.Keys);
             foreach (String key in keys)
             {
-                if (!re.IsMatch(key)) { __refinedMatches.Remove(key); }
+                if (!overlay.IsMatch(key))
+                {
+                    __refinedMatches.Remove(key);
+                    refinementsMade = true;
+                }
             }
+            __refinedChanges = true;
+            return refinementsMade;
+        }
+
+        private void recalculateRefinedRegex()
+        {
+            // Populate a per-character-position lookup of which letters are valid
+            Dictionary<int, HashSet<char>> refinedPatternLetters = new Dictionary<int, HashSet<char>>();
+            for (int i = 0; i < clue.length; i++)
+            {
+                refinedPatternLetters.Add(i, new HashSet<char>());
+            }
+            // Go through each possible word, seeing which letters could fit in each position
+            foreach (String word in __refinedMatches.Keys)
+            {
+                char[] wordChars = word.ToCharArray();
+                for (int i = 0; i < word.Length; i++)
+                {
+                    refinedPatternLetters[i].Add(wordChars[i]);
+                }
+            }
+            // Now generate a character class per position, separating them
+            String[] refinedPatternClasses = new string[clue.length];
+            for (int i = 0; i < clue.length; i++)
+            {
+                refinedPatternClasses[i] = "[" + String.Join("", refinedPatternLetters[i]) + "]";
+            }
+            __refinedRegex = new regex.Regex("^" + String.Join("[" + Clue.NonCountingChars_Regex + "]*", refinedPatternClasses) + "$", regex.RegexOptions.IgnoreCase);
+            __refinedChanges = false;
         }
 
         /// <summary>
