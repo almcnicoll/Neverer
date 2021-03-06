@@ -109,6 +109,7 @@ namespace Neverer
             this.cmdCalculate.TabIndex = 27;
             this.cmdCalculate.Text = "Calculate";
             this.cmdCalculate.UseVisualStyleBackColor = true;
+            this.cmdCalculate.Click += new System.EventHandler(this.cmdCalculate_Click);
             // 
             // AnagramCreator
             // 

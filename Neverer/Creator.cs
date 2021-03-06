@@ -403,11 +403,36 @@ namespace Neverer
 
             return ce.AcceptedClue;
         }
+        /// <summary>
+        /// Creates a new clue at the specified location
+        /// </summary>
+        /// <param name="x">The 1-based column from which the clue starts</param>
+        /// <param name="y">The 1-based row from which the clue starts</param>
+        /// <returns></returns>
         private PlacedClue getClue(int x, int y)
         {
+            AD defaultOrientation = AD.Across;
+            // Check if there's existing clues intersecting the coordinates
+            List<PlacedClue> existing = FindCluesFromGridPos(x, y);
+            if (existing.Count > 0)
+            {
+                if (existing.Count > 1)
+                {
+                    // Two intersecting clues - don't create another
+                    MessageBox.Show("Cannot create another clue here - it already has two.");
+                    return null;
+                }
+                else
+                {
+                    // One intersecting clue - default to opposite direction
+                    if (existing[0].orientation == AD.Across) { defaultOrientation = AD.Down; }
+                }
+            }
+
             PlacedClue template = new PlacedClue();
             template.x = x; template.y = y;
             template.clue = new Clue(Clue.BlankQuestion, "?");
+            template.orientation = defaultOrientation;
             ClueEntry ce = new ClueEntry(this, template);
             ce.ShowDialog();
 
@@ -755,10 +780,16 @@ namespace Neverer
             TryClueEdit();
         }
 
+        /// <summary>
+        /// Attempts to add a clue to the crossword
+        /// </summary>
+        /// <param name="x">The 1-based column from which the clue starts</param>
+        /// <param name="y">The 1-based row from which the clue starts</param>
         private void TryClueAdd(int x = 1, int y = 1)
         {
             List<PlacedClue> added = new List<PlacedClue>();
             PlacedClue pc = getClue(x, y);
+            // Check if we got a new clue or a cancellation
             if (pc != null)
             {
                 crossword.placedClues.Add(pc);
@@ -1568,13 +1599,17 @@ namespace Neverer
 
             // Retrieve user dictionary (1st custom, then 1st default - think about a better way to do this)
             IWordSource ws;
-            if (AllDictionaries.ContainsKey(DictType.Custom) && (AllDictionaries[DictType.Custom].Count > 0)) {
-                ws = AllDictionaries[DictType.Custom][0];
-            } else
+            if (AllDictionaries.ContainsKey(DictType.Custom) && (AllDictionaries[DictType.Custom].Count > 0))
             {
-                if (AllDictionaries.ContainsKey(DictType.Default) && (AllDictionaries[DictType.Default].Count > 0)) {
+                ws = AllDictionaries[DictType.Custom][0];
+            }
+            else
+            {
+                if (AllDictionaries.ContainsKey(DictType.Default) && (AllDictionaries[DictType.Default].Count > 0))
+                {
                     ws = AllDictionaries[DictType.Default][0];
-                } else
+                }
+                else
                 {
                     MessageBox.Show("There are no dictionaries available to add to.");
                     return;
@@ -1808,31 +1843,6 @@ namespace Neverer
             }
         }
 
-        private void tsClearCell_Click(object sender, EventArgs e)
-        {
-            if ((__mouseRow > 0) && (__mouseCol > 0))
-            {
-                List<PlacedClue> matches = FindCluesFromGridPos(__mouseCol, __mouseRow);
-                int pos = 0;
-                foreach (PlacedClue pc in matches)
-                {
-                    switch (pc.orientation)
-                    {
-                        case AD.Across:
-                            pos = __mouseCol - pc.x;
-                            break;
-                        case AD.Down:
-                            pos = __mouseRow - pc.y;
-                            break;
-                    }
-                    StringBuilder sb = new StringBuilder(pc.clue.answer);
-                    sb[pos] = '?';
-                    pc.clue.answer = sb.ToString();
-                }
-            }
-            UpdatePreviewGrid();
-        }
-
         private void newClueHereToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TryClueAdd(__mouseCol, __mouseRow);
@@ -1910,6 +1920,105 @@ namespace Neverer
         {
             AnagramCreator ac = new AnagramCreator(this);
             ac.Show();
+        }
+        private void tsClearCell_Click(object sender, EventArgs e)
+        {
+            if ((__mouseRow > 0) && (__mouseCol > 0))
+            {
+                ClearCell(__mouseRow, __mouseCol);
+            }
+            UpdatePreviewGrid();
+        }
+
+        private void tsClearClue_Click(object sender, EventArgs e)
+        {
+            if ((__mouseCol > 0) && (__mouseRow > 0))
+            {
+                ClearClues(__mouseCol, __mouseRow);
+            }
+            UpdatePreviewGrid();
+            //populateClueDisplays();
+        }
+
+        /// <summary>
+        /// Clears the given cell (by x and y) in all intersecting clues
+        /// </summary>
+        /// <param name="x">The x position at which to clear</param>
+        /// <param name="y">The y position at which to clear</param>
+        private void ClearCell(int x, int y)
+        {
+            List<PlacedClue> matches = FindCluesFromGridPos(x, y);
+            int pos = 0;
+            foreach (PlacedClue pc in matches)
+            {
+                switch (pc.orientation)
+                {
+                    case AD.Across:
+                        pos = x - pc.x;
+                        break;
+                    case AD.Down:
+                        pos = y - pc.y;
+                        break;
+                }
+                // Now allow for non-counting characters:
+                //  every one of these occurring before the relevant part of the string should increase pos by 1
+                int cumulative = 0;int nonCountings = 0;
+                foreach (int part in pc.clue.pattern)
+                {
+                    cumulative += part;
+                    if(cumulative<=pos) { nonCountings += 1; }
+                }
+                pos += nonCountings;
+                StringBuilder sb = new StringBuilder(pc.clue.answer);
+                sb[pos] = '?';
+                pc.clue.answer = sb.ToString();
+            }
+        }
+
+        /// <summary>
+        /// Clears all cells in the specified clue, including any intersections with other clues, as well as the clue question
+        /// </summary>
+        /// <param name="clue">The clue to clear</param>
+        private void ClearClue(PlacedClue clue)
+        {
+            int xLoop = clue.x;
+            int yLoop = clue.y;
+            switch (clue.orientation)
+            {
+                case AD.Across:
+                    for (xLoop = clue.x; xLoop < (clue.x + clue.clue.length); xLoop++)
+                    {
+                        ClearCell(xLoop, yLoop);
+                    }
+                    break;
+                case AD.Down:
+                    for (yLoop = clue.y; yLoop < (clue.y + clue.clue.length); yLoop++)
+                    {
+                        ClearCell(xLoop, yLoop);
+                    }
+                    break;
+                default:
+                    // Shouldn't really happen!
+                    break;
+            }
+            clue.clue.question = Clue.BlankQuestion;
+            clue.Changed();
+        }
+
+        /// <summary>
+        /// Clears all cells in any clue crossing the specified cell
+        /// </summary>
+        /// <param name="x">The x position at which to select clues to clear</param>
+        /// <param name="y">The y position at which to select clues to clear</param>
+        private void ClearClues(int x, int y)
+        {
+            //int xLoop;
+            //int yLoop;
+            List<PlacedClue> intersections = FindCluesFromGridPos(x, y);
+            foreach (PlacedClue pc in intersections)
+            {
+                ClearClue(pc);
+            }
         }
     }
 }

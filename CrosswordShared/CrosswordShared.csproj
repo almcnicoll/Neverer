@@ -54,6 +54,9 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Settings.cs" />
+    <Compile Include="UtilityClass\AnagramFunctions.cs" />
+    <Compile Include="UtilityClass\AnagramSolver.cs" />
+    <Compile Include="UtilityClass\AnagramTree.cs" />
     <Compile Include="UtilityClass\Clue.cs" />
     <Compile Include="UtilityClass\Crossword.cs" />
     <Compile Include="UtilityClass\CrosswordDictionary.cs" />

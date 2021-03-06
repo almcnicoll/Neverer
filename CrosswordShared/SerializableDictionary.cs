@@ -4,6 +4,7 @@
     using System.Runtime.Serialization;
     using System.Xml;
     using System.Xml.Serialization;
+    using System.Linq;
 
     // This code copyright (c) Dacris Software Inc. under MIT license
 

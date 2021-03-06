@@ -142,6 +142,7 @@ namespace Neverer.UtilityClass
             // Set autosave to false so we don't overwrite any existing linked wordlist on load
             this.Autosave = false;
             // Do not add handler for CollectionChanged event, as it should already be present from constructor
+            if (this.Words == null) { this.Words = new ObservableCollection<String>(); }
             this.Words.Clear();
             this.Words = new ObservableCollection<String>(File.ReadAllLines(filename));
             // If persistFilename is true, this is our new filename for the wordlist, even if we already have one

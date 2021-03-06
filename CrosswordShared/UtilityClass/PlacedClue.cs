@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Xml.Serialization;
+using regex = System.Text.RegularExpressions;
+using System.Linq;
 
 namespace Neverer.UtilityClass
 {
@@ -26,6 +28,7 @@ namespace Neverer.UtilityClass
         }
         public static Color StatusColor(ClueStatus status)
         {
+            /*
             switch (status)
             {
                 case ClueStatus.NoMatchingWord:
@@ -33,12 +36,70 @@ namespace Neverer.UtilityClass
                 case ClueStatus.MatchingWordNoQuestion:
                     return Color.Gold;
                 case ClueStatus.MatchingWordWithQuestion:
-                    return Color.CornflowerBlue;
+                    return Color.MediumSeaGreen;
                 case ClueStatus.NoMatchingWordComplete:
                     return Color.LightSlateGray;
+                case ClueStatus.FewMatchingWords:
+                    return Color.DarkOrange;
+                case ClueStatus.Complete:
+                    return Color.CornflowerBlue;
                 default:
                     return Color.FromKnownColor(KnownColor.Control);
             }
+            */
+
+            // Do we have matches?
+            if (status.HasFlag(ClueStatus.HasMatches))
+            {
+                // Yes - matches
+                // Do we have a chosen answer?
+                if (status.HasFlag(ClueStatus.AnswerComplete))
+                {
+                    // Yes - chosen answer
+                    // Do we have a question filled out?
+                    if (status.HasFlag(ClueStatus.QuestionComplete))
+                    {
+                        // Yes - we're done here - blue
+                        return Color.CornflowerBlue;
+                    }
+                    else
+                    {
+                        // No - need a question still
+                        return Color.MediumSeaGreen;
+                    }
+                }
+                else
+                {
+                    // No - some blanks remain
+                    // Are we down to only a few matching words?
+                    if (status.HasFlag(ClueStatus.HasFewMatches))
+                    {
+                        // Yes - dark orange
+                        return Color.DarkOrange;
+                    }
+                    else
+                    {
+                        // No - gold
+                        return Color.Gold;
+                    }
+                }
+            }
+            else
+            {
+                // No matches
+                // Do we have a chosen answer in place?
+                if (status.HasFlag(ClueStatus.AnswerComplete))
+                {
+                    // Answer chosen but we don't recognise it - might not be a valid word
+                    return Color.LightSlateGray;
+                }
+                else
+                {
+                    // No answer, no matches - we could be in trouble
+                    return Color.Red;
+                }
+            }
+            //return Color.FromKnownColor(KnownColor.Control);
         }
 
         // Member variables
@@ -49,9 +110,14 @@ namespace Neverer.UtilityClass
         private int __placeNumber = 0; // This property is not updated by this class, but is for storage by calling routines
         private Guid __UniqueID;
         private ClueStatus __status = ClueStatus.Unknown;
+
         private SerializableDictionary<String, List<String>> __matches = new SerializableDictionary<String, List<String>>();
         private bool __uncheckedChanges = true;
         private bool __pauseEvents = false;
+        private int lowMatchesTrigger = 5;
+
+        private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
+
 
         [XmlIgnore()]
         public int height
@@ -84,6 +150,8 @@ namespace Neverer.UtilityClass
                 return PlacedClue.GetOrder(y, x);
             }
         }
+
+        public String refinedLetters = null;
 
         public String placeDescriptor
         {
@@ -119,9 +187,21 @@ namespace Neverer.UtilityClass
             }
         }
 
+        /// <summary>
+        /// Recalculates the status of the clue based on available word-matches data
+        /// </summary>
         public void recalculateStatus()
         {
-            if (clue.answer.Contains("?"))
+            ClueStatus newStatus = ClueStatus.Unknown;
+            if (!clue.answer.Contains("?")) { newStatus |= ClueStatus.AnswerComplete; }
+            if ((clue.question != "") && (clue.question != Clue.BlankQuestion)) { newStatus |= ClueStatus.QuestionComplete; }
+            if ((Matches != null) && (Matches.Count > 0))
+            {
+                newStatus |= ClueStatus.HasMatches;
+                if (Matches.Count <= lowMatchesTrigger) { newStatus |= ClueStatus.HasFewMatches; }
+            }
+
+            /*if (clue.answer.Contains("?"))
             {
                 if ((Matches == null) || (Matches.Count == 0))
                 {
@@ -150,11 +230,25 @@ namespace Neverer.UtilityClass
                     }
                     else
                     {
-                        __status = ClueStatus.MatchingWordWithQuestion;
+                        __status = ClueStatus.Complete;
                     }
                 }
             }
-            Changed();
+            // Handle low-matches
+            if (((__status == ClueStatus.MatchingWordWithQuestion)
+                || (__status == ClueStatus.MatchingWordNoQuestion))
+                && (Matches.Count <= lowMatchesTrigger)
+                && (clue.answer.Contains("?")))
+            {
+                __status = ClueStatus.FewMatchingWords;
+            }
+            */
+            // Put the Changed() call in an if(), otherwise we end up in a recursive loop
+            if (__status != newStatus)
+            {
+                __status = newStatus;
+                Changed();
+            }
         }
 
         public ClueStatus status
@@ -212,7 +306,7 @@ namespace Neverer.UtilityClass
         }
 
         // Functions
-        private void Changed(Clue sender = null, ClueChangedEventArgs e = null)
+        public void Changed(Clue sender = null, ClueChangedEventArgs e = null)
         {
             // One universal place to register that the clue has changed
             //  and needs to bubble up an event.
@@ -235,6 +329,20 @@ namespace Neverer.UtilityClass
             }
         }
 
+        public override string ToString()
+        {
+            String clueText = "";
+            if (clue == null)
+            {
+                clueText = "[no clue]";
+            }
+            else
+            {
+                clueText = clue.ToString();
+            }
+            return String.Format("{0} [{1},{2}] {3}", clueText, x, y, orientation);
+        }
+
         /// <summary>
         /// Copies the <see cref="PlacedClue"/> object to another, essentially creating a clone
         /// </summary>
@@ -253,6 +361,7 @@ namespace Neverer.UtilityClass
             clue.CopyTo(target.clue);
             target.Changed();
         }
+
         /// <summary>
         /// Creates a clone of the current clue
         /// </summary>
@@ -312,36 +421,87 @@ namespace Neverer.UtilityClass
             return null;
         }
 
+        public void RefinePattern(String overlay)
+        {
+            regex.Regex reStrip = new regex.Regex("[^A-Za-z?]+");
+            overlay = reStrip.Replace(overlay, "");
+
+            char[] overlayLetters = overlay.ToCharArray();
+            char[] rl = refinedLetters.ToCharArray();
+            for (int i = 0; i < overlayLetters.Length; i++)
+            {
+                char c = overlayLetters[i];
+                if (c != '?')
+                {
+                    rl[i] = c;
+                }
+            }
+            refinedLetters = rl.ToString();
+
+            // Now refine the matches further
+            regex.Regex re = Clue.toRegExp(refinedLetters);
+            List<String> keys = new List<String>(__refinedMatches.Keys);
+            foreach (String key in keys)
+            {
+                if (!re.IsMatch(key)) { __refinedMatches.Remove(key); }
+            }
+        }
+
+        /// <summary>
+        /// Clear the list of matches against the clue
+        /// </summary>
         public void clearMatches()
         {
             __matches = null;
             __matches = new SerializableDictionary<String, List<String>>();
-            //status = ClueStatus.NoMatchingWord;
-            //if (clue.answer.Contains("?"))
-            //{
-            //    status = ClueStatus.NoMatchingWord;
-            //} else if ((clue.question == null)||(clue.question == Clue.BlankQuestion))
-            //{
-            //    status = ClueStatus.MatchingWordNoQuestion;
-            //} else
-            //{
-            //    status = ClueStatus.MatchingWordWithQuestion;
-            //}
+            __refinedMatches = null;
+            __refinedMatches = new SerializableDictionary<String, List<String>>();
+            /*
+                        status = ClueStatus.NoMatchingWord;
+                        if (clue.answer.Contains("?"))
+                        {
+                            status = ClueStatus.NoMatchingWord;
+                        }
+                        else if ((clue.question == null) || (clue.question == Clue.BlankQuestion))
+                        {
+                            status = ClueStatus.MatchingWordNoQuestion;
+                        }
+                        else
+                        {
+                            status = ClueStatus.MatchingWordWithQuestion;
+                        }
+            */
         }
+
+        /// <summary>
+        /// Adds a match to the list
+        /// </summary>
+        /// <param name="answer">The matching answer</param>
+        /// <param name="question">The suggested question text</param>
         public void addMatch(String answer, String question = "")
         {
             // Ensure there's an entry
             if (!__matches.ContainsKey(answer))
             {
                 __matches.Add(answer, new List<String>());
-                if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
+                //if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
+                __status |= ClueStatus.HasMatches;
+            }
+            if (!__refinedMatches.ContainsKey(answer))
+            {
+                __refinedMatches.Add(answer, new List<String>());
             }
             // No duplicate questions (including blank question, which means "answer only")
             if (!__matches[answer].Contains(question))
             {
                 __matches[answer].Add(question);
-                if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
-                if (question != "") { status = ClueStatus.MatchingWordWithQuestion; }
+                //if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
+                //if (question != "") { status = ClueStatus.MatchingWordWithQuestion; }
+                __status |= ClueStatus.HasMatches;
+            }
+            if (!__refinedMatches[answer].Contains(question))
+            {
+                __refinedMatches[answer].Add(question);
             }
         }
     }

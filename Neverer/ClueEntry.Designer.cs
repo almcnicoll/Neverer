@@ -50,7 +50,7 @@
             // lblAnswer
             // 
             this.lblAnswer.AutoSize = true;
-            this.lblAnswer.Location = new System.Drawing.Point(12, 9);
+            this.lblAnswer.Location = new System.Drawing.Point(12, 35);
             this.lblAnswer.Name = "lblAnswer";
             this.lblAnswer.Size = new System.Drawing.Size(42, 13);
             this.lblAnswer.TabIndex = 0;
@@ -59,7 +59,7 @@
             // lblQuestion
             // 
             this.lblQuestion.AutoSize = true;
-            this.lblQuestion.Location = new System.Drawing.Point(12, 35);
+            this.lblQuestion.Location = new System.Drawing.Point(12, 62);
             this.lblQuestion.Name = "lblQuestion";
             this.lblQuestion.Size = new System.Drawing.Size(49, 13);
             this.lblQuestion.TabIndex = 2;
@@ -69,7 +69,7 @@
             // 
             this.txtAnswer.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtAnswer.Location = new System.Drawing.Point(67, 6);
+            this.txtAnswer.Location = new System.Drawing.Point(67, 32);
             this.txtAnswer.Name = "txtAnswer";
             this.txtAnswer.Size = new System.Drawing.Size(381, 20);
             this.txtAnswer.TabIndex = 1;
@@ -80,7 +80,7 @@
             // 
             this.txtQuestion.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.txtQuestion.Location = new System.Drawing.Point(67, 32);
+            this.txtQuestion.Location = new System.Drawing.Point(67, 59);
             this.txtQuestion.Name = "txtQuestion";
             this.txtQuestion.Size = new System.Drawing.Size(381, 20);
             this.txtQuestion.TabIndex = 3;
@@ -92,11 +92,11 @@
             this.txtPreview.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.txtPreview.BackColor = System.Drawing.SystemColors.Control;
-            this.txtPreview.Location = new System.Drawing.Point(15, 58);
+            this.txtPreview.Location = new System.Drawing.Point(15, 85);
             this.txtPreview.Name = "txtPreview";
             this.txtPreview.ReadOnly = true;
             this.txtPreview.Size = new System.Drawing.Size(433, 20);
-            this.txtPreview.TabIndex = 4;
+            this.txtPreview.TabIndex = 9;
             // 
             // cmdCancel
             // 
@@ -105,7 +105,7 @@
             this.cmdCancel.Location = new System.Drawing.Point(15, 269);
             this.cmdCancel.Name = "cmdCancel";
             this.cmdCancel.Size = new System.Drawing.Size(75, 23);
-            this.cmdCancel.TabIndex = 11;
+            this.cmdCancel.TabIndex = 12;
             this.cmdCancel.Text = "Cancel";
             this.cmdCancel.UseVisualStyleBackColor = true;
             this.cmdCancel.Click += new System.EventHandler(this.cmdCancel_Click);
@@ -116,7 +116,7 @@
             this.cmdOK.Location = new System.Drawing.Point(373, 269);
             this.cmdOK.Name = "cmdOK";
             this.cmdOK.Size = new System.Drawing.Size(75, 23);
-            this.cmdOK.TabIndex = 10;
+            this.cmdOK.TabIndex = 11;
             this.cmdOK.Text = "&OK";
             this.cmdOK.UseVisualStyleBackColor = true;
             this.cmdOK.Click += new System.EventHandler(this.cmdOK_Click);
@@ -124,7 +124,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(12, 87);
+            this.label1.Location = new System.Drawing.Point(177, 8);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(80, 13);
             this.label1.TabIndex = 5;
@@ -133,7 +133,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(152, 87);
+            this.label2.Location = new System.Drawing.Point(317, 8);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(63, 13);
             this.label2.TabIndex = 7;
@@ -141,7 +141,7 @@
             // 
             // nudCol
             // 
-            this.nudCol.Location = new System.Drawing.Point(98, 85);
+            this.nudCol.Location = new System.Drawing.Point(263, 6);
             this.nudCol.Name = "nudCol";
             this.nudCol.Size = new System.Drawing.Size(45, 20);
             this.nudCol.TabIndex = 6;
@@ -150,7 +150,7 @@
             // 
             // nudRow
             // 
-            this.nudRow.Location = new System.Drawing.Point(238, 85);
+            this.nudRow.Location = new System.Drawing.Point(403, 6);
             this.nudRow.Name = "nudRow";
             this.nudRow.Size = new System.Drawing.Size(45, 20);
             this.nudRow.TabIndex = 8;
@@ -163,10 +163,10 @@
             this.comboOrientation.Items.AddRange(new object[] {
             "Across",
             "Down"});
-            this.comboOrientation.Location = new System.Drawing.Point(327, 84);
+            this.comboOrientation.Location = new System.Drawing.Point(15, 5);
             this.comboOrientation.Name = "comboOrientation";
             this.comboOrientation.Size = new System.Drawing.Size(121, 21);
-            this.comboOrientation.TabIndex = 9;
+            this.comboOrientation.TabIndex = 4;
             this.comboOrientation.SelectedIndexChanged += new System.EventHandler(this.comboOrientation_SelectedIndexChanged);
             this.comboOrientation.TextUpdate += new System.EventHandler(this.comboOrientation_TextUpdate);
             // 
@@ -180,7 +180,7 @@
             this.dgvPossibleClues.Name = "dgvPossibleClues";
             this.dgvPossibleClues.RowHeadersVisible = false;
             this.dgvPossibleClues.Size = new System.Drawing.Size(433, 152);
-            this.dgvPossibleClues.TabIndex = 12;
+            this.dgvPossibleClues.TabIndex = 10;
             this.dgvPossibleClues.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.dgvPossibleClues_CellDoubleClick);
             // 
             // ClueEntry

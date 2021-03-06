@@ -55,19 +55,25 @@ namespace Neverer.UtilityClass
                 return reStrip.Replace(__answer, "");
             }
         }
-        public regex.Regex regExp
+        
+        public static regex.Regex toRegExp(String source)
         {
-            get
-            {
-                return new regex.Regex(
+            return new regex.Regex(
                         "^"
                         + regex.Regex.Replace(
-                            this.answer.Replace("?", ".")
+                            source.Replace("?", ".")
                             , "."
                             , "$0[" + Clue.NonCountingChars_Regex + "]*"
                         )
                         + "$"
                     , regex.RegexOptions.IgnoreCase);
+        }
+
+        public regex.Regex regExp
+        {
+            get
+            {
+                return Clue.toRegExp(this.answer);
             }
         }
 

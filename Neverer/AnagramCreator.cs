@@ -61,10 +61,10 @@ namespace Neverer
             // TODO - Anagram generation code
             HashSet<String> dict = this.allWords;
             {
-
+                //AnagramSolver solver = new AnagramSolver();
             }
         }
-
+        /*
         // recursive function to find all the anagrams for charInventory characters
         // starting with the word at dictionaryIndex in dictionary keyList
         private HashSet<HashSet<String>> findAnagrams(int dictionaryIndex, char[] charInventory, List<String> keyList)
@@ -171,6 +171,14 @@ namespace Neverer
 
             return mergedSets;
         }
+        
+        */
+        private void cmdCalculate_Click(object sender, EventArgs e)
+        {
+            String s = txtOriginal.Text;
+            if (s.Trim() == "") { return; }
+            generateAnagrams(s, 100);
+        }
 
         /*
          * prints usage instructions
@@ -198,7 +206,8 @@ namespace Neverer
             // defaulting it to 3
             minWordLength = 3;
         }
-        
+*/
+        /*
 AnagramSolver anagramSolver = new AnagramSolver(minWordLength, wordlistPath);
 String anagramWords = "";
 for (int index = 2; index < args.length; index++)
