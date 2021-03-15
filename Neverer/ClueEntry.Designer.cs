@@ -206,6 +206,8 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ClueEntry";
             this.Text = "ClueEntry";
+            this.Shown += new System.EventHandler(this.ClueEntry_Shown);
+            this.VisibleChanged += new System.EventHandler(this.ClueEntry_VisibleChanged);
             ((System.ComponentModel.ISupportInitialize)(this.nudCol)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.nudRow)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPossibleClues)).EndInit();

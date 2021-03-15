@@ -2048,5 +2048,11 @@ namespace Neverer
                 // Analyse this clue, including adding back to the stack any other clues that have been affected
             }
         }
+
+        private void exportTextToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            TextExporter te = new TextExporter(ref crossword);
+            te.Show();
+        }
     }
 }

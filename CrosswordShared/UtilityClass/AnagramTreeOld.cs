@@ -7,36 +7,36 @@ using System.Threading.Tasks;
 
 namespace Neverer.UtilityClass
 {
-    public class AnagramTree
+    public class AnagramTreeOld
     {
         public String OriginalWord;
         private String OrderedString;
         public HashSet<String> words;
-        public Dictionary<String, AnagramTree> children;
+        public Dictionary<String, AnagramTreeOld> children;
         public Boolean childrenPopulated = false;
         private String lastEvaluatedPartial = null;
 
         public HashSet<String> workingList;
-        public Dictionary<String, AnagramTree> globalLookup;
+        public Dictionary<String, AnagramTreeOld> globalLookup;
 
         // TODO - set this to false
         public const Boolean DebugMode = true;
 
-        public AnagramTree()
+        public AnagramTreeOld()
         {
             OrderedString = "";
             words = new HashSet<String>();
-            children = new Dictionary<String, AnagramTree>();
+            children = new Dictionary<String, AnagramTreeOld>();
         }
 
-        public AnagramTree(String characters, ref HashSet<String> masterWordList, ref Dictionary<String, AnagramTree> globalLookup)
+        public AnagramTreeOld(String characters, ref HashSet<String> masterWordList, ref Dictionary<String, AnagramTreeOld> globalLookup)
         {
             this.OriginalWord = characters;
-            OrderedString = AnagramFunctions.getOrderedLetterString(characters);
+            OrderedString = AnagramFunctionsOld.getOrderedLetterString(characters);
             this.workingList = masterWordList;
             this.globalLookup = globalLookup;
             words = new HashSet<String>();
-            children = new Dictionary<String, AnagramTree>();
+            children = new Dictionary<String, AnagramTreeOld>();
         }
 
         public HashSet<String> getAllAnagrams(String prefix = "")
@@ -56,8 +56,8 @@ namespace Neverer.UtilityClass
             // Add sub-anagrams
             foreach (String partial in children.Keys)
             {
-                AnagramTree remainder = children[partial];
-                AnagramTree child = globalLookup[partial];
+                AnagramTreeOld remainder = children[partial];
+                AnagramTreeOld child = globalLookup[partial];
                 //output.UnionWith(child.getAllAnagrams(prefix + " " + child.OriginalWord + " "));
                 foreach (String word in child.words)
                 {
@@ -78,7 +78,7 @@ namespace Neverer.UtilityClass
             Dictionary<String, HashSet<String>> lookup = new Dictionary<String, HashSet<String>>();
 
             // Prepare initial word list - only words with the right letters
-            String validLetters = AnagramFunctions.getOrderedLetterString(OrderedString, true);
+            String validLetters = AnagramFunctionsOld.getOrderedLetterString(OrderedString, true);
             Regex reLimit = new Regex("^[" + validLetters + "]{1," + OrderedString.Length.ToString() + "}$", RegexOptions.IgnoreCase);
             HashSet<String> sourceWords = new HashSet<String>(
                             from String s in workingList
@@ -105,12 +105,12 @@ namespace Neverer.UtilityClass
             // Put candidate words into a dictionary with the sorted string as the key
             foreach (String word in sourceWords)
             {
-                String ow = AnagramFunctions.getOrderedLetterString(word);
+                String ow = AnagramFunctionsOld.getOrderedLetterString(word);
                 // Filter on max-counts
                 if (reMaxCountFilter.IsMatch(ow))
                 {
-                    AnagramFunctions.addToHashSetInDictionary(ref lookup, ow, word);
-                    if (!globalLookup.ContainsKey(ow)) { globalLookup.Add(ow, new AnagramTree()); }
+                    AnagramFunctionsOld.addToHashSetInDictionary(ref lookup, ow, word);
+                    if (!globalLookup.ContainsKey(ow)) { globalLookup.Add(ow, new AnagramTreeOld()); }
                     globalLookup[ow].words.Add(word);
                 }
             }
@@ -142,7 +142,7 @@ namespace Neverer.UtilityClass
             {
                 lastEvaluatedPartial = partial;
                 // Get remainder string if this partial is used
-                String remainder = AnagramFunctions.subtractSortedString(OrderedString, partial);
+                String remainder = AnagramFunctionsOld.subtractSortedString(OrderedString, partial);
                 Log("Breaking " + OriginalWord.ToUpper() + " into " + partial.ToUpper() + " and " + remainder.ToUpper(), nestLevel);
 
                 // See what can be done with the remainder
@@ -154,7 +154,7 @@ namespace Neverer.UtilityClass
                 }
                 else
                 {
-                    AnagramTree partialTree = new AnagramTree(remainder, ref this.workingList, ref globalLookup);
+                    AnagramTreeOld partialTree = new AnagramTreeOld(remainder, ref this.workingList, ref globalLookup);
                     if (partialTree.solve(false, nestLevel + 1))
                     {
                         // At least one solution

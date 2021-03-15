@@ -66,6 +66,14 @@ namespace Neverer
                 dgvcClueText.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgvPossibleClues.Columns.Add(dgvcClueText);
                 dgvPossibleClues.DataSource = possibilities;
+                if (txtAnswer.Text.Contains("?"))
+                {
+                    txtAnswer.Focus();
+                }
+                else
+                {
+                    txtQuestion.Focus();
+                }
                 UpdatePreview();
             }
             __loaded = true;
@@ -159,7 +167,7 @@ namespace Neverer
         {
             get
             {
-                  if (result == DialogResult.OK)
+                if (result == DialogResult.OK)
                 {
                     return pc;
                 }
@@ -261,6 +269,30 @@ namespace Neverer
             txtAnswer.Text = dgvc.Value.ToString().ToUpper();
             dgvc = dgvPossibleClues[1, e.RowIndex];
             if (dgvc.Value.ToString() != "") { txtQuestion.Text = dgvc.Value.ToString(); }
+        }
+
+        private void ClueEntry_Shown(object sender, EventArgs e)
+        {
+            if (txtAnswer.Text.Contains("?"))
+            {
+                txtAnswer.Focus();
+            }
+            else
+            {
+                txtQuestion.Focus();
+            }
+        }
+
+        private void ClueEntry_VisibleChanged(object sender, EventArgs e)
+        {
+            if (txtAnswer.Text.Contains("?"))
+            {
+                txtAnswer.Focus();
+            }
+            else
+            {
+                txtQuestion.Focus();
+            }
         }
     }
 }

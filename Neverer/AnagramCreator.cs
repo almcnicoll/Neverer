@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
-using CrosswordShared.UtilityClass;
 using Neverer.UtilityClass;
 
 namespace Neverer
@@ -12,7 +11,7 @@ namespace Neverer
         HashSet<String> __allWords;
         int minWordSize = 1;
 
-        SortedWordDictionary swdDict = new SortedWordDictionary();
+        //SortedWordDictionary swdDict = new SortedWordDictionary();
 
         HashSet<String> allWords
         {

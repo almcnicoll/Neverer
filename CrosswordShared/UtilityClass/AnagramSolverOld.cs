@@ -7,12 +7,12 @@ using System.Text.RegularExpressions;
 
 namespace Neverer.UtilityClass
 {
-    public class AnagramSolver
+    public class AnagramSolverOld
     {
         public HashSet<String> workingList;
         public static Dictionary<String, AnagramTree> globalLookup = null;
 
-        public AnagramSolver(List<IWordSource> sourceLists)
+        public AnagramSolverOld(List<IWordSource> sourceLists)
         {
             if (globalLookup == null) { globalLookup = new Dictionary<String, AnagramTree>(); }
             workingList = new HashSet<String>();
@@ -34,7 +34,7 @@ namespace Neverer.UtilityClass
 
             // Output vars and working vars
             HashSet<String> output = new HashSet<String>();
-            String sortedInput = AnagramFunctions.getOrderedLetterString(input);
+            String sortedInput = AnagramFunctionsOld.getOrderedLetterString(input);
 
             // Create a parent AnagramTree object
             AnagramTree root = new AnagramTree(sortedInput, ref workingList, ref globalLookup);

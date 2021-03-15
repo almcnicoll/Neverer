@@ -55,8 +55,6 @@
     <Compile Include="SerializableDictionary.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="UtilityClass\AnagramFunctions.cs" />
-    <Compile Include="UtilityClass\AnagramSolver.cs" />
-    <Compile Include="UtilityClass\AnagramTree.cs" />
     <Compile Include="UtilityClass\Clue.cs" />
     <Compile Include="UtilityClass\Crossword.cs" />
     <Compile Include="UtilityClass\CrosswordDictionary.cs" />
@@ -73,7 +71,6 @@
     <Compile Include="UtilityClass\Position.cs" />
     <Compile Include="UtilityClass\RemoteCrosswordDictionary.cs" />
     <Compile Include="UtilityClass\CrosswordStatistic.cs" />
-    <Compile Include="UtilityClass\SortedWordDictionary.cs" />
     <Compile Include="UtilityClass\WordList.cs" />
     <Compile Include="WordSources.cs" />
   </ItemGroup>

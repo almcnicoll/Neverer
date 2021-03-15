@@ -3,76 +3,101 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Text.RegularExpressions;
 
 namespace Neverer.UtilityClass
 {
     public static class AnagramFunctions
     {
-
-        /// <summary>
-        /// Returns a string of the letters in the source word, ordered alphabetically
-        /// </summary>
-        /// <param name="word">The source word</param>
-        /// <param name="excludeDuplicates">Whether to return only unique letters</param>
-        /// <returns>An ordered string of the characters in the source word</returns>
-        public static String getOrderedLetterString(String word, Boolean excludeDuplicates = false)
+        public static String Alphabetise(this String original)
         {
-            char[] characters = word.ToLower().ToCharArray();
-            if (excludeDuplicates)
-            {
-                char[] unique = characters.Distinct().ToArray();
-                Array.Sort(unique);
-                return new String(unique); //unique.ToString();
-            }
-            else
-            {
-                Array.Sort(characters);
-                return new string(characters);
-            }
+            char[] letters = original.ToCharArray();
+            Array.Sort(letters);
+            return new String(letters);
         }
 
-        /// <summary>
-        /// Returns the initial string, minus the letters specified in <paramref name="subtractionLetters"/>
-        /// </summary>
-        /// <param name="initialString">The starting string</param>
-        /// <param name="subtractionLetters">The letters to remove</param>
-        /// <returns></returns>
-        public static String subtractSortedString(String initialString, String subtractionLetters)
+        public static Dictionary<String, HashSet<String>> GetOrderedDictionary(this IEnumerable<String> original)
         {
-            char[] allChars = subtractionLetters.ToCharArray();
-            foreach (char c in allChars)
+            Dictionary<String, HashSet<String>> output = new Dictionary<String, HashSet<String>>();
+            foreach (String word in original)
             {
-                if (initialString.Contains(c.ToString()))
+                String a = Alphabetise(word);
+                if (output.ContainsKey(a))
                 {
-                    var regex = new Regex(Regex.Escape(c.ToString()));
-                    initialString = regex.Replace(initialString, "", 1);
+                    //output[a] += "," + word;
+                    output[a].Add(word);
                 }
                 else
                 {
-                    throw new Exception("Could not find all the subtractionLetters in initialString");
+                    output.Add(a, new HashSet<String>());
+                    output[a].Add(word);
                 }
             }
-            return initialString;
+            return output;
         }
-
 
         /// <summary>
-        /// Adds a value to a <see cref="HashSet{U}"/> within a <see cref="Dictionary{T, HashSet<U>}"/>, whether or not the key already exists
+        /// Swaps two elements by index in a character array
         /// </summary>
-        /// <typeparam name="T">The key type of the Dictionary</typeparam>
-        /// <typeparam name="U">The value type within the Dictionary's HashSets</typeparam>
-        /// <param name="dict">The dictionary to update</param>
-        /// <param name="key">The key to update or create</param>
-        /// <param name="value">The value to add to the HashSet</param>
-        public static void addToHashSetInDictionary<T, U>(ref Dictionary<T, HashSet<U>> dict, T key, U value)
+        /// <param name="letters">The array of characters</param>
+        /// <param name="pos1">The position of the first character to swap</param>
+        /// <param name="pos2">The position of the second character to swap</param>
+        /// <returns>The new array of characters</returns>
+        public static char[] Swap(this char[] letters, int pos1, int pos2)
         {
-            if (!dict.ContainsKey(key))
-            {
-                dict.Add(key, new HashSet<U>());
-            }
-            dict[key].Add(value);
+            char[] output = new char[letters.Length];
+            letters.CopyTo(output, 0);
+            output[pos1] = letters[pos2];
+            output[pos2] = letters[pos1];
+            return output;
+        }
+        /// <summary>
+        /// Swaps two elements by index in a string
+        /// </summary>
+        /// <param name="letterString">The string of characters</param>
+        /// <param name="pos1">The position of the first character to swap</param>
+        /// <param name="pos2">The position of the second character to swap</param>
+        /// <returns>The new array of characters</returns>
+        public static char[] Swap(this String letterString, int pos1, int pos2)
+        {
+            char[] letters = letterString.ToCharArray();
+            return letters.Swap(pos1, pos2);
         }
 
+        /// <summary>
+        /// Returns all valid permutations of <paramref name="original"/> within <paramref name="dictionary"/>
+        /// </summary>
+        /// <param name="dictionary"></param>
+        /// <param name="original"></param>
+        /// <returns>A <see cref="HashSet"/> of Strings</returns>
+        /// <seealso cref="https://www.researchgate.net/publication/10779787_Generating_anagrams_from_multiple_core_strings_employing_user-defined_vocabularies_and_orthographic_parameters?enrichId=rgreq-fa2796d62326869bf4a0cda7e6089347-XXX&enrichSource=Y292ZXJQYWdlOzEwNzc5Nzg3O0FTOjEwMjM2NDM0NjMyMjk0NUAxNDAxNDE2OTcwNjEz&el=1_x_2&_esc=publicationCoverPdf"/>
+        public static HashSet<String> GetPermutations(this String original, IEnumerable<String> dictionary = null)
+        {
+            HashSet<String> output = new HashSet<String>();
+            if ((dictionary == null) || (dictionary.Contains(original))) { output.Add(original); }
+
+            char[] letters = original.ToCharArray();
+
+            for (int k = 0; k < letters.Length; k++)
+            {
+                for (int n = 0; n < k; n++)
+                {
+                    String[] looper = new String[output.Count];
+                    output.CopyTo(looper);
+                    foreach (String existingPerm in looper)
+                    {
+                        //char[] permLetters = letters.Swap(k, n);
+                        char[] permLetters = existingPerm.Swap(k, n);
+                        String permString = new String(permLetters);
+                        if ((dictionary == null) || (dictionary.Contains(permString)))
+                        {
+                            // Move the dictionary-filtering elsewhere, as we need all strings added to get valid perms
+                            output.Add(permString);
+                        }
+                    }
+                }
+            }
+
+            return output;
+        }
     }
 }

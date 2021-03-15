@@ -150,6 +150,12 @@
     <Compile Include="Statistics.Designer.cs">
       <DependentUpon>Statistics.cs</DependentUpon>
     </Compile>
+    <Compile Include="TextExporter.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="TextExporter.Designer.cs">
+      <DependentUpon>TextExporter.cs</DependentUpon>
+    </Compile>
     <EmbeddedResource Include="AboutBox.resx">
       <DependentUpon>AboutBox.cs</DependentUpon>
     </EmbeddedResource>
@@ -186,6 +192,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Statistics.resx">
       <DependentUpon>Statistics.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="TextExporter.resx">
+      <DependentUpon>TextExporter.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="almcnicoll.pfx" />
     <None Include="Neverer_TemporaryKey.pfx" />
@@ -227,10 +236,10 @@
     <PublishFile Include="Resources\sowpods.txt">
       <Visible>False</Visible>
       <Group>Dictionaries</Group>
-      <PublishState>Auto</PublishState>
-      <IncludeHash>True</IncludeHash>
       <TargetPath>
       </TargetPath>
+      <PublishState>Auto</PublishState>
+      <IncludeHash>True</IncludeHash>
       <FileType>File</FileType>
     </PublishFile>
   </ItemGroup>
