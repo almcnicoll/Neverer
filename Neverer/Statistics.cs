@@ -13,6 +13,7 @@ namespace Neverer
         public Creator callingForm = null;
         private List<PlacedClueWithStats> clues = new List<PlacedClueWithStats>();
         private Dictionary<String, Dictionary<String, Decimal>> stats = new Dictionary<String, Dictionary<String, Decimal>>();
+        private Dictionary<Char, int> letterCounts = new Dictionary<Char, int>();
 
         public Statistics(Creator caller)
         {
@@ -55,6 +56,14 @@ namespace Neverer
                                       && pcwsTmp.y <= pcws.y + pcws.height - 1 && pcwsTmp.y + pcwsTmp.height - 1 >= pcws.y
                                       && pcwsTmp.x <= pcws.x + pcws.width - 1 && pcwsTmp.x + pcwsTmp.width - 1 >= pcws.x
                                       select pcwsTmp).Count();
+                if (pcws.clue.length == 0)
+                {
+                    pcws.intersectionsPerLetter = 0;
+                }
+                else
+                {
+                    pcws.intersectionsPerLetter = Decimal.Round((decimal)(pcws.intersections) / (decimal)(pcws.clue.length), 2, MidpointRounding.AwayFromZero);
+                }
             }
 
             if (clues.Count == 0)
@@ -74,6 +83,10 @@ namespace Neverer
                                                                             select (decimal)pcws.intersections / (decimal)pcws.clue.length).Min());
             }
 
+            populateStats_Intersections();
+        }
+        public void populateStats_Intersections()
+        {
             // Populate stats into grid
             dgvIntersectionStats.SuspendLayout();
             dgvIntersectionStats.Columns.Clear();
@@ -82,29 +95,89 @@ namespace Neverer
             dgvIntersectionStats.DataSource = null;
             dgvIntersectionStats.ResumeLayout();
             dgvIntersectionStats.DataSource = (from kvp in stats[tpIntersections.Name]
-                                               select new CrosswordStatistic(kvp.Key, Decimal.Round(kvp.Value,2,MidpointRounding.AwayFromZero))).ToArray();
+                                               select new CrosswordStatistic(kvp.Key, Decimal.Round(kvp.Value, 2, MidpointRounding.AwayFromZero))).ToArray();
 
             // Clear FlowLayoutPanel
+            bool perLetter = !(cmbPerLetter.Text.Contains("absolute"));
             foreach (Control ctrl in flpClues.Controls)
             {
                 ctrl.Dispose();
             }
             flpClues.Controls.Clear();
             // Populate FlowLayoutPanel with sorted clues
-            foreach (PlacedClueWithStats pcws in
-                (
+            IEnumerable<PlacedClueWithStats> sorted;
+            if (perLetter)
+            {
+                sorted = (
+                from PlacedClueWithStats pcwsTmp in clues
+                orderby pcwsTmp.intersectionsPerLetter
+                select pcwsTmp
+                );
+            }
+            else
+            {
+                sorted = (
                 from PlacedClueWithStats pcwsTmp in clues
                 orderby pcwsTmp.intersections
                 select pcwsTmp
-                )
-                )
+                );
+            }
+
+            foreach (PlacedClueWithStats pcws in sorted)
             {
                 ClueDisplay cd = new ClueDisplay();
                 cd.Clue = pcws;
-                cd.Statistic = pcws.intersections;
+                if (perLetter)
+                {
+                    cd.Statistic = pcws.intersectionsPerLetter;
+                }
+                else
+                {
+                    cd.Statistic = pcws.intersections;
+                }
                 flpClues.Controls.Add(cd);
-                Debug.WriteLine("pcwsTmp.intersections == " + pcws.intersections);
+                //Debug.WriteLine("pcwsTmp.intersections == " + pcws.intersections);
             }
+        }
+
+        private void cmbPerLetter_TextChanged(object sender, EventArgs e)
+        {
+            populateStats_Intersections();
+        }
+
+        public void calculateStats_Letters()
+        {
+            List<Char> allLetters = new List<Char>();
+            foreach (PlacedClueWithStats pcws in clues)
+            {
+                allLetters.AddRange(pcws.clue.answer.ToLowerInvariant().ToCharArray());
+            }
+
+            letterCounts.Clear();
+            Char a = 'a'; Char z = 'z';
+            for (int c = (int)a; c <= (int)z; c++)
+            {
+                int count = (from Char cc in allLetters
+                             where cc == (Char)c
+                             select cc).Count();
+                letterCounts.Add((Char)c, count);
+            }
+
+            populateStats_Letters();
+        }
+
+        public void populateStats_Letters()
+        {
+            // Populate stats into grid
+            dgvLetterSpread.SuspendLayout();
+            dgvLetterSpread.Columns.Clear();
+            //dgvLetterSpread.Columns.Add("Key", "Statistic");
+            //dgvLetterSpread.Columns.Add("Value", "Value");
+            dgvLetterSpread.DataSource = null;
+            dgvLetterSpread.ResumeLayout();
+            dgvLetterSpread.DataSource = (from kvp in letterCounts
+                                          select new CrosswordStatistic(kvp.Key.ToString(), kvp.Value)).ToArray();
+
         }
     }
 }

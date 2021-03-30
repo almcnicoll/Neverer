@@ -9,6 +9,6 @@ namespace Neverer.UtilityClass
     public class PlacedClueWithStats : PlacedClue
     {
         public int intersections = 0;
-
+        public decimal intersectionsPerLetter = 0;
     }
 }
