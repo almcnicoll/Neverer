@@ -104,8 +104,5 @@ namespace Neverer.UtilityClass
 
             return output;
         }
-
-
-        public 
     }
 }
