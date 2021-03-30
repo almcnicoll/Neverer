@@ -66,14 +66,6 @@ namespace Neverer
                 dgvcClueText.AutoSizeMode = DataGridViewAutoSizeColumnMode.Fill;
                 dgvPossibleClues.Columns.Add(dgvcClueText);
                 dgvPossibleClues.DataSource = possibilities;
-                if (txtAnswer.Text.Contains("?"))
-                {
-                    txtAnswer.Focus();
-                }
-                else
-                {
-                    txtQuestion.Focus();
-                }
                 UpdatePreview();
             }
             __loaded = true;
@@ -271,9 +263,15 @@ namespace Neverer
             if (dgvc.Value.ToString() != "") { txtQuestion.Text = dgvc.Value.ToString(); }
         }
 
+        /// <summary>
+        /// Sets focus to question or answer, depending on the state of completion of the clue
+        /// </summary>
+        /// <param name="sender">The sending object</param>
+        /// <param name="e">The EventArgs relating to the triggering event</param>
         private void ClueEntry_Shown(object sender, EventArgs e)
         {
-            if (txtAnswer.Text.Contains("?"))
+            // Set focus on question if answer has no blanks and is longer than 1 character            
+            if (txtAnswer.Text.Contains("?") || (txtAnswer.Text.Length <= 1))
             {
                 txtAnswer.Focus();
             }
