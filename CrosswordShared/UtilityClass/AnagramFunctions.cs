@@ -90,14 +90,22 @@ namespace Neverer.UtilityClass
                         String permString = new String(permLetters);
                         if ((dictionary == null) || (dictionary.Contains(permString)))
                         {
-                            // Move the dictionary-filtering elsewhere, as we need all strings added to get valid perms
                             output.Add(permString);
                         }
                     }
                 }
             }
 
+            // Dictionary-filtering
+            if (dictionary == null)
+            {
+                output.IntersectWith(dictionary);
+            }
+
             return output;
         }
+
+
+        public 
     }
 }
