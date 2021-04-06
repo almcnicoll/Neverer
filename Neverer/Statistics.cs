@@ -14,6 +14,8 @@ namespace Neverer
         private List<PlacedClueWithStats> clues = new List<PlacedClueWithStats>();
         private Dictionary<String, Dictionary<String, Decimal>> stats = new Dictionary<String, Dictionary<String, Decimal>>();
         private Dictionary<Char, int> letterCounts = new Dictionary<Char, int>();
+        private Dictionary<char, Decimal> freqText = new Dictionary<char, Decimal>();
+        private Dictionary<char, Decimal> freqDict = new Dictionary<char, Decimal>();
 
         public Statistics(Creator caller)
         {
@@ -34,6 +36,13 @@ namespace Neverer
                 this.clues.Add(pcws);
             }
             calculateStats_Intersections();
+            InitFreq();
+            calculateStats_Letters();
+        }
+
+        private void InitFreq()
+        {
+            freqText.Add('a', 0.082m); freqDict.Add('a', 0.078m); freqText.Add('b', 0.015m); freqDict.Add('b', 0.02m); freqText.Add('c', 0.028m); freqDict.Add('c', 0.04m); freqText.Add('d', 0.043m); freqDict.Add('d', 0.038m); freqText.Add('e', 0.13m); freqDict.Add('e', 0.11m); freqText.Add('f', 0.022m); freqDict.Add('f', 0.014m); freqText.Add('g', 0.02m); freqDict.Add('g', 0.03m); freqText.Add('h', 0.061m); freqDict.Add('h', 0.023m); freqText.Add('i', 0.07m); freqDict.Add('i', 0.086m); freqText.Add('j', 0.0015m); freqDict.Add('j', 0.0021m); freqText.Add('k', 0.0077m); freqDict.Add('k', 0.0097m); freqText.Add('l', 0.04m); freqDict.Add('l', 0.053m); freqText.Add('m', 0.024m); freqDict.Add('m', 0.027m); freqText.Add('n', 0.067m); freqDict.Add('n', 0.072m); freqText.Add('o', 0.075m); freqDict.Add('o', 0.061m); freqText.Add('p', 0.019m); freqDict.Add('p', 0.028m); freqText.Add('q', 0.00095m); freqDict.Add('q', 0.0019m); freqText.Add('r', 0.06m); freqDict.Add('r', 0.073m); freqText.Add('s', 0.063m); freqDict.Add('s', 0.087m); freqText.Add('t', 0.091m); freqDict.Add('t', 0.067m); freqText.Add('u', 0.028m); freqDict.Add('u', 0.033m); freqText.Add('v', 0.0098m); freqDict.Add('v', 0.01m); freqText.Add('w', 0.024m); freqDict.Add('w', 0.0091m); freqText.Add('x', 0.0015m); freqDict.Add('x', 0.0027m); freqText.Add('y', 0.02m); freqDict.Add('y', 0.016m); freqText.Add('z', 0.00074m); freqDict.Add('z', 0.0044m);
         }
 
         public void calculateStats_Intersections()
@@ -44,12 +53,6 @@ namespace Neverer
             // Calculate all intersecting clues
             foreach (PlacedClueWithStats pcws in clues)
             {
-                //TODO - some of these are calculating correctly, but most are not (most evaluate to zero)
-                /*String desc = String.Format("All clues where:{0}UniqueID != {1}{0}Orientation != {2}{0}"
-                    + "y+height >= {4}{0}y <= {3}{0}x+width >= {6}{0}x <= {5}{0}"
-                    , Environment.NewLine, pcws.UniqueID, pcws.orientation
-                    , pcws.y + pcws.height - 1, pcws.y, pcws.x + pcws.width - 1, pcws.x);
-                MessageBox.Show(desc);*/
                 pcws.intersections = (from PlacedClueWithStats pcwsTmp in clues
                                       where pcwsTmp.UniqueID != pcws.UniqueID
                                       && pcwsTmp.orientation != pcws.orientation
@@ -174,9 +177,13 @@ namespace Neverer
             //dgvLetterSpread.Columns.Add("Key", "Statistic");
             //dgvLetterSpread.Columns.Add("Value", "Value");
             dgvLetterSpread.DataSource = null;
-            dgvLetterSpread.ResumeLayout();
             dgvLetterSpread.DataSource = (from kvp in letterCounts
-                                          select new CrosswordStatistic(kvp.Key.ToString(), kvp.Value)).ToArray();
+                                          select new Tuple<String, Decimal, Decimal, Decimal>(kvp.Key.ToString(), kvp.Value, freqText[kvp.Key], freqDict[kvp.Key])).ToArray();
+            dgvLetterSpread.Columns[0].HeaderText = "Letter";
+            dgvLetterSpread.Columns[1].HeaderText = "Usage";
+            dgvLetterSpread.Columns[2].HeaderText = "Text avg";
+            dgvLetterSpread.Columns[3].HeaderText = "Dict avg";
+            dgvLetterSpread.ResumeLayout();
 
         }
     }
