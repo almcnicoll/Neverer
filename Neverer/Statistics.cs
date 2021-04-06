@@ -16,6 +16,7 @@ namespace Neverer
         private Dictionary<Char, int> letterCounts = new Dictionary<Char, int>();
         private Dictionary<char, Decimal> freqText = new Dictionary<char, Decimal>();
         private Dictionary<char, Decimal> freqDict = new Dictionary<char, Decimal>();
+        private int totalLetterCount = 1;
 
         public Statistics(Creator caller)
         {
@@ -157,6 +158,7 @@ namespace Neverer
             }
 
             letterCounts.Clear();
+            totalLetterCount = 0;
             Char a = 'a'; Char z = 'z';
             for (int c = (int)a; c <= (int)z; c++)
             {
@@ -164,7 +166,9 @@ namespace Neverer
                              where cc == (Char)c
                              select cc).Count();
                 letterCounts.Add((Char)c, count);
+                totalLetterCount += count;
             }
+            if (totalLetterCount == 0) { totalLetterCount = 1; }
 
             populateStats_Letters();
         }
@@ -178,13 +182,14 @@ namespace Neverer
             //dgvLetterSpread.Columns.Add("Value", "Value");
             dgvLetterSpread.DataSource = null;
             dgvLetterSpread.DataSource = (from kvp in letterCounts
-                                          select new Tuple<String, Decimal, Decimal, Decimal>(kvp.Key.ToString(), kvp.Value, freqText[kvp.Key], freqDict[kvp.Key])).ToArray();
+                                          select new Tuple<String, Decimal, Decimal, Decimal>(
+                                              kvp.Key.ToString(), kvp.Value, Math.Round(freqText[kvp.Key] * totalLetterCount, 2), Math.Round(freqDict[kvp.Key] * totalLetterCount, 2))
+                                          ).ToArray();
             dgvLetterSpread.Columns[0].HeaderText = "Letter";
             dgvLetterSpread.Columns[1].HeaderText = "Usage";
-            dgvLetterSpread.Columns[2].HeaderText = "Text avg";
-            dgvLetterSpread.Columns[3].HeaderText = "Dict avg";
+            dgvLetterSpread.Columns[2].HeaderText = "Expected (text)";
+            dgvLetterSpread.Columns[3].HeaderText = "Expected (dict)";
             dgvLetterSpread.ResumeLayout();
-
         }
     }
 }

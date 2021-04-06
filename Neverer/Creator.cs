@@ -2054,5 +2054,12 @@ namespace Neverer
             TextExporter te = new TextExporter(ref crossword);
             te.Show();
         }
+
+        private void letterFrequenciesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Statistics frmStats = new Statistics(this);
+            frmStats.tabCtrl.SelectTab(frmStats.tpLetters);
+            frmStats.ShowDialog();
+        }
     }
 }
