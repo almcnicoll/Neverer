@@ -116,6 +116,8 @@ namespace Neverer.UtilityClass
         private bool __pauseEvents = false;
         private int lowMatchesTrigger = 5;
 
+        // Refined properties take into account possible solutions on other clues, and their effect on this clue
+        private Dictionary<int, HashSet<char>> __refinedPatternLetters = null;
         private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
         private bool __refinedChanges = true;
         private regex.Regex __refinedRegex = null;
@@ -514,6 +516,7 @@ namespace Neverer.UtilityClass
             regex.Regex overlay = new regex.Regex(pattern, regex.RegexOptions.IgnoreCase);
             return RefinePattern(overlay);
             //TODO - this whole refinedMatches business probably wants each PlacedClue to have an array of Hashset<char> that tracks what each cell could potentially be - that would be a neater way to do what we've got here
+            // NB - I think we might have this now - but do check!
         }
 
         /// <summary>
@@ -540,29 +543,62 @@ namespace Neverer.UtilityClass
 
         private void recalculateRefinedRegex()
         {
-            // Populate a per-character-position lookup of which letters are valid
-            Dictionary<int, HashSet<char>> refinedPatternLetters = new Dictionary<int, HashSet<char>>();
-            for (int i = 0; i < clue.length; i++)
+            // Check whether we make any changes - so we know whether to recalculate intersects
+            bool changesMade = false;
+
+            // If we haven't populated this dict then it must be the first time around
+            if (__refinedPatternLetters == null)
             {
-                refinedPatternLetters.Add(i, new HashSet<char>());
+                // Populate a per-character-position lookup of which letters are valid
+                __refinedPatternLetters = new Dictionary<int, HashSet<char>>();
+                for (int i = 0; i < clue.length; i++)
+                {
+                    __refinedPatternLetters.Add(i, new HashSet<char>());
+                }
+                changesMade = true;
             }
+
+            // Log old refinedPatternLetters so we can tell if it's changed
+            Dictionary<int, HashSet<char>> oldLetters;
+            if (changesMade)
+            {
+                // If we know we already have changes, there's no point checking for more
+                oldLetters = new Dictionary<int, HashSet<char>>();
+            }
+            else
+            {
+                // Otherwise work from a deep copy
+                oldLetters = __refinedPatternLetters.DeepCopy();
+            }
+
             // Go through each possible word, seeing which letters could fit in each position
             foreach (String word in __refinedMatches.Keys)
             {
                 char[] wordChars = word.ToCharArray();
                 for (int i = 0; i < word.Length; i++)
                 {
-                    refinedPatternLetters[i].Add(wordChars[i]);
+                    __refinedPatternLetters[i].Add(wordChars[i]);
                 }
             }
+
+            // Check if refinedPatternLetters has changed as a result - but only bother if we haven't already got changes
+            if (!changesMade)
+            {
+                // TODO - would be good to see _which_ positions changed so we don't recalculate ALL intersecting clues
+                // That would involve switching from a boolean to a Dict<int,boolean> or something like that
+                changesMade = __refinedPatternLetters.DeepEquals(oldLetters);
+            }
+
             // Now generate a character class per position, separating them
             String[] refinedPatternClasses = new string[clue.length];
             for (int i = 0; i < clue.length; i++)
             {
-                refinedPatternClasses[i] = "[" + String.Join("", refinedPatternLetters[i]) + "]";
+                refinedPatternClasses[i] = "[" + String.Join("", __refinedPatternLetters[i]) + "]";
             }
             __refinedRegex = new regex.Regex("^" + String.Join("[" + Clue.NonCountingChars_Regex + "]*", refinedPatternClasses) + "$", regex.RegexOptions.IgnoreCase);
             __refinedChanges = false;
+
+            // TODO - if changes made, recalculate refinedPatterns of all intersecting clues
         }
 
         /// <summary>

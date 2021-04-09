@@ -9,6 +9,7 @@ using System.Xml;
 using System.Xml.Serialization;
 using Excel = Microsoft.Office.Interop.Excel;
 using System.Text;
+using System.Linq;
 
 namespace Neverer
 {
@@ -332,6 +333,40 @@ namespace Neverer
             {
                 return method();
             }
+        }
+
+        /// <summary>
+        /// Creates a deep copy of the Dictionary-HashSet type
+        /// </summary>
+        /// <typeparam name="T">The key-type of the Dictionary</typeparam>
+        /// <typeparam name="U">The value-type of the contained HashSet</typeparam>
+        /// <param name="source">The source to copy from</param>
+        /// <returns></returns>
+        public static Dictionary<T, HashSet<U>> DeepCopy<T, U>(this Dictionary<T, HashSet<U>> source)
+        {
+            Dictionary<T, HashSet<U>> dest = new Dictionary<T, HashSet<U>>();
+            foreach (T key in dest.Keys)
+            {
+                dest.Add(key, new HashSet<U>());
+                foreach (U val in source[key])
+                {
+                    dest[key].Add(val);
+                }
+            }
+            return dest;
+        }
+
+        public static bool DeepEquals<T, U>(this Dictionary<T, HashSet<U>> dict1, Dictionary<T, HashSet<U>> dict2)
+        {
+            if (dict1.Keys.Except(dict2.Keys).Count() > 0) { return false; } // Different keys
+            if (dict2.Keys.Except(dict1.Keys).Count() > 0) { return false; } // Different keys
+
+            // Keys must be the same
+            foreach (T key in dict1.Keys)
+            {
+                if (!dict1[key].SetEquals(dict2[key])) { return false; } // Different value in dict[key]
+            }
+            return true;
         }
 
     }
