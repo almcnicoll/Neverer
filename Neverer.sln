@@ -1,13 +1,19 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28307.960
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Neverer", "Neverer\Neverer.csproj", "{381ABFB2-7B2C-4EA2-8A61-9D76D6FA9D50}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosswordControls", "CrosswordControls\CrosswordControls.csproj", "{043FFBBF-ED15-4B0A-AB9D-F3C982F6243C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CrosswordShared", "CrosswordShared\CrosswordShared.csproj", "{E3AF0E61-909E-440A-8BD4-3FE58DCF1483}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0252060B-447F-4ABB-A6D9-77B481204C2A}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+		RefinedPatternSearching.md = RefinedPatternSearching.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

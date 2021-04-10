@@ -122,6 +122,8 @@ namespace Neverer.UtilityClass
         private bool __refinedChanges = true;
         private regex.Regex __refinedRegex = null;
 
+
+
         [XmlIgnore()]
         public int height
         {
@@ -541,6 +543,9 @@ namespace Neverer.UtilityClass
             return refinementsMade;
         }
 
+        /// <summary>
+        /// Recalculates the regex that defines what letters can be where
+        /// </summary>
         private void recalculateRefinedRegex()
         {
             // Check whether we make any changes - so we know whether to recalculate intersects
@@ -586,7 +591,7 @@ namespace Neverer.UtilityClass
             {
                 // TODO - would be good to see _which_ positions changed so we don't recalculate ALL intersecting clues
                 // That would involve switching from a boolean to a Dict<int,boolean> or something like that
-                changesMade = __refinedPatternLetters.DeepEquals(oldLetters);
+                changesMade = !__refinedPatternLetters.DeepEquals(oldLetters);
             }
 
             // Now generate a character class per position, separating them
@@ -598,7 +603,7 @@ namespace Neverer.UtilityClass
             __refinedRegex = new regex.Regex("^" + String.Join("[" + Clue.NonCountingChars_Regex + "]*", refinedPatternClasses) + "$", regex.RegexOptions.IgnoreCase);
             __refinedChanges = false;
 
-            // TODO - if changes made, recalculate refinedPatterns of all intersecting clues
+            // TODO - if changes made, recalculate refinedPatterns of all intersecting clues?
         }
 
         /// <summary>
