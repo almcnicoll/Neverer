@@ -117,7 +117,8 @@ namespace Neverer.UtilityClass
         private int lowMatchesTrigger = 5;
 
         // Refined properties take into account possible solutions on other clues, and their effect on this clue
-        private Dictionary<int, HashSet<char>> __refinedPatternLetters = null;
+        private Dictionary<int, HashSet<char>> __refinedLetters = null;
+        private Dictionary<int, HashSet<char>> __externalConstraints = null;
         private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
         private bool __refinedChanges = true;
         private regex.Regex __refinedRegex = null;
@@ -156,7 +157,27 @@ namespace Neverer.UtilityClass
             }
         }
 
-        public String refinedLetters = null;
+        /// <summary>
+        /// Returns the __refinedLetters variable, blank-populated if null
+        /// </summary>
+        public Dictionary<int, HashSet<char>> refinedLetters
+        {
+            get
+            {
+                // Make sure our private variable is populated
+                if (__refinedLetters == null)
+                {
+                    // Populate a per-character-position lookup of which letters are valid
+                    __refinedLetters = new Dictionary<int, HashSet<char>>();
+                    for (int i = 0; i < clue.length; i++)
+                    {
+                        __refinedLetters.Add(i, new HashSet<char>());
+                    }
+                }
+                // Return the variable
+                return __refinedLetters;
+            }
+        }
 
         public String placeDescriptor
         {
@@ -198,7 +219,7 @@ namespace Neverer.UtilityClass
             {
                 if (__refinedChanges)
                 {
-                    recalculateRefinedRegex();
+                    // TODO - rewrite recalculateRefinedRegex();
                 }
                 return __refinedRegex;
             }
@@ -438,6 +459,7 @@ namespace Neverer.UtilityClass
             return null;
         }
 
+        /* RefinePattern functions for rewriting
         /// <summary>
         /// Filters the list of "refined matches" by a further string-pattern
         /// </summary>
@@ -542,7 +564,9 @@ namespace Neverer.UtilityClass
             __refinedChanges = true;
             return refinementsMade;
         }
+        */
 
+        /* recalculateRefinedRegex function for rewriting
         /// <summary>
         /// Recalculates the regex that defines what letters can be where
         /// </summary>
@@ -605,6 +629,7 @@ namespace Neverer.UtilityClass
 
             // TODO - if changes made, recalculate refinedPatterns of all intersecting clues?
         }
+        */
 
         /// <summary>
         /// Clear the list of matches against the clue
@@ -662,6 +687,79 @@ namespace Neverer.UtilityClass
             {
                 __refinedMatches[answer].Add(question);
             }
+        }
+
+        /// <summary>
+        /// Refreshes the RefinedLetters structure based on the clue itself and the ExternalConstraints structure
+        /// </summary>
+        /// <returns>A set of integer positions in the clue where the constraints have changed</returns>
+        public HashSet<int> RefreshRefinedLetters()
+        {
+            // Prepare return variable
+            HashSet<int> modifiedList = new HashSet<int>();
+
+            // Make a deep copy of the original
+            Dictionary<int, HashSet<char>> old = __refinedLetters.DeepCopy();
+
+            // Clear out the old structure
+            __refinedLetters.Clear();
+
+            var answerChars = clue.letters.ToCharArray();
+
+            // Loop through clue length, adding in constraints from clue and ExternalConstraints
+            for (int pos = 0; pos < clue.length; pos++)
+            {
+                HashSet<char> thisPos = new HashSet<char>();
+
+                // Start with clue constraint
+                if (answerChars[pos] == '?')
+                {
+                    for (char c = 'a'; c <= 'z'; c++)
+                    {
+                        thisPos.Add(c);
+                    }
+                }
+                else
+                {
+                    thisPos.Add(answerChars[pos]);
+                }
+
+                // Then look to ExternalConstraints
+                if (__externalConstraints.ContainsKey(pos))
+                {
+                    // If there's external constraints, apply them (intersect)
+                    __refinedLetters[pos] = (HashSet<char>)__externalConstraints[pos].Intersect(thisPos);
+                }
+                else
+                {
+                    // Otherwise just use the clue constraints
+                    __refinedLetters[pos] = thisPos;
+                }
+            }
+
+            // Now compare to the original structure - remembering to loop past end of clueLength if old struct is longer (if, for instance, the clue has been shortened)
+            var oldMax = (from int k in __externalConstraints.Keys select k).Max();
+            for (int pos = 0; pos < Math.Max(clue.length, oldMax); pos++)
+            {
+                if((!old.ContainsKey(pos))||(!__refinedLetters.ContainsKey(pos)))
+                {
+                    // Mismatch of lengths - must be a difference
+                    modifiedList.Add(pos);
+                } else
+                {
+                    // Both have a value - are they the same?
+                    if (old[pos] != __refinedLetters[pos])
+                    {
+                        // Lists are different - changes at this position
+                        modifiedList.Add(pos);
+                    } else
+                    {
+                        // No changes here
+                    }
+                }
+            }
+
+            return modifiedList;
         }
     }
 }

@@ -21,7 +21,7 @@ If the letter choices at a given intersection are altered, the intersecting clue
 The original clue is then removed from the stack (but might be re-added later by changes to an intersecting clue)
 
 ## Methodology
-Each `PlacedClue` object contains a `Dictionary<int,HashSet<char>>` called `RefinedLetters`.
+Each `PlacedClue` object contains a `Dictionary<int,HashSet<char>>` called `ExternalConstraints` and another `Dictionary<int,HashSet<char>>` called `RefinedLetters`, which is calculated from `ExternalConstraints` and the clue's letter pattern.
 The `int` corresponds to the position in the string, while the `HashSet<char>`
 corresponds to the possible letters at that position.
 
@@ -29,9 +29,9 @@ The steps to evaluate a clue are as follows:
 1. Populate the clue's `RefinedLetters` if not already populated.
 2. Take a copy of `RefinedLetters` for comparison later.
 3. Test all dictionaries for possible solutions.
-4. Refresh `RefinedLetters` based on the possible responses.
+4. Refresh `ExternalConstraints` and `RefinedLetters` based on the possible responses.
 5. Compare `RefinedLetters` to the copy from **Step 2**. In any position where there are changes, search for intersecting clues.
-6. In the event of a letter-choice change coinciding with a clue intersection, call `LimitToLetters` on that clue. This will make a change to `RefinedLetters` in that clue and add it to the stack if not already present.
+6. In the event of a letter-choice change coinciding with a clue intersection, call `LimitToLetters` on that clue. This will make a change to `ExternalConstraints` in that clue and add it to the stack if not already present.
 
 **TODO**: this system has a flaw - `LimitToLetters` would most naturally output the intersection of 
 the existing `RefinedLetters` and the new constraints from the calling clue.
@@ -40,6 +40,7 @@ constraints of the calling clue are _loosened_ (e.g. `[rt]` => `[drst]`) or
 changed in a non-overlapping manner (e.g. `[rt]` => `[aio]`). **This points to  a need for 
 a more complex constraint system, in which we store the external constraints on a clue separately 
 from its own internal constraints (letters entered manually, dictionary possibilities)**
+**Think that the addition of ExternalConstraints dictionary will fix this.**
 
 ## No-win situations
 Sometimes it is inevitable that within the 

@@ -38,6 +38,8 @@ namespace Neverer
 
         public CrosswordDictionaryCollection AllDictionaries = new CrosswordDictionaryCollection();
 
+        private Stack<PlacedClue> refiningStack = new Stack<PlacedClue>();
+
         /*private CrosswordDictionary DefaultWords = new CrosswordDictionary();
         private CrosswordDictionary CustomWords = new CrosswordDictionary();*/
 
@@ -2021,38 +2023,34 @@ namespace Neverer
             }
         }
 
-        //TODO - abstract contents of BackgroundWorker DoWork into a "CheckClues" function
-        //TODO - then make the folowing function run automatically instead of on demand
-        /// <summary>
-        /// Look through all the clues, seeing where their possible matches narrow down choices in other clues
-        /// </summary>
-        private void CheckCluesRefined()
-        {
-            // Push all incomplete clues with at least one match onto the stack
-            // Push all incomplete clues with at least one match onto the stack
-            Stack<PlacedClue> clueStack = new Stack<PlacedClue>();
-            foreach (PlacedClue pc in crossword.placedClues)
-            {
-                if (
-                    (!pc.status.HasFlag(ClueStatus.AnswerComplete)) &&
-                    (pc.status.HasFlag(ClueStatus.HasMatches))
-                    )
-                {
-                    clueStack.Push(pc);
-                }
-            }
-
-            while(clueStack.Count>0)
-            {
-                PlacedClue target = clueStack.Pop();
-                // Analyse this clue, including adding back to the stack any other clues that have been affected
-            }
-        }
 
         private void exportTextToolStripMenuItem_Click(object sender, EventArgs e)
         {
             TextExporter te = new TextExporter(ref crossword);
             te.Show();
+        }
+    
+        /// <summary>
+        /// Add a PlacedClue to the stack of clues needing refining
+        /// </summary>
+        /// <param name="clue">The clue to add</param>
+        private void addToRefiningStack(PlacedClue clue)
+        {
+            if(!refiningStack.Contains(clue)) { refiningStack.Push(clue); }
+        }
+
+        //TODO - abstract contents of BackgroundWorker DoWork into a "CheckClues" function
+        //TODO - then make the following function run automatically instead of on demand
+        /// <summary>
+        /// Look through all the clues, seeing where their possible matches narrow down choices in other clues
+        /// </summary>
+        private void CheckCluesRefined()
+        {
+            while(refiningStack.Count>0)
+            {
+                PlacedClue target = refiningStack.Pop();
+                // TODO - Analyse this clue, including adding back to the stack any other clues that have been affected
+            }
         }
     }
 }
