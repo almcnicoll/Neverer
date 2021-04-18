@@ -160,6 +160,7 @@ namespace Neverer.UtilityClass
         /// <summary>
         /// Returns the __refinedLetters variable, blank-populated if null
         /// </summary>
+        [XmlIgnore]
         public Dictionary<int, HashSet<char>> refinedLetters
         {
             get
@@ -169,9 +170,13 @@ namespace Neverer.UtilityClass
                 {
                     // Populate a per-character-position lookup of which letters are valid
                     __refinedLetters = new Dictionary<int, HashSet<char>>();
+                    __externalConstraints = new Dictionary<int, HashSet<char>>();
                     for (int i = 0; i < clue.length; i++)
                     {
+                        // TODO - fine to do this now, but what if clue changes length?
+                        // TODO - need to decide when ExternalConstraints gets populated
                         __refinedLetters.Add(i, new HashSet<char>());
+                        __externalConstraints.Add(i, new HashSet<char>());
                     }
                 }
                 // Return the variable
@@ -539,8 +544,6 @@ namespace Neverer.UtilityClass
             }
             regex.Regex overlay = new regex.Regex(pattern, regex.RegexOptions.IgnoreCase);
             return RefinePattern(overlay);
-            //TODO - this whole refinedMatches business probably wants each PlacedClue to have an array of Hashset<char> that tracks what each cell could potentially be - that would be a neater way to do what we've got here
-            // NB - I think we might have this now - but do check!
         }
 
         /// <summary>
@@ -702,7 +705,7 @@ namespace Neverer.UtilityClass
             Dictionary<int, HashSet<char>> old = __refinedLetters.DeepCopy();
 
             // Clear out the old structure
-            __refinedLetters.Clear();
+            refinedLetters.Clear();
 
             var answerChars = clue.letters.ToCharArray();
 
@@ -728,7 +731,9 @@ namespace Neverer.UtilityClass
                 if (__externalConstraints.ContainsKey(pos))
                 {
                     // If there's external constraints, apply them (intersect)
-                    __refinedLetters[pos] = (HashSet<char>)__externalConstraints[pos].Intersect(thisPos);
+                    __refinedLetters[pos] = new HashSet<char>(__externalConstraints[pos]);
+                    __refinedLetters[pos].IntersectWith(thisPos);
+                    //__refinedLetters[pos] = (HashSet<char>)__externalConstraints[pos].Intersect(thisPos);
                 }
                 else
                 {

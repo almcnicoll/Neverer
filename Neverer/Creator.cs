@@ -125,13 +125,7 @@ namespace Neverer
 
         private void BwDictionaryChecker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            tspbClueUpdate.Value = e.ProgressPercentage;
-            if (e.ProgressPercentage == 100)
-            {
-                // Shouldn't now need to call anything - controls should update themselves as needed
-                //UpdateClueGrid();
-                //populateClueDisplays();
-            }
+            tspbClueUpdate.Value = Math.Min(100, Math.Max(0, e.ProgressPercentage));
         }
 
         // Enums
@@ -1699,100 +1693,8 @@ namespace Neverer
         /// <param name="e"></param>
         private void bwDictionaryChecker_DoWork(object sender, DoWorkEventArgs e)
         {
-            while (__cluesToCheck) // Stays in loop so long as we keep changing stuff in the UI
-            {
-                __cluesToCheck = false;
-                bwDictionaryChecker.ReportProgress(0);
-                int cluesChecked = 0;
-                // Loop through each clue, seeing if it's solvable
-                for (var ii = 0; ii < crossword.placedClues.Count; ii++)
-                //foreach (PlacedClue pc in crossword.placedClues)
-                {
-                    PlacedClue pc = null;
-                    if (ii < crossword.placedClues.Count)
-                    {
-                        pc = crossword.placedClues[ii];
-                    }
-                    // Ignore unchanged clues
-                    if (!pc.uncheckedChanges) { continue; }
-
-                    // Ignore blank answers
-                    String word = pc.clue.answer;
-                    if ((word == null) | (word.Length == 0)) { continue; }
-
-                    //if (word.IndexOf("?") == -1) { pc.status = ClueStatus.MatchingWordNoQuestion; continue; }
-
-                    // Change pattern as needed, depending on intersection with other clues
-                    LetterSubstitutionSet lss = LetterSubstitutionSet.getIntersectionChanges(pc, crossword.placedClues);
-                    if (lss.definiteChanges.Count > 0)
-                    {
-                        foreach (LetterSubstitution ls in lss.definiteChanges)
-                        {
-                            int j = 0;
-                            for (int i = 0; i < ls.position; i++)
-                            {
-                                while (pc.clue.answer[i + j] == ' ') { j++; }
-                            }
-                            StringBuilder tmp = new StringBuilder(pc.clue.answer);
-                            tmp[ls.position + j] = Convert.ToChar(ls.newValue);
-                            pc.clue.answer = tmp.ToString();
-                        }
-                        //if (ClueChanged != null) { ClueChanged("", new EventArgs()); }
-                        this.Invoke(delegate
-                        {
-                            ClueChanged("", new PlacedClueChangedEventArgs(pc));
-                        }
-                        );
-                    }
-
-                    // Create regular expression
-                    Regex reWord = pc.clue.regExp; /*new Regex(
-                        "^"
-                        + Regex.Replace(
-                            pc.clue.answer.Replace("?", ".")
-                            , "."
-                            , "$0[" + Clue.NonCountingChars_Regex + "]*"
-                        )
-                        + "$"
-                    , RegexOptions.IgnoreCase);*/
-
-                    // Clear any existing matches
-                    pc.clearMatches();
-
-                    // Loop through dictionaries, looking for matches
-                    for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
-                    {
-                        if (!AllDictionaries.ContainsKey(dt)) { continue; } // Mayhaps we have no dicts of this type
-                        List<IWordSource> dicts = AllDictionaries[dt];
-                        foreach (CrosswordDictionary dict in dicts)
-                        {
-                            List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.entries
-                                                                                  where reWord.IsMatch(kvp.Key)
-                                                                                  select kvp).ToList();
-                            foreach (KeyValuePair<String, List<String>> kvp in possibles)
-                            {
-                                if (kvp.Value == null || kvp.Value.Count == 0)
-                                {
-                                    // Word without definition
-                                    pc.addMatch(kvp.Key);
-                                }
-                                else
-                                {
-                                    // Add word with multiple definitions
-                                    foreach (String question in kvp.Value)
-                                    {
-                                        pc.addMatch(kvp.Key, question);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    pc.changesChecked(); // Notify clue that all changes checked
-                    pc.recalculateStatus();
-                    bwDictionaryChecker.ReportProgress((int)Math.Round((Decimal)cluesChecked / (Decimal)crossword.placedClues.Count));
-                }
-                bwDictionaryChecker.ReportProgress(100);
-            }
+            CheckClues();
+            RefineClues();
         }
 
         private void regularExpressionSearchToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2029,27 +1931,159 @@ namespace Neverer
             TextExporter te = new TextExporter(ref crossword);
             te.Show();
         }
-    
+
         /// <summary>
         /// Add a PlacedClue to the stack of clues needing refining
         /// </summary>
         /// <param name="clue">The clue to add</param>
         private void addToRefiningStack(PlacedClue clue)
         {
-            if(!refiningStack.Contains(clue)) { refiningStack.Push(clue); }
+            if (!refiningStack.Contains(clue)) { refiningStack.Push(clue); }
         }
 
-        //TODO - abstract contents of BackgroundWorker DoWork into a "CheckClues" function
-        //TODO - then make the following function run automatically instead of on demand
+        /// <summary>
+        /// Look through all the clues, working out possible solutions for each
+        /// </summary>
+        private void CheckClues(bool foreground = false)
+        {
+            while (__cluesToCheck) // Stays in loop so long as we keep changing stuff in the UI
+            {
+                __cluesToCheck = false;
+                if (!foreground) { bwDictionaryChecker.ReportProgress(0); }
+                int cluesChecked = 0;
+                // Loop through each clue, seeing if it's solvable
+                for (var ii = 0; ii < crossword.placedClues.Count; ii++)
+                //foreach (PlacedClue pc in crossword.placedClues)
+                {
+                    PlacedClue pc = null;
+                    if (ii < crossword.placedClues.Count)
+                    {
+                        pc = crossword.placedClues[ii];
+                    }
+                    // Ignore unchanged clues
+                    if (!pc.uncheckedChanges) { continue; }
+
+                    // Ignore blank answers
+                    String word = pc.clue.answer;
+                    if ((word == null) | (word.Length == 0)) { continue; }
+
+                    //if (word.IndexOf("?") == -1) { pc.status = ClueStatus.MatchingWordNoQuestion; continue; }
+
+                    // Change pattern as needed, depending on intersection with other clues
+                    LetterSubstitutionSet lss = LetterSubstitutionSet.getIntersectionChanges(pc, crossword.placedClues);
+                    if (lss.definiteChanges.Count > 0)
+                    {
+                        foreach (LetterSubstitution ls in lss.definiteChanges)
+                        {
+                            int j = 0;
+                            for (int i = 0; i < ls.position; i++)
+                            {
+                                while (pc.clue.answer[i + j] == ' ') { j++; }
+                            }
+                            StringBuilder tmp = new StringBuilder(pc.clue.answer);
+                            tmp[ls.position + j] = Convert.ToChar(ls.newValue);
+                            pc.clue.answer = tmp.ToString();
+                        }
+                        //if (ClueChanged != null) { ClueChanged("", new EventArgs()); }
+                        this.Invoke(delegate
+                        {
+                            ClueChanged("", new PlacedClueChangedEventArgs(pc));
+                        }
+                        );
+                    }
+
+                    // Create regular expression
+                    Regex reWord = pc.clue.regExp;
+
+                    // Clear any existing matches
+                    pc.clearMatches();
+
+                    // Loop through dictionaries, looking for matches
+                    for (DictType dt = DictType.Default; dt < DictType.Remote; dt++)
+                    {
+                        if (!AllDictionaries.ContainsKey(dt)) { continue; } // Mayhaps we have no dicts of this type
+                        List<IWordSource> dicts = AllDictionaries[dt];
+                        foreach (CrosswordDictionary dict in dicts)
+                        {
+                            List<KeyValuePair<String, List<String>>> possibles = (from KeyValuePair<String, List<String>> kvp in dict.entries
+                                                                                  where reWord.IsMatch(kvp.Key)
+                                                                                  select kvp).ToList();
+                            foreach (KeyValuePair<String, List<String>> kvp in possibles)
+                            {
+                                if (kvp.Value == null || kvp.Value.Count == 0)
+                                {
+                                    // Word without definition
+                                    pc.addMatch(kvp.Key);
+                                }
+                                else
+                                {
+                                    // Add word with multiple definitions
+                                    foreach (String question in kvp.Value)
+                                    {
+                                        pc.addMatch(kvp.Key, question);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    refiningStack.Push(pc); // Flag clue for refining
+                    pc.changesChecked(); // Notify clue that all changes checked
+                    pc.recalculateStatus();
+                    if (!foreground) { bwDictionaryChecker.ReportProgress((int)Math.Round((Decimal)cluesChecked / (Decimal)crossword.placedClues.Count)); }
+                }
+                if (!foreground) { bwDictionaryChecker.ReportProgress(100); }
+            }
+        }
+
+        // TODO - Monitor this function to see if it works!
         /// <summary>
         /// Look through all the clues, seeing where their possible matches narrow down choices in other clues
         /// </summary>
-        private void CheckCluesRefined()
+        private void RefineClues(Boolean foreground = false)
         {
-            while(refiningStack.Count>0)
+            int cluesRefined = 0;
+            if (!foreground) { bwDictionaryChecker.ReportProgress(0); }
+            while (refiningStack.Count > 0)
             {
                 PlacedClue target = refiningStack.Pop();
-                // TODO - Analyse this clue, including adding back to the stack any other clues that have been affected
+                // Analyse this clue
+                HashSet<int> changedPositions = target.RefreshRefinedLetters();
+                // Now add back to the stack any other clues that have been affected - allow for running beyond the current length of the clue
+                foreach (int pos in changedPositions)
+                {
+                    // Work out coordinates of changed location
+                    int x = target.x;
+                    int y = target.y;
+                    if (target.orientation == AD.Down)
+                    {
+                        y += pos;
+                    }
+                    else
+                    {
+                        x += pos;
+                    }
+                    // See if any other clues intersect
+                    List<PlacedClue> intersects = FindCluesFromGridPos(x, y);
+                    foreach (PlacedClue pc in intersects)
+                    {
+                        // If there is a clues at that location that isn't the original one, push it to the stack
+                        if (pc != target)
+                        {
+                            refiningStack.Push(pc);
+                        }
+                    }
+                }
+                // Come up with a valid percentage to show in the progress bar
+                cluesRefined++;
+                Decimal numerator = crossword.placedClues.Count - refiningStack.Count;
+                Decimal denominator = crossword.placedClues.Count;
+                int fraction;
+                if (denominator == 0) { fraction = 1; }
+                else
+                {
+                    fraction = ((int)Math.Round(numerator / denominator));
+                }
+                if (!foreground) { bwDictionaryChecker.ReportProgress(fraction); }
             }
         }
     }
