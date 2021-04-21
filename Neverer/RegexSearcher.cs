@@ -7,6 +7,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 
+// TODO - allow copying words to clipboard
+// TODO - drag-select area on grid to produce regex from there (whether or not a clue is present)
+
 namespace Neverer
 {
     public partial class RegexSearcher : Form

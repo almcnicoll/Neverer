@@ -971,7 +971,8 @@ namespace Neverer
         private List<PlacedClue> FindCluesFromGridPos(int x, int y)
         {
             List<PlacedClue> outList = new List<PlacedClue>();
-            foreach (PlacedClue pc in this.crossword.placedClues)
+            List<PlacedClue> iterator = new List<PlacedClue>(crossword.placedClues); // Create a copy to stop collection-changed errors
+            foreach (PlacedClue pc in iterator)
             {
                 if (pc.Overlaps(x, y))
                 {
@@ -1694,7 +1695,7 @@ namespace Neverer
         private void bwDictionaryChecker_DoWork(object sender, DoWorkEventArgs e)
         {
             CheckClues();
-            RefineClues();
+            //RefineClues(); // TODO - see if it's this code that's messing with dictionary-loading
         }
 
         private void regularExpressionSearchToolStripMenuItem_Click(object sender, EventArgs e)
