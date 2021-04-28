@@ -286,7 +286,8 @@ namespace Neverer
             dgvPuzzle.RowCount = crossword.height;
             dgvPuzzle.ColumnHeadersVisible = false;
             dgvPuzzle.RowHeadersVisible = false;
-            dgvPuzzle.RowsDefaultCellStyle.SelectionBackColor = System.Drawing.Color.Transparent;
+            //dgvPuzzle.RowsDefaultCellStyle.SelectionBackColor = System.Drawing.Color.Transparent;
+            dgvPuzzle.RowsDefaultCellStyle.SelectionBackColor = System.Drawing.Color.Yellow;
 
             SetBoxSize();
 
@@ -986,16 +987,28 @@ namespace Neverer
         {
             __mouseCol = e.ColumnIndex;
             __mouseRow = e.RowIndex;
-            dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag = dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor;
-            dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = Color.FromKnownColor(KnownColor.Yellow);
+            if (currentSettings.Get<Boolean>("Display.HighlightOnHover"))
+            {
+                dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag = dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor;
+                dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = Color.FromKnownColor(KnownColor.Yellow);
+            }
         }
 
+        /// <summary>
+        /// Select the first clue that overlaps with the current cell
+        /// </summary>
+        /// <param name="sender">The sending object</param>
+        /// <param name="e">The event arguments</param>
         private void dgvPuzzle_CellClick(object sender, DataGridViewCellEventArgs e)
         {
-
             SelectClueFromGridPos(e.ColumnIndex, e.RowIndex);
         }
 
+        /// <summary>
+        /// Create a new clue at the double-clicked location
+        /// </summary>
+        /// <param name="sender">The sending object</param>
+        /// <param name="e">The event arguments</param>
         private void dgvPuzzle_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
             bool foundClue = SelectClueFromGridPos(e.ColumnIndex, e.RowIndex);
@@ -1011,6 +1024,125 @@ namespace Neverer
             }
         }
 
+        /// <summary>
+        /// If cell-highlighting is enabled, revert this cell to its previous colour
+        /// </summary>
+        /// <param name="sender">The sending object</param>
+        /// <param name="e">The event arguments</param>
+        private void dgvPuzzle_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        {
+            if (currentSettings.Get<Boolean>("Display.HighlightOnHover"))
+            {
+                if (dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag == null)
+                {
+                    UpdatePreviewGrid();
+                }
+                else
+                {
+                    try
+                    {
+                        dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = (System.Drawing.Color)dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag;
+                    }
+                    catch (Exception)
+                    {
+                        // Was thrown if Style.Tag == null and therefore cannot be cast to a System.Drawing.Color, although we now trap that in the if() above
+                        // We don't know what colour to revert to, so don't
+                        UpdatePreviewGrid();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Limit selection to a single row or column
+        /// </summary>
+        /// <param name="sender">The sending object</param>
+        /// <param name="e">The event arguments</param>
+        private void dgvPuzzle_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            // Try to only allow a straight line of cells
+            if (dgvPuzzle.SelectedCells.Count > 1)
+            {
+                HashSet<int> rows = new HashSet<int>();
+                HashSet<int> cols = new HashSet<int>();
+                foreach (DataGridViewCell cell in dgvPuzzle.SelectedCells)
+                {
+                    rows.Add(cell.RowIndex);
+                    cols.Add(cell.ColumnIndex);
+                }
+
+                // Test if we've selected more than one
+                if (rows.Count > 1 && cols.Count > 1)
+                {
+                    // We need to cut it down
+                    if (rows.Count > cols.Count)
+                    {
+                        // More rows selected - select vertical line by deselecting anything not in the first cell's column
+                        foreach (DataGridViewCell cell in (from DataGridViewCell dvc in dgvPuzzle.SelectedCells where dvc.ColumnIndex != cols.First() select dvc))
+                        {
+                            cell.Selected = false;
+                        }
+                    } else
+                    {
+                        // More cols selected - select horizontal line by deselecting anything not in the first cell's row
+                        foreach (DataGridViewCell cell in (from DataGridViewCell dvc in dgvPuzzle.SelectedCells where dvc.RowIndex != rows.First() select dvc))
+                        {
+                            cell.Selected = false;
+                        }
+                    }
+                }
+            }
+        }
+
+        /*
+        /// <summary>
+        /// Test for Shift key and multi-select if appropriate
+        /// </summary>
+        /// <param name="sender">The sending object</param>
+        /// <param name="e">The event arguments</param>
+        private void dgvPuzzle_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
+        {
+            if (Control.ModifierKeys.HasFlag(Keys.Shift))
+            {
+                // Try to select a straight line of cells
+                if (dgvPuzzle.SelectedCells.Count > 0)
+                {
+                    HashSet<int> rows = new HashSet<int>();
+                    HashSet<int> cols = new HashSet<int>();
+                    foreach (DataGridViewCell cell in dgvPuzzle.SelectedCells)
+                    {
+                        rows.Add(cell.RowIndex);
+                        cols.Add(cell.ColumnIndex);
+                    }
+                    if ((rows.Count == 1) && (e.RowIndex == rows.First()))
+                    {
+                        // Same row - select between the two points
+                        cols.Add(e.ColumnIndex);
+                        int colStart = (from int c in cols select c).Min();
+                        int colEnd = (from int c in cols select c).Max();
+                        dgvPuzzle.ClearSelection();
+                        for (int c = colStart; c <= colEnd; c++)
+                        {
+                            dgvPuzzle[c, rows.First()].Selected = true;
+                        }
+
+                    }
+                    else if ((cols.Count == 1) && (e.ColumnIndex == cols.First()))
+                    {
+                        // Same column - select between the two points
+                        rows.Add(e.RowIndex);
+                        int rowStart = (from int r in rows select r).Min();
+                        int rowEnd = (from int r in rows select r).Max();
+                        dgvPuzzle.ClearSelection();
+                        for (int r = rowStart; r <= rowEnd; r++)
+                        {
+                            dgvPuzzle[cols.First(), r].Selected = true;
+                        }
+                    }
+                }
+            }
+        }
+        */
 
         /*private void exportExcelToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1753,27 +1885,6 @@ namespace Neverer
             TryClueAdd(__mouseCol, __mouseRow);
         }
 
-        private void dgvPuzzle_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
-        {
-            if (dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag == null)
-            {
-                UpdatePreviewGrid();
-            }
-            else
-            {
-                try
-                {
-                    dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = (System.Drawing.Color)dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag;
-                }
-                catch (Exception)
-                {
-                    // Was thrown if Style.Tag == null and therefore cannot be cast to a System.Drawing.Color, although we now trap that in the if() above
-                    // We don't know what colour to revert to, so don't
-                    UpdatePreviewGrid();
-                }
-            }
-        }
-
         /// <summary>
         /// Loads a new regex searcher based on each clue intersecting with the selected cell, or a blank searcher if black cell chosen
         /// </summary>
@@ -2085,6 +2196,14 @@ namespace Neverer
                     fraction = ((int)Math.Round(numerator / denominator));
                 }
                 if (!foreground) { bwDictionaryChecker.ReportProgress(fraction); }
+            }
+        }
+
+        private void dgvPuzzle_CellPainting(object sender, DataGridViewCellPaintingEventArgs e)
+        {
+            if (e.State.HasFlag(DataGridViewElementStates.Selected))
+            {
+                e.CellStyle.SelectionBackColor = Color.Yellow;
             }
         }
     }
