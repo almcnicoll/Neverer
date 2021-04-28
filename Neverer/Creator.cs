@@ -1060,6 +1060,8 @@ namespace Neverer
         /// <param name="e">The event arguments</param>
         private void dgvPuzzle_CellMouseUp(object sender, DataGridViewCellMouseEventArgs e)
         {
+            AD selectionMode = AD.Across;
+
             // Try to only allow a straight line of cells
             if (dgvPuzzle.SelectedCells.Count > 1)
             {
@@ -1078,13 +1080,16 @@ namespace Neverer
                     if (rows.Count > cols.Count)
                     {
                         // More rows selected - select vertical line by deselecting anything not in the first cell's column
+                        selectionMode = AD.Down;
                         foreach (DataGridViewCell cell in (from DataGridViewCell dvc in dgvPuzzle.SelectedCells where dvc.ColumnIndex != cols.First() select dvc))
                         {
                             cell.Selected = false;
                         }
-                    } else
+                    }
+                    else
                     {
                         // More cols selected - select horizontal line by deselecting anything not in the first cell's row
+                        selectionMode = AD.Across;
                         foreach (DataGridViewCell cell in (from DataGridViewCell dvc in dgvPuzzle.SelectedCells where dvc.RowIndex != rows.First() select dvc))
                         {
                             cell.Selected = false;
@@ -1092,57 +1097,63 @@ namespace Neverer
                     }
                 }
             }
-        }
 
-        /*
-        /// <summary>
-        /// Test for Shift key and multi-select if appropriate
-        /// </summary>
-        /// <param name="sender">The sending object</param>
-        /// <param name="e">The event arguments</param>
-        private void dgvPuzzle_CellMouseDown(object sender, DataGridViewCellMouseEventArgs e)
-        {
-            if (Control.ModifierKeys.HasFlag(Keys.Shift))
+            // Now if we've *still* got multiple cells selected, launch a RegEx search there
+            if (dgvPuzzle.SelectedCells.Count > 1)
             {
-                // Try to select a straight line of cells
-                if (dgvPuzzle.SelectedCells.Count > 0)
+                String pattern = "";
+                // Get search-string
+                int r, c, r1,r2,c1, c2;
+                String s;
+                switch (selectionMode)
                 {
-                    HashSet<int> rows = new HashSet<int>();
-                    HashSet<int> cols = new HashSet<int>();
-                    foreach (DataGridViewCell cell in dgvPuzzle.SelectedCells)
-                    {
-                        rows.Add(cell.RowIndex);
-                        cols.Add(cell.ColumnIndex);
-                    }
-                    if ((rows.Count == 1) && (e.RowIndex == rows.First()))
-                    {
-                        // Same row - select between the two points
-                        cols.Add(e.ColumnIndex);
-                        int colStart = (from int c in cols select c).Min();
-                        int colEnd = (from int c in cols select c).Max();
-                        dgvPuzzle.ClearSelection();
-                        for (int c = colStart; c <= colEnd; c++)
+                    case AD.Across:
+                        r = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.RowIndex).First();
+                        c1 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.ColumnIndex).Min();
+                        c2 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.ColumnIndex).Max();
+                        for (c = c1; c <= c2; c++)
                         {
-                            dgvPuzzle[c, rows.First()].Selected = true;
+                            // Can contain empty string, letter, question mark, or * followed by two "competing" letters in the case of a conflict
+                            s = dgvPuzzle[c, r].Value.ToString();
+                            if (s=="") { s = "?"; }
+                            if (s[0] == '*')
+                            {
+                                pattern += s[1];
+                            }
+                            else
+                            {
+                                pattern += s[0];
+                            }
                         }
-
-                    }
-                    else if ((cols.Count == 1) && (e.ColumnIndex == cols.First()))
-                    {
-                        // Same column - select between the two points
-                        rows.Add(e.RowIndex);
-                        int rowStart = (from int r in rows select r).Min();
-                        int rowEnd = (from int r in rows select r).Max();
-                        dgvPuzzle.ClearSelection();
-                        for (int r = rowStart; r <= rowEnd; r++)
+                        break;
+                    case AD.Down:
+                        c = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.ColumnIndex).First();
+                        r1 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.RowIndex).Min();
+                        r2 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.RowIndex).Max();
+                        for (r = r1; r <= r2; r++)
                         {
-                            dgvPuzzle[cols.First(), r].Selected = true;
+                            // Can contain empty string, letter, question mark, or * followed by two "competing" letters in the case of a conflict
+                            s = dgvPuzzle[c, r].Value.ToString();
+                            if (s == "") { s = "?"; }
+                            if (s[0] == '*')
+                            {
+                                pattern += s[1];
+                            }
+                            else
+                            {
+                                pattern += s[0];
+                            }
                         }
-                    }
+                        break;
+                    default:
+                        break;
                 }
+
+                RegexSearcher re = new RegexSearcher(this, pattern);
+
+                re.Show();
             }
         }
-        */
 
         /*private void exportExcelToolStripMenuItem_Click(object sender, EventArgs e)
         {
@@ -1897,7 +1908,8 @@ namespace Neverer
             List<PlacedClue> matchingClues = FindCluesFromGridPos(__mouseCol, __mouseRow);
             if ((matchingClues == null) || (matchingClues.Count == 0))
             {
-                allRE.Add(new RegexSearcher(this, null));
+                Clue junk = null;
+                allRE.Add(new RegexSearcher(this, junk));
                 allRE[0].Show();
             }
             else

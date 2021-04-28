@@ -16,7 +16,8 @@ namespace Neverer.UtilityClass
         {
             get
             {
-                return regex.Regex.Escape(String.Join("", NonCountingChars));
+                //return regex.Regex.Escape(String.Join("", NonCountingChars));
+                return @"\" + String.Join(@"\", NonCountingChars);
             }
         }
 
@@ -55,18 +56,37 @@ namespace Neverer.UtilityClass
                 return reStrip.Replace(__answer, "");
             }
         }
-        
-        public static regex.Regex toRegExp(String source)
+
+        /// <summary>
+        /// Takes a clue pattern in the form it's displayed to end-users, and returns it as a regular expression
+        /// </summary>
+        /// <param name="source">The clue pattern</param>
+        /// <param name="allowFlexibleSpaces">Whether to return matches which split the clue differently (spaces/hyphens)</param>
+        /// <returns></returns>
+        public static regex.Regex toRegExp(String source, Boolean allowFlexibleSpaces = true)
         {
-            return new regex.Regex(
-                        "^"
-                        + regex.Regex.Replace(
-                            source.Replace("?", ".")
-                            , "."
-                            , "$0[" + Clue.NonCountingChars_Regex + "]*"
-                        )
-                        + "$"
-                    , regex.RegexOptions.IgnoreCase);
+            if (allowFlexibleSpaces)
+            {
+                // build with blocks of (.([...])?)
+                char[] allChars = source.Replace("?", ".").ToCharArray();
+                String prefix = "(";
+                String suffix = "([" + Clue.NonCountingChars_Regex + "]?))";
+                String pattern = "^" + prefix + String.Join(suffix + prefix, allChars) + suffix + "$";
+                return new regex.Regex(pattern, regex.RegexOptions.IgnoreCase);
+            }
+            else
+            {
+                throw new NotImplementedException("No implementation of this function yet");
+                /*return new regex.Regex(
+                            "^"
+                            + regex.Regex.Replace(
+                                source.Replace("?", ".")
+                                , "."
+                                , "$0[" + Clue.NonCountingChars_Regex + "]*"
+                            )
+                            + "$"
+                        , regex.RegexOptions.IgnoreCase);*/
+            }
         }
 
         public regex.Regex regExp
@@ -136,7 +156,7 @@ namespace Neverer.UtilityClass
             if (makeContiguous)
             {
                 // Lose any dividers (space, hyphen, etc.)
-                regex.Regex reNoDividers= new regex.Regex("[^?]");
+                regex.Regex reNoDividers = new regex.Regex("[^?]");
                 c.answer = reNoDividers.Replace(c.answer, "");
             }
             // Make question blank

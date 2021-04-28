@@ -38,6 +38,26 @@ namespace Neverer
             }
         }
 
+        /// <summary>
+        /// Fires up a new RegexSearcher instance based on the clue-pattern indicated (letters and question marks)
+        /// </summary>
+        /// <param name="callingForm">The Creator instance launching the form</param>
+        /// <param name="cluePattern">The pattern to search for</param>
+        public RegexSearcher(Creator callingForm, String cluePattern)
+        {
+            this.__callingForm = callingForm;
+            InitializeComponent();
+            if (cluePattern == null)
+            {
+                this.txtSearchPattern.Text = "";
+            }
+            else
+            {
+                this.txtSearchPattern.Text = Clue.toRegExp(cluePattern).ToString();
+                runSearch();
+            }
+        }
+
         private void cmdSearch_Click(object sender, EventArgs e)
         {
             runSearch();
