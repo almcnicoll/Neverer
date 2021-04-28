@@ -16,6 +16,7 @@ namespace Neverer
         private Dictionary<Char, int> letterCounts = new Dictionary<Char, int>();
         private Dictionary<char, Decimal> freqText = new Dictionary<char, Decimal>();
         private Dictionary<char, Decimal> freqDict = new Dictionary<char, Decimal>();
+        private int __totalLetterCount = 0;
 
         public Statistics(Creator caller)
         {
@@ -156,6 +157,8 @@ namespace Neverer
                 allLetters.AddRange(pcws.clue.answer.ToLowerInvariant().ToCharArray());
             }
 
+            __totalLetterCount = allLetters.Count;
+
             letterCounts.Clear();
             Char a = 'a'; Char z = 'z';
             for (int c = (int)a; c <= (int)z; c++)
@@ -178,13 +181,23 @@ namespace Neverer
             //dgvLetterSpread.Columns.Add("Value", "Value");
             dgvLetterSpread.DataSource = null;
             dgvLetterSpread.DataSource = (from kvp in letterCounts
-                                          select new Tuple<String, Decimal, Decimal, Decimal>(kvp.Key.ToString(), kvp.Value, freqText[kvp.Key], freqDict[kvp.Key])).ToArray();
+                                          select new Tuple<String, Decimal, Decimal, Decimal>(kvp.Key.ToString(), kvp.Value, __totalLetterCount * freqText[kvp.Key], __totalLetterCount * freqDict[kvp.Key])).ToArray();
             dgvLetterSpread.Columns[0].HeaderText = "Letter";
             dgvLetterSpread.Columns[1].HeaderText = "Usage";
             dgvLetterSpread.Columns[2].HeaderText = "Text avg";
             dgvLetterSpread.Columns[3].HeaderText = "Dict avg";
             dgvLetterSpread.ResumeLayout();
 
+        }
+
+        private void cmdRefreshIntersections_Click(object sender, EventArgs e)
+        {
+            calculateStats_Intersections();
+        }
+
+        private void cmdRefreshLetters_Click(object sender, EventArgs e)
+        {
+            calculateStats_Letters();
         }
     }
 }

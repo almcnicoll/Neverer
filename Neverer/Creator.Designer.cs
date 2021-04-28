@@ -89,6 +89,7 @@
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
             this.timerBackup = new System.Windows.Forms.Timer(this.components);
+            this.letterDistributionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.msMain.SuspendLayout();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
@@ -332,7 +333,8 @@
             // statsToolStripMenuItem
             // 
             this.statsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.intersectionsToolStripMenuItem});
+            this.intersectionsToolStripMenuItem,
+            this.letterDistributionToolStripMenuItem});
             this.statsToolStripMenuItem.Name = "statsToolStripMenuItem";
             this.statsToolStripMenuItem.Size = new System.Drawing.Size(44, 20);
             this.statsToolStripMenuItem.Text = "&Stats";
@@ -340,7 +342,7 @@
             // intersectionsToolStripMenuItem
             // 
             this.intersectionsToolStripMenuItem.Name = "intersectionsToolStripMenuItem";
-            this.intersectionsToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
+            this.intersectionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.intersectionsToolStripMenuItem.Text = "&Intersections";
             this.intersectionsToolStripMenuItem.Click += new System.EventHandler(this.intersectionsToolStripMenuItem_Click);
             // 
@@ -583,6 +585,13 @@
             this.timerBackup.Interval = 10000;
             this.timerBackup.Tick += new System.EventHandler(this.timerBackup_Tick);
             // 
+            // letterDistributionToolStripMenuItem
+            // 
+            this.letterDistributionToolStripMenuItem.Name = "letterDistributionToolStripMenuItem";
+            this.letterDistributionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.letterDistributionToolStripMenuItem.Text = "&Letter Distribution";
+            this.letterDistributionToolStripMenuItem.Click += new System.EventHandler(this.letterDistributionToolStripMenuItem_Click);
+            // 
             // Creator
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -680,6 +689,7 @@
         private System.Windows.Forms.ToolStripMenuItem anagramCreatorToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem tsClearClue;
         private System.Windows.Forms.ToolStripMenuItem exportTextToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem letterDistributionToolStripMenuItem;
     }
 }
 

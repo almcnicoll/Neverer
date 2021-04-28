@@ -139,7 +139,7 @@ namespace Neverer
             this.Controls.Add(this.cmdClose);
             this.Controls.Add(this.txtSource);
             this.Name = "TextExporter";
-            this.Text = "TextExporter";
+            this.Text = "Export as Text...";
             this.ResumeLayout(false);
             this.PerformLayout();
 

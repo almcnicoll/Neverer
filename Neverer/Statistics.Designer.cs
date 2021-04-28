@@ -30,12 +30,14 @@
         {
             this.tabCtrl = new System.Windows.Forms.TabControl();
             this.tpIntersections = new System.Windows.Forms.TabPage();
+            this.cmbPerLetter = new System.Windows.Forms.ComboBox();
             this.splitContainerIntersections = new System.Windows.Forms.SplitContainer();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
             this.dgvIntersectionStats = new System.Windows.Forms.DataGridView();
-            this.cmbPerLetter = new System.Windows.Forms.ComboBox();
             this.tpLetters = new System.Windows.Forms.TabPage();
             this.dgvLetterSpread = new System.Windows.Forms.DataGridView();
+            this.cmdRefreshIntersections = new System.Windows.Forms.Button();
+            this.cmdRefreshLetters = new System.Windows.Forms.Button();
             this.tabCtrl.SuspendLayout();
             this.tpIntersections.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainerIntersections)).BeginInit();
@@ -60,6 +62,7 @@
             // 
             // tpIntersections
             // 
+            this.tpIntersections.Controls.Add(this.cmdRefreshIntersections);
             this.tpIntersections.Controls.Add(this.cmbPerLetter);
             this.tpIntersections.Controls.Add(this.splitContainerIntersections);
             this.tpIntersections.Location = new System.Drawing.Point(4, 22);
@@ -69,6 +72,21 @@
             this.tpIntersections.TabIndex = 0;
             this.tpIntersections.Text = "Intersections";
             this.tpIntersections.UseVisualStyleBackColor = true;
+            // 
+            // cmbPerLetter
+            // 
+            this.cmbPerLetter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
+            this.cmbPerLetter.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
+            this.cmbPerLetter.FormattingEnabled = true;
+            this.cmbPerLetter.Items.AddRange(new object[] {
+            "Intersections (absolute)",
+            "Intersections (per letter)"});
+            this.cmbPerLetter.Location = new System.Drawing.Point(8, 6);
+            this.cmbPerLetter.Name = "cmbPerLetter";
+            this.cmbPerLetter.Size = new System.Drawing.Size(178, 21);
+            this.cmbPerLetter.TabIndex = 2;
+            this.cmbPerLetter.Text = "Intersections (absolute)";
+            this.cmbPerLetter.TextChanged += new System.EventHandler(this.cmbPerLetter_TextChanged);
             // 
             // splitContainerIntersections
             // 
@@ -119,23 +137,9 @@
             this.dgvIntersectionStats.Size = new System.Drawing.Size(422, 388);
             this.dgvIntersectionStats.TabIndex = 0;
             // 
-            // cmbPerLetter
-            // 
-            this.cmbPerLetter.AutoCompleteMode = System.Windows.Forms.AutoCompleteMode.Suggest;
-            this.cmbPerLetter.AutoCompleteSource = System.Windows.Forms.AutoCompleteSource.ListItems;
-            this.cmbPerLetter.FormattingEnabled = true;
-            this.cmbPerLetter.Items.AddRange(new object[] {
-            "Intersections (absolute)",
-            "Intersections (per letter)"});
-            this.cmbPerLetter.Location = new System.Drawing.Point(8, 6);
-            this.cmbPerLetter.Name = "cmbPerLetter";
-            this.cmbPerLetter.Size = new System.Drawing.Size(178, 21);
-            this.cmbPerLetter.TabIndex = 2;
-            this.cmbPerLetter.Text = "Intersections (absolute)";
-            this.cmbPerLetter.TextChanged += new System.EventHandler(this.cmbPerLetter_TextChanged);
-            // 
             // tpLetters
             // 
+            this.tpLetters.Controls.Add(this.cmdRefreshLetters);
             this.tpLetters.Controls.Add(this.dgvLetterSpread);
             this.tpLetters.Location = new System.Drawing.Point(4, 22);
             this.tpLetters.Name = "tpLetters";
@@ -151,10 +155,30 @@
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvLetterSpread.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.dgvLetterSpread.Location = new System.Drawing.Point(8, 6);
+            this.dgvLetterSpread.Location = new System.Drawing.Point(8, 35);
             this.dgvLetterSpread.Name = "dgvLetterSpread";
-            this.dgvLetterSpread.Size = new System.Drawing.Size(776, 410);
+            this.dgvLetterSpread.Size = new System.Drawing.Size(776, 381);
             this.dgvLetterSpread.TabIndex = 0;
+            // 
+            // cmdRefreshIntersections
+            // 
+            this.cmdRefreshIntersections.Location = new System.Drawing.Point(722, 6);
+            this.cmdRefreshIntersections.Name = "cmdRefreshIntersections";
+            this.cmdRefreshIntersections.Size = new System.Drawing.Size(67, 23);
+            this.cmdRefreshIntersections.TabIndex = 3;
+            this.cmdRefreshIntersections.Text = "Refresh";
+            this.cmdRefreshIntersections.UseVisualStyleBackColor = true;
+            this.cmdRefreshIntersections.Click += new System.EventHandler(this.cmdRefreshIntersections_Click);
+            // 
+            // cmdRefreshLetters
+            // 
+            this.cmdRefreshLetters.Location = new System.Drawing.Point(717, 6);
+            this.cmdRefreshLetters.Name = "cmdRefreshLetters";
+            this.cmdRefreshLetters.Size = new System.Drawing.Size(67, 23);
+            this.cmdRefreshLetters.TabIndex = 4;
+            this.cmdRefreshLetters.Text = "Refresh";
+            this.cmdRefreshLetters.UseVisualStyleBackColor = true;
+            this.cmdRefreshLetters.Click += new System.EventHandler(this.cmdRefreshLetters_Click);
             // 
             // Statistics
             // 
@@ -185,7 +209,9 @@
         private System.Windows.Forms.FlowLayoutPanel flpClues;
         private System.Windows.Forms.DataGridView dgvIntersectionStats;
         private System.Windows.Forms.ComboBox cmbPerLetter;
-        private System.Windows.Forms.TabPage tpLetters;
         private System.Windows.Forms.DataGridView dgvLetterSpread;
+        public System.Windows.Forms.TabPage tpLetters;
+        private System.Windows.Forms.Button cmdRefreshIntersections;
+        private System.Windows.Forms.Button cmdRefreshLetters;
     }
 }

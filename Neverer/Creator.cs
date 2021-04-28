@@ -30,6 +30,7 @@ namespace Neverer
         private bool __cluesToCheck = false;
         private int __mouseRow = 0;
         private int __mouseCol = 0;
+        private Statistics statWindow = null;
 
         private List<CrosswordControls.ClueDisplay> __clueDisplays = new List<CrosswordControls.ClueDisplay>();
 
@@ -406,7 +407,7 @@ namespace Neverer
         /// <param name="x">The 1-based column from which the clue starts</param>
         /// <param name="y">The 1-based row from which the clue starts</param>
         /// <returns></returns>
-        private PlacedClue getClue(int x, int y)
+        private PlacedClue getClue(int x, int y, AD orientation = AD.Unset, String pattern = "?")
         {
             AD defaultOrientation = AD.Across;
             // Check if there's existing clues intersecting the coordinates
@@ -426,9 +427,11 @@ namespace Neverer
                 }
             }
 
+            if (orientation != AD.Unset) { defaultOrientation = orientation; }
+
             PlacedClue template = new PlacedClue();
             template.x = x; template.y = y;
-            template.clue = new Clue(Clue.BlankQuestion, "?");
+            template.clue = new Clue(Clue.BlankQuestion, pattern);
             template.orientation = defaultOrientation;
             ClueEntry ce = new ClueEntry(this, template);
             ce.ShowDialog();
@@ -782,10 +785,10 @@ namespace Neverer
         /// </summary>
         /// <param name="x">The 1-based column from which the clue starts</param>
         /// <param name="y">The 1-based row from which the clue starts</param>
-        private void TryClueAdd(int x = 1, int y = 1)
+        public void TryClueAdd(int x = 1, int y = 1, AD orientation = AD.Unset, String pattern = null)
         {
             List<PlacedClue> added = new List<PlacedClue>();
-            PlacedClue pc = getClue(x, y);
+            PlacedClue pc = getClue(x, y, orientation, pattern);
             // Check if we got a new clue or a cancellation
             if (pc != null)
             {
@@ -1096,6 +1099,10 @@ namespace Neverer
                         }
                     }
                 }
+                else
+                {
+                    if (rows.Count > 1) { selectionMode = AD.Down; } else { selectionMode = AD.Across; }
+                }
             }
 
             // Now if we've *still* got multiple cells selected, launch a RegEx search there
@@ -1103,7 +1110,8 @@ namespace Neverer
             {
                 String pattern = "";
                 // Get search-string
-                int r, c, r1,r2,c1, c2;
+                int r, c, r1, r2, c1, c2;
+                Point? origin = null;
                 String s;
                 switch (selectionMode)
                 {
@@ -1111,11 +1119,12 @@ namespace Neverer
                         r = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.RowIndex).First();
                         c1 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.ColumnIndex).Min();
                         c2 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.ColumnIndex).Max();
+                        origin = new Point(c1, r);
                         for (c = c1; c <= c2; c++)
                         {
                             // Can contain empty string, letter, question mark, or * followed by two "competing" letters in the case of a conflict
                             s = dgvPuzzle[c, r].Value.ToString();
-                            if (s=="") { s = "?"; }
+                            if (s == "") { s = "?"; }
                             if (s[0] == '*')
                             {
                                 pattern += s[1];
@@ -1130,6 +1139,7 @@ namespace Neverer
                         c = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.ColumnIndex).First();
                         r1 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.RowIndex).Min();
                         r2 = (from DataGridViewCell dvc in dgvPuzzle.SelectedCells select dvc.RowIndex).Max();
+                        origin = new Point(c, r1);
                         for (r = r1; r <= r2; r++)
                         {
                             // Can contain empty string, letter, question mark, or * followed by two "competing" letters in the case of a conflict
@@ -1149,7 +1159,7 @@ namespace Neverer
                         break;
                 }
 
-                RegexSearcher re = new RegexSearcher(this, pattern);
+                RegexSearcher re = new RegexSearcher(this, pattern, origin, selectionMode);
 
                 re.Show();
             }
@@ -1925,9 +1935,25 @@ namespace Neverer
 
         private void intersectionsToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (statWindow == null || statWindow.Disposing || statWindow.IsDisposed)
+            {
+                statWindow = new Statistics(this);
+            }
+            statWindow.Show();
+            statWindow.tabCtrl.SelectTab(statWindow.tpIntersections);
+            statWindow.BringToFront();
+        }
+
+        private void letterDistributionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (statWindow == null || statWindow.Disposing || statWindow.IsDisposed)
+            {
+                statWindow = new Statistics(this);
+            }
             Statistics frmStats = new Statistics(this);
-            frmStats.tabCtrl.SelectTab(frmStats.tpIntersections);
-            frmStats.ShowDialog();
+            statWindow.Show();
+            frmStats.tabCtrl.SelectTab(frmStats.tpLetters);
+            statWindow.BringToFront();
         }
 
         private void timerBackup_Tick(object sender, EventArgs e)
@@ -1951,7 +1977,7 @@ namespace Neverer
         }
         private void tsClearCell_Click(object sender, EventArgs e)
         {
-            if ((__mouseRow > 0) && (__mouseCol > 0))
+            if ((__mouseRow >= 0) && (__mouseCol >= 0))
             {
                 ClearCell(__mouseRow, __mouseCol);
             }
@@ -1960,7 +1986,7 @@ namespace Neverer
 
         private void tsClearClue_Click(object sender, EventArgs e)
         {
-            if ((__mouseCol > 0) && (__mouseRow > 0))
+            if ((__mouseCol >= 0) && (__mouseRow >= 0))
             {
                 ClearClues(__mouseCol, __mouseRow);
             }
@@ -2215,8 +2241,18 @@ namespace Neverer
         {
             if (e.State.HasFlag(DataGridViewElementStates.Selected))
             {
-                e.CellStyle.SelectionBackColor = Color.Yellow;
+                //e.CellStyle.SelectionBackColor = Color.Yellow;
+                if ((e.Value == null) || (e.Value.ToString() == ""))
+                {
+                    e.CellStyle.SelectionBackColor = Color.DarkOrchid;
+                }
+                else
+                {
+                    e.CellStyle.SelectionBackColor = Color.Pink;
+                    e.CellStyle.SelectionForeColor = Color.Black;
+                }
             }
         }
+
     }
 }
