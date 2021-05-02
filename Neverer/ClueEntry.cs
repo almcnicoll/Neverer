@@ -12,7 +12,7 @@ using Neverer.UtilityClass;
 namespace Neverer
 {
     // FIXED METHINKS - when loading solutions from dictionaries, spaces are counted as a letter, resulting in wrong letter count
-    public partial class ClueEntry : Form
+    public partial class ClueEntry : PopupForm
     {
         Creator __callingInstance;
         PlacedClue pc = new PlacedClue();
@@ -20,7 +20,7 @@ namespace Neverer
         private bool __loaded = false;
         private List<KeyValuePair<String, String>> possibilities = new List<KeyValuePair<String, String>>();
 
-        public ClueEntry(Creator callingInstance)
+        public ClueEntry(Creator callingInstance) : base(callingInstance)
         {
             InitializeComponent();
             __callingInstance = callingInstance;
@@ -28,7 +28,7 @@ namespace Neverer
             setMinMax();
             __loaded = true;
         }
-        public ClueEntry(Creator callingInstance, PlacedClue template)
+        public ClueEntry(Creator callingInstance, PlacedClue template) : base(callingInstance)
         {
             InitializeComponent();
             __callingInstance = callingInstance;
@@ -292,5 +292,16 @@ namespace Neverer
                 txtQuestion.Focus();
             }
         }
+
+        /*
+        private void ClueEntry_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            // TODO - abstract this to a class method in a new class PopupForm, and make ClueEntry etc. inherit from that form
+            if (__callingInstance != null)
+            {
+                __callingInstance.SetLastPosition("ClueEntry", this.Location);
+            }
+        }
+        */
     }
 }

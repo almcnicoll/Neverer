@@ -32,6 +32,8 @@ namespace Neverer
         private int __mouseCol = 0;
         private Statistics statWindow = null;
 
+        private Dictionary<String, Point> __lastPositions = new Dictionary<string, Point>();
+
         private List<CrosswordControls.ClueDisplay> __clueDisplays = new List<CrosswordControls.ClueDisplay>();
 
         public Settings currentSettings = new Settings();
@@ -144,6 +146,40 @@ namespace Neverer
         public event EventHandler<PlacedClueChangedEventArgs> ClueChanged;
 
         // Functions & Properties
+        /// <summary>
+        /// Retrieves the last position of the specified window from last time
+        /// </summary>
+        /// <param name="Identifier">An identifier for the window - often its ClassName</param>
+        /// <returns>A <see cref="Point"/> giving the window position</param>
+        public Point? GetLastPosition(String Identifier)
+        {
+            if (__lastPositions.ContainsKey(Identifier))
+            {
+                return __lastPositions[Identifier];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Saves the last position of the specified window so it's remembered for next time
+        /// </summary>
+        /// <param name="Identifier">An identifier for the window - often its ClassName</param>
+        /// <param name="position">A <see cref="Point"/> giving the window position</param>
+        public void SetLastPosition(String Identifier, Point position)
+        {
+            if (__lastPositions.ContainsKey(Identifier))
+            {
+                __lastPositions[Identifier] = position;
+            }
+            else
+            {
+                __lastPositions.Add(Identifier, position);
+            }
+        }
+
         private void UpdateTitleText()
         {
             String unsavedMarker = "";
@@ -390,13 +426,14 @@ namespace Neverer
         private PlacedClue getClue()
         {
             ClueEntry ce = new ClueEntry(this);
+            if (__lastPositions.ContainsKey("ClueEntry")) { ce.StartPosition = FormStartPosition.Manual; ce.Location = __lastPositions["ClueEntry"]; }
             ce.ShowDialog();
-
             return ce.AcceptedClue;
         }
         private PlacedClue getClue(PlacedClue template)
         {
             ClueEntry ce = new ClueEntry(this, template);
+            if (__lastPositions.ContainsKey("ClueEntry")) { ce.StartPosition = FormStartPosition.Manual; ce.Location = __lastPositions["ClueEntry"]; }
             ce.ShowDialog();
 
             return ce.AcceptedClue;

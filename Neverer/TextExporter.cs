@@ -36,7 +36,7 @@ namespace Neverer
         private void GenerateText(String separator = " ")
         {
             List<String> output = new List<String>();
-            foreach (PlacedClue pc in __source.placedClues)
+            foreach (PlacedClue pc in (from PlacedClue pc in __source.placedClues orderby pc.orientation, pc.order select pc))
             {
                 List<String> parts = new List<String>();
                 if (ShowQuestionNumbers) { parts.Add(pc.placeDescriptor); }

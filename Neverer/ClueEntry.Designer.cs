@@ -206,6 +206,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "ClueEntry";
             this.Text = "ClueEntry";
+            //this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.ClueEntry_FormClosing);
             this.Shown += new System.EventHandler(this.ClueEntry_Shown);
             this.VisibleChanged += new System.EventHandler(this.ClueEntry_VisibleChanged);
             ((System.ComponentModel.ISupportInitialize)(this.nudCol)).EndInit();

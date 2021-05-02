@@ -130,6 +130,9 @@
     <Compile Include="MRUManager.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="PopupForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="RegexSearcher.cs">
       <SubType>Form</SubType>
     </Compile>
