@@ -43,6 +43,10 @@ namespace Neverer
 
         private Stack<PlacedClue> refiningStack = new Stack<PlacedClue>();
 
+#if(DEBUG)
+        private Dictionary<Point, String> CellPattern = new Dictionary<Point, String>();
+#endif
+
         /*private CrosswordDictionary DefaultWords = new CrosswordDictionary();
         private CrosswordDictionary CustomWords = new CrosswordDictionary();*/
 
@@ -824,6 +828,8 @@ namespace Neverer
         /// <param name="y">The 1-based row from which the clue starts</param>
         public void TryClueAdd(int x = 1, int y = 1, AD orientation = AD.Unset, String pattern = null)
         {
+            // TODO - TryClueAdd seems not to be adding new clues to the checking/refining stack - or possibly not triggering the worker to run on the stack
+            // NB - editing works fine
             List<PlacedClue> added = new List<PlacedClue>();
             PlacedClue pc = getClue(x, y, orientation, pattern);
             // Check if we got a new clue or a cancellation
@@ -1032,6 +1038,12 @@ namespace Neverer
                 dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag = dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor;
                 dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.BackColor = Color.FromKnownColor(KnownColor.Yellow);
             }
+#if (DEBUG)
+            if (CellPattern.ContainsKey(new Point(e.ColumnIndex, e.RowIndex)))
+            {
+                tsslCellInfo.Text = CellPattern[new Point(e.ColumnIndex, e.RowIndex)];
+            }
+#endif
         }
 
         /// <summary>
@@ -1071,6 +1083,10 @@ namespace Neverer
         /// <param name="e">The event arguments</param>
         private void dgvPuzzle_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
         {
+            // Remove cell info from status bar
+            tsslCellInfo.Text = "";
+
+            // Unhighlight cell
             if (currentSettings.Get<Boolean>("Display.HighlightOnHover"))
             {
                 if (dgvPuzzle[e.ColumnIndex, e.RowIndex].Style.Tag == null)
@@ -1885,7 +1901,7 @@ namespace Neverer
         private void bwDictionaryChecker_DoWork(object sender, DoWorkEventArgs e)
         {
             CheckClues();
-            //RefineClues(); // TODO - see if it's this code that's messing with dictionary-loading
+            RefineClues(); // TODO - see if it's this RefineClues code that's messing with dictionary-loading
         }
 
         private void regularExpressionSearchToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2115,7 +2131,7 @@ namespace Neverer
 
         private void exportTextToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            TextExporter te = new TextExporter(ref crossword);
+            TextExporter te = new TextExporter(this, ref crossword);
             te.Show();
         }
 
@@ -2182,6 +2198,15 @@ namespace Neverer
                     // Create regular expression
                     Regex reWord = pc.clue.regExp;
 
+                    // Update cell tooltips with the contents of refinedLetters at that point in the clue
+#if (DEBUG)
+                    for (int pos = 0; pos < pc.clue.length; pos++)
+                    {
+                        Point p = pc.GetCoordsAtPosition(pos);
+                        CellPattern.AddOrUpdate(new Point(p.X, p.Y), "Pattern: " + String.Join("", pc.refinedLetters[pos]));
+                    }
+#endif
+
                     // Clear any existing matches
                     pc.clearMatches();
 
@@ -2239,7 +2264,12 @@ namespace Neverer
                 foreach (int pos in changedPositions)
                 {
                     // Work out coordinates of changed location
-                    int x = target.x;
+                    Point posPoint = target.GetCoordsAtPosition(pos);
+#if (DEBUG)
+                    // Update debugging CellPattern
+                    CellPattern.AddOrUpdate(posPoint, "Pattern: " + String.Join("", target.refinedLetters[pos]));
+#endif
+                    /*int x = target.x;
                     int y = target.y;
                     if (target.orientation == AD.Down)
                     {
@@ -2248,12 +2278,12 @@ namespace Neverer
                     else
                     {
                         x += pos;
-                    }
+                    }*/
                     // See if any other clues intersect
-                    List<PlacedClue> intersects = FindCluesFromGridPos(x, y);
+                    List<PlacedClue> intersects = FindCluesFromGridPos(posPoint.X, posPoint.Y);
                     foreach (PlacedClue pc in intersects)
                     {
-                        // If there is a clues at that location that isn't the original one, push it to the stack
+                        // If there is a clue at that location that isn't the original one, push it to the stack
                         if (pc != target)
                         {
                             refiningStack.Push(pc);

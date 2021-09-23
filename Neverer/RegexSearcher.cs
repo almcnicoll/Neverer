@@ -13,20 +13,20 @@ using System.Drawing;
 
 namespace Neverer
 {
-    public partial class RegexSearcher : Form
+    public partial class RegexSearcher : PopupForm
     {
         private Creator __callingForm;
         private List<String> __matchingWords;
         private Point __origin;
         private AD __orientation;
 
-        public RegexSearcher(Creator callingForm)
+        public RegexSearcher(Creator callingForm) : base(callingForm)
         {
             this.__callingForm = callingForm;
             InitializeComponent();
         }
 
-        public RegexSearcher(Creator callingForm, Clue clue)
+        public RegexSearcher(Creator callingForm, Clue clue) : base(callingForm)
         {
             this.__callingForm = callingForm;
             InitializeComponent();
@@ -48,7 +48,7 @@ namespace Neverer
         /// <param name="cluePattern">The pattern to search for</param>
         /// <param name="createAt">The location at which to create a new clue, if relevant</param>
         /// <param name="orientation">The direction the created clue should go, if relevant</param>
-        public RegexSearcher(Creator callingForm, String cluePattern, Point? createAt = null, AD orientation = AD.Unset)
+        public RegexSearcher(Creator callingForm, String cluePattern, Point? createAt = null, AD orientation = AD.Unset) : base(callingForm)
         {
             this.__callingForm = callingForm;
             InitializeComponent();

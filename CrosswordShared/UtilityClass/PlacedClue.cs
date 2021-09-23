@@ -123,7 +123,7 @@ namespace Neverer.UtilityClass
         private bool __refinedChanges = true;
         private regex.Regex __refinedRegex = null;
 
-
+        private HashSet<char> allLetters = new HashSet<char> { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
         [XmlIgnore()]
         public int height
@@ -174,9 +174,15 @@ namespace Neverer.UtilityClass
                     for (int i = 0; i < clue.length; i++)
                     {
                         // TODO - fine to do this now, but what if clue changes length?
-                        // TODO - need to decide when ExternalConstraints gets populated
-                        __refinedLetters.Add(i, new HashSet<char>());
-                        __externalConstraints.Add(i, new HashSet<char>());
+                        if (clue.letters[i] == '?')
+                        {
+                            __refinedLetters.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                        }
+                        else
+                        {
+                            __refinedLetters.Add(i, new HashSet<char>()); __refinedLetters[i].Add(Char.ToLower(clue.letters[i]));
+                        }
+                        __externalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
                     }
                 }
                 // Return the variable
@@ -225,6 +231,7 @@ namespace Neverer.UtilityClass
                 if (__refinedChanges)
                 {
                     // TODO - rewrite recalculateRefinedRegex();
+                    recalculateRefinedRegex();
                 }
                 return __refinedRegex;
             }
@@ -464,6 +471,20 @@ namespace Neverer.UtilityClass
             return null;
         }
 
+        /// <summary>
+        /// Returns the coordinates of the cell at position <paramref name="position"/> in the clue
+        /// </summary>
+        /// <param name="position">The position in the clue to search at</param>
+        /// <returns></returns>
+        public Point GetCoordsAtPosition(int position)
+        {
+            int posX = this.x;
+            int posY = this.y;
+            if (this.orientation == AD.Across) { posX += position; }
+            if (this.orientation == AD.Down) { posY += position; }
+            return new Point(posX, posY);
+        }
+
         /* RefinePattern functions for rewriting
         /// <summary>
         /// Filters the list of "refined matches" by a further string-pattern
@@ -569,10 +590,15 @@ namespace Neverer.UtilityClass
         }
         */
 
-        /* recalculateRefinedRegex function for rewriting
+
         /// <summary>
         /// Recalculates the regex that defines what letters can be where
         /// </summary>
+        private void recalculateRefinedRegex()
+        {
+            bool changesMade = false;
+        }
+        /* recalculateRefinedRegex function for rewriting
         private void recalculateRefinedRegex()
         {
             // Check whether we make any changes - so we know whether to recalculate intersects
@@ -712,19 +738,17 @@ namespace Neverer.UtilityClass
             // Loop through clue length, adding in constraints from clue and ExternalConstraints
             for (int pos = 0; pos < clue.length; pos++)
             {
-                HashSet<char> thisPos = new HashSet<char>();
+                HashSet<char> thisPos;
 
                 // Start with clue constraint
                 if (answerChars[pos] == '?')
                 {
-                    for (char c = 'a'; c <= 'z'; c++)
-                    {
-                        thisPos.Add(c);
-                    }
+                    thisPos = new HashSet<char>(allLetters);
                 }
                 else
                 {
-                    thisPos.Add(answerChars[pos]);
+                    thisPos = new HashSet<char>();
+                    thisPos.Add(Char.ToLower(answerChars[pos]));
                 }
 
                 // Then look to ExternalConstraints
@@ -744,20 +768,22 @@ namespace Neverer.UtilityClass
 
             // Now compare to the original structure - remembering to loop past end of clueLength if old struct is longer (if, for instance, the clue has been shortened)
             var oldMax = (from int k in __externalConstraints.Keys select k).Max();
-            for (int pos = 0; pos < Math.Max(clue.length, oldMax); pos++)
+            for (int pos = 0; pos < Math.Max(clue.length, oldMax); pos++) // TODO - clue.length is 1-based, oldMax is 0-based. Is this a problem?
             {
-                if((!old.ContainsKey(pos))||(!__refinedLetters.ContainsKey(pos)))
+                if ((!old.ContainsKey(pos)) || (!__refinedLetters.ContainsKey(pos)))
                 {
                     // Mismatch of lengths - must be a difference
                     modifiedList.Add(pos);
-                } else
+                }
+                else
                 {
                     // Both have a value - are they the same?
-                    if (old[pos] != __refinedLetters[pos])
+                    if (!old[pos].SetEquals(__refinedLetters[pos]))
                     {
                         // Lists are different - changes at this position
                         modifiedList.Add(pos);
-                    } else
+                    }
+                    else
                     {
                         // No changes here
                     }

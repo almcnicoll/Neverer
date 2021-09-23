@@ -61,6 +61,7 @@
             this.optionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.intersectionsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.letterDistributionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cmsClueClick = new System.Windows.Forms.ContextMenuStrip(this.components);
@@ -89,7 +90,7 @@
             this.bwDictionaryChecker = new System.ComponentModel.BackgroundWorker();
             this.flpClues = new System.Windows.Forms.FlowLayoutPanel();
             this.timerBackup = new System.Windows.Forms.Timer(this.components);
-            this.letterDistributionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.tsslCellInfo = new System.Windows.Forms.ToolStripStatusLabel();
             this.msMain.SuspendLayout();
             this.cmsClueClick.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dgvPuzzle)).BeginInit();
@@ -342,9 +343,16 @@
             // intersectionsToolStripMenuItem
             // 
             this.intersectionsToolStripMenuItem.Name = "intersectionsToolStripMenuItem";
-            this.intersectionsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.intersectionsToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
             this.intersectionsToolStripMenuItem.Text = "&Intersections";
             this.intersectionsToolStripMenuItem.Click += new System.EventHandler(this.intersectionsToolStripMenuItem_Click);
+            // 
+            // letterDistributionToolStripMenuItem
+            // 
+            this.letterDistributionToolStripMenuItem.Name = "letterDistributionToolStripMenuItem";
+            this.letterDistributionToolStripMenuItem.Size = new System.Drawing.Size(169, 22);
+            this.letterDistributionToolStripMenuItem.Text = "&Letter Distribution";
+            this.letterDistributionToolStripMenuItem.Click += new System.EventHandler(this.letterDistributionToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
@@ -540,7 +548,8 @@
             // 
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.tsslMessage,
-            this.tspbClueUpdate});
+            this.tspbClueUpdate,
+            this.tsslCellInfo});
             this.statusStrip1.Location = new System.Drawing.Point(0, 368);
             this.statusStrip1.Name = "statusStrip1";
             this.statusStrip1.Size = new System.Drawing.Size(636, 22);
@@ -585,12 +594,10 @@
             this.timerBackup.Interval = 10000;
             this.timerBackup.Tick += new System.EventHandler(this.timerBackup_Tick);
             // 
-            // letterDistributionToolStripMenuItem
+            // tsslCellInfo
             // 
-            this.letterDistributionToolStripMenuItem.Name = "letterDistributionToolStripMenuItem";
-            this.letterDistributionToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.letterDistributionToolStripMenuItem.Text = "&Letter Distribution";
-            this.letterDistributionToolStripMenuItem.Click += new System.EventHandler(this.letterDistributionToolStripMenuItem_Click);
+            this.tsslCellInfo.Name = "tsslCellInfo";
+            this.tsslCellInfo.Size = new System.Drawing.Size(0, 17);
             // 
             // Creator
             // 
@@ -690,6 +697,7 @@
         private System.Windows.Forms.ToolStripMenuItem tsClearClue;
         private System.Windows.Forms.ToolStripMenuItem exportTextToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem letterDistributionToolStripMenuItem;
+        private System.Windows.Forms.ToolStripStatusLabel tsslCellInfo;
     }
 }
 

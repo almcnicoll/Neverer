@@ -345,7 +345,7 @@ namespace Neverer
         public static Dictionary<T, HashSet<U>> DeepCopy<T, U>(this Dictionary<T, HashSet<U>> source)
         {
             Dictionary<T, HashSet<U>> dest = new Dictionary<T, HashSet<U>>();
-            foreach (T key in dest.Keys)
+            foreach (T key in source.Keys)
             {
                 dest.Add(key, new HashSet<U>());
                 foreach (U val in source[key])

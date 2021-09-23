@@ -43,6 +43,7 @@ namespace Neverer.UtilityClass
             }
             set
             {
+                if (value==null) { value = ""; }
                 regex.Regex reStrip = new regex.Regex("[^A-Za-z?" + Clue.NonCountingChars_Regex + "]+");
                 __answer = reStrip.Replace(value, "").ToUpper();
                 changed?.Invoke(this, new ClueChangedEventArgs());

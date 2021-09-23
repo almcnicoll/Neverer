@@ -12,7 +12,7 @@ using Neverer.UtilityClass;
 
 namespace Neverer
 {
-    public partial class TextExporter : Form
+    public partial class TextExporter : PopupForm
     {
         public static bool ShowQuestions = false;
         public static bool ShowQuestionNumbers = false;
@@ -20,7 +20,7 @@ namespace Neverer
 
         private Crossword __source;
 
-        public TextExporter(ref Crossword source)
+        public TextExporter(Creator callingInstance, ref Crossword source) : base(callingInstance)
         {
             InitializeComponent();
             __source = source;
