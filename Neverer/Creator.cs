@@ -13,7 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using System.Xml;
-using Excel = Microsoft.Office.Interop.Excel;
+using Excel = ClosedXML.Excel;
 using Serial = System.Xml.Serialization;
 using WebUI = System.Web.UI;
 
@@ -1283,41 +1283,50 @@ namespace Neverer
             int firstPuzzleCol = 4;
             int firstPuzzleRow = 4;
 
-            Excel.Application eApp = new Excel.Application();
-            eApp.Visible = true;
-            Excel.Workbook eWbk = eApp.Workbooks.Add();
-            Excel.Worksheet eWks = eWbk.Sheets[1];
+            //Excel.Application eApp = new Excel.Application();
+            //eApp.Visible = true;
+            Excel.XLWorkbook eWbk = new Excel.XLWorkbook();
+            Excel.IXLWorksheet eWks = eWbk.Worksheets.Add("Crossword");
 
             int r = 0;
 
             // Title
-            ((Excel.Range)eWks.Range[eWks.Cells[1, firstClueCol], eWks.Cells[firstPuzzleRow - 1, firstPuzzleCol + this.crossword.cols - 1]]).Merge();
-            ((Excel.Range)eWks.Range[eWks.Cells[1, firstClueCol], eWks.Cells[firstPuzzleRow - 1, firstPuzzleCol + this.crossword.cols - 1]]).Font.Bold = true;
-            ((Excel.Range)eWks.Range[eWks.Cells[1, firstClueCol], eWks.Cells[firstPuzzleRow - 1, firstPuzzleCol + this.crossword.cols - 1]]).Font.Size = 24;
-            ((Excel.Range)eWks.Range[eWks.Cells[1, firstClueCol], eWks.Cells[firstPuzzleRow - 1, firstPuzzleCol + this.crossword.cols - 1]]).HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-            ((Excel.Range)eWks.Range[eWks.Cells[1, firstClueCol], eWks.Cells[firstPuzzleRow - 1, firstPuzzleCol + this.crossword.cols - 1]]).VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
-            ((Excel.Range)eWks.Range[eWks.Cells[1, firstClueCol], eWks.Cells[firstPuzzleRow - 1, firstPuzzleCol + this.crossword.cols - 1]]).Value = crossword.title;
+            Excel.IXLRange titleRange = ((Excel.IXLRange)eWks.Range(1, firstClueCol, firstPuzzleRow - 1, firstPuzzleCol + this.crossword.cols - 1));
+            titleRange.Merge();
+            titleRange.Style.Font.Bold = true;
+            titleRange.Style.Font.SetFontSize(24);
+            titleRange.Style.Alignment.SetHorizontal(Excel.XLAlignmentHorizontalValues.Center);
+            titleRange.Style.Alignment.SetVertical(Excel.XLAlignmentVerticalValues.Center);
+            titleRange.Value = crossword.title;
 
             // Puzzle setup (black fill, square cells, borders
-            ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Interior.Color = Color.Black.ToOle();
+            Excel.IXLRange puzzleRange = ((Excel.IXLRange)eWks.Range(firstPuzzleRow, firstPuzzleCol, firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1));
+            puzzleRange.Style.Fill.SetBackgroundColor(Excel.XLColor.Black);
             switch (style)
             {
                 case OutputStyle.EmptyGrid:
-                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Font.Size = 6;
-                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).HorizontalAlignment = Excel.XlHAlign.xlHAlignLeft;
-                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).VerticalAlignment = Excel.XlVAlign.xlVAlignTop;
+                    puzzleRange.Style.Font.SetFontSize(6);
+                    puzzleRange.Style.Alignment.SetHorizontal(Excel.XLAlignmentHorizontalValues.Left);
+                    puzzleRange.Style.Alignment.SetVertical(Excel.XLAlignmentVerticalValues.Top);
                     break;
 
                 case OutputStyle.GridWithAnswers:
-                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Font.Size = 10;
-                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).HorizontalAlignment = Excel.XlHAlign.xlHAlignCenter;
-                    ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).VerticalAlignment = Excel.XlVAlign.xlVAlignCenter;
+                    puzzleRange.Style.Font.SetFontSize(10);
+                    puzzleRange.Style.Alignment.SetHorizontal(Excel.XLAlignmentHorizontalValues.Center);
+                    puzzleRange.Style.Alignment.SetVertical(Excel.XLAlignmentVerticalValues.Center);
                     break;
             }
 
-            ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Columns.ColumnWidth = 3;
-            ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).Rows.RowHeight = 20;
-            ((Excel.Range)eWks.Range[eWks.Cells[firstPuzzleRow, firstPuzzleCol], eWks.Cells[firstPuzzleRow + this.crossword.rows - 1, firstPuzzleCol + this.crossword.cols - 1]]).AllBorders();
+            foreach (Excel.IXLColumn col in puzzleRange.Columns())
+            {
+                col.Width = 3;
+            }
+            foreach (Excel.IXLRow row in puzzleRange.Rows())
+            {
+                row.Height = 20;
+            }
+            puzzleRange.Style.Border.SetInsideBorder(Excel.XLBorderStyleValues.Thin);
+            puzzleRange.Style.Border.SetOutsideBorder(Excel.XLBorderStyleValues.Thin);
 
             // Clues
             r = firstClueRow;
@@ -1331,22 +1340,22 @@ namespace Neverer
                     switch (pc.orientation)
                     {
                         case AD.Down:
-                            ((Excel.Range)eWks.Cells[r, firstClueCol]).Value = "Clues down";
-                            ((Excel.Range)eWks.Cells[r, firstClueCol]).Font.Bold = true;
+                            eWks.Cell(r, firstClueCol).Value = "Clues down";
+                            eWks.Cell(r, firstClueCol).Style.Font.Bold = true;
                             r++;
                             break;
                         case AD.Across:
-                            ((Excel.Range)eWks.Cells[r, firstClueCol]).Value = "Clues across";
-                            ((Excel.Range)eWks.Cells[r, firstClueCol]).Font.Bold = true;
+                            eWks.Cell(r, firstClueCol).Value = "Clues across";
+                            eWks.Cell(r, firstClueCol).Style.Font.Bold = true;
                             r++;
                             break;
                     }
                     lastOrient = pc.orientation;
                 }
                 // Add clue text to clue list
-                ((Excel.Range)eWks.Cells[r, firstClueCol]).Value = pc.placeNumber;
-                ((Excel.Range)eWks.Cells[r, firstClueCol + 1]).Value = pc.clueText;
-                ((Excel.Range)eWks.Cells[r, firstClueCol]).Rows.RowHeight = 20;
+                eWks.Cell(r, firstClueCol).Value = pc.placeNumber;
+                eWks.Cell(r, firstClueCol + 1).Value = pc.clueText;
+                eWks.Row(r).Height = 20;
                 r++;
 
                 // Alter grid
@@ -1364,9 +1373,9 @@ namespace Neverer
                                 x2 += pc.clue.length - 1;
                                 break;
                         }
-                        ((Excel.Range)eWks.Range[eWks.Cells[pc.y + firstPuzzleRow, pc.x + firstPuzzleCol], eWks.Cells[y2 + firstPuzzleRow, x2 + firstPuzzleCol]]).Interior.Color = Color.White.ToOle();
+                        eWks.Range(pc.y + firstPuzzleRow, pc.x + firstPuzzleCol, y2 + firstPuzzleRow, x2 + firstPuzzleCol).Style.Fill.SetBackgroundColor(Excel.XLColor.White);
                         // Number clue
-                        ((Excel.Range)eWks.Cells[pc.y + firstPuzzleRow, pc.x + firstPuzzleCol]).Value = pc.placeNumber;
+                        eWks.Cell(pc.y + firstPuzzleRow, pc.x + firstPuzzleCol).Value = pc.placeNumber;
                         break;
                     case OutputStyle.GridWithAnswers:
                         // Enter answer into grid
@@ -1375,16 +1384,16 @@ namespace Neverer
                             case AD.Down:
                                 for (int yy = 0; yy < pc.clue.length; yy++)
                                 {
-                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol], eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol]]).Value = pc.clue.letters[yy].ToString();
-                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol], eWks.Cells[pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol]]).Interior.Color = Color.White.ToOle();
+                                    eWks.Range(pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol).Value = pc.clue.letters[yy].ToString();
+                                    eWks.Range(pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol, pc.y + yy + firstPuzzleRow, pc.x + firstPuzzleCol).Style.Fill.SetBackgroundColor(Excel.XLColor.White);
                                 }
                                 break;
                             case AD.Across:
                                 for (int xx = 0; xx < pc.clue.length; xx++)
                                 {
 
-                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol], eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol]]).Value = pc.clue.letters[xx].ToString();
-                                    ((Excel.Range)eWks.Range[eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol], eWks.Cells[pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol]]).Interior.Color = Color.White.ToOle();
+                                    eWks.Range(pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol).Value = pc.clue.letters[xx].ToString();
+                                    eWks.Range(pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol, pc.y + firstPuzzleRow, pc.x + xx + firstPuzzleCol).Style.Fill.SetBackgroundColor(Excel.XLColor.White);
                                 }
                                 break;
                         }
@@ -1392,18 +1401,22 @@ namespace Neverer
                 }
 
             }
-            ((Excel.Range)eWks.Range[eWks.Cells[1, 1], eWks.Cells[r, 2]]).Columns.AutoFit();
-            Excel.PageSetup ps = eWks.PageSetup;
-            ps.PrintArea = "A1:" + (firstPuzzleCol + this.crossword.cols - 1).ToExcelCol() + r.ToString();
-            ps.Orientation = Excel.XlPageOrientation.xlLandscape;
-            ps.LeftMargin = eApp.InchesToPoints(0.25);
-            ps.RightMargin = eApp.InchesToPoints(0.25);
-            ps.TopMargin = eApp.InchesToPoints(0.75);
-            ps.BottomMargin = eApp.InchesToPoints(0.75);
-            ps.HeaderMargin = eApp.InchesToPoints(0.3);
-            ps.FooterMargin = eApp.InchesToPoints(0.3);
-            ps.FitToPagesTall = 1;
-            ps.FitToPagesWide = 1;
+            foreach (Excel.IXLColumn col in eWks.Range(1, 1, r, 2).Columns())
+            {
+                col.AdjustToContents();
+            }
+            Excel.IXLPageSetup ps = eWks.PageSetup;
+            ps.PrintAreas.Clear();
+            ps.PrintAreas.Add("A1:" + (firstPuzzleCol + this.crossword.cols - 1).ToExcelCol() + r.ToString());
+            ps.SetPageOrientation(Excel.XLPageOrientation.Landscape);
+            ps.Margins.Left = (72 * 0.25);
+            ps.Margins.Right = (72 * 0.25);
+            ps.Margins.Top = (72 * 0.75);
+            ps.Margins.Bottom = (72 * 0.75);
+            ps.Margins.Header = (72 * 0.3);
+            ps.Margins.Footer = (72 * 0.3);
+            ps.SetPagesTall(1);
+            ps.SetPagesWide(1);
         }
 
         private void MakeHtml(OutputStyle style = OutputStyle.EmptyGrid)
