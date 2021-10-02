@@ -1317,13 +1317,13 @@ namespace Neverer
                     break;
             }
 
-            foreach (Excel.IXLColumn col in puzzleRange.Columns())
+            for (int col = puzzleRange.FirstColumn().ColumnNumber(); col <= puzzleRange.LastColumn().ColumnNumber(); col++)
             {
-                col.Width = 3;
+                eWks.Column(col).Width = 3;
             }
-            foreach (Excel.IXLRow row in puzzleRange.Rows())
+            for (int row = puzzleRange.FirstRow().RowNumber(); row <= puzzleRange.LastRow().RowNumber(); row++)
             {
-                row.Height = 20;
+                eWks.Row(row).Height = 20;
             }
             puzzleRange.Style.Border.SetInsideBorder(Excel.XLBorderStyleValues.Thin);
             puzzleRange.Style.Border.SetOutsideBorder(Excel.XLBorderStyleValues.Thin);
@@ -1401,9 +1401,9 @@ namespace Neverer
                 }
 
             }
-            foreach (Excel.IXLColumn col in eWks.Range(1, 1, r, 2).Columns())
+            foreach (var col in eWks.Range(1, 1, r, 2).Columns())
             {
-                col.AdjustToContents();
+                eWks.Column(col.ColumnNumber()).AdjustToContents();
             }
             Excel.IXLPageSetup ps = eWks.PageSetup;
             ps.PrintAreas.Clear();
