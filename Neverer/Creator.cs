@@ -1417,6 +1417,22 @@ namespace Neverer
             ps.Margins.Footer = (72 * 0.3);
             ps.SetPagesTall(1);
             ps.SetPagesWide(1);
+            SaveFileDialog dlg = new SaveFileDialog();
+            dlg.DefaultExt = "xlsx";
+            dlg.Filter = "Spreadsheets|*.xl*|All files|*.*";
+            if (currentFilename != null)
+            {
+                dlg.InitialDirectory = Path.GetDirectoryName(currentFilename);
+                FileInfo fi = new FileInfo(currentFilename);
+                dlg.FileName = fi.Name.Replace(fi.Extension, "");
+            }
+            DialogResult dr = dlg.ShowDialog();
+            if (dr == DialogResult.OK)
+            {
+                eWbk.SaveAs(dlg.FileName);
+                System.Diagnostics.Process.Start(dlg.FileName);
+            }
+            dlg.Dispose();
         }
 
         private void MakeHtml(OutputStyle style = OutputStyle.EmptyGrid)
