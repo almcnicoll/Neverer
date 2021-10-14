@@ -171,7 +171,7 @@ namespace CrosswordControls
                 this.ClueText = __Clue.clueText;
                 this.BackColor = __Clue.statusColor;
                 __Clue.ClueStatusChanged += __Clue_ClueStatusChanged;
-                __Clue.ClueDefinitionChanged += __Clue_ClueDefinitionChanged;
+                __Clue.ClueSpecificationChanged += __Clue_ClueDefinitionChanged;
             }
         }
 

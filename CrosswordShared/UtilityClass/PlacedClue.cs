@@ -15,6 +15,14 @@ namespace Neverer.UtilityClass
         Down = 2
     }
 
+    [Serializable, Flags]
+    public enum ConstraintType
+    {
+        Unset = 0,
+        Internal = 1,
+        External = 2
+    }
+
     [Serializable]
     public class PlacedClue
     {
@@ -112,18 +120,19 @@ namespace Neverer.UtilityClass
         private ClueStatus __status = ClueStatus.Unknown;
 
         private SerializableDictionary<String, List<String>> __matches = new SerializableDictionary<String, List<String>>();
+        // Refined properties take into account possible solutions on other clues, and their effect on this clue
+        private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
         private bool __uncheckedChanges = true;
+        private bool __uncheckedRefinedChanges = true;
         private bool __pauseEvents = false;
         private int lowMatchesTrigger = 5;
 
-        // Refined properties take into account possible solutions on other clues, and their effect on this clue
+        private Dictionary<int, HashSet<char>> __internalConstraints = null; // Constraints of which letters can go in each place based on refinedMatches
+        private Dictionary<int, HashSet<char>> __externalConstraints = null; // Constraints of which letters can go in each place based on intersecting clues
         private Dictionary<int, HashSet<char>> __refinedLetters = null;
-        private Dictionary<int, HashSet<char>> __externalConstraints = null;
-        private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
-        private bool __refinedChanges = true;
-        private regex.Regex __refinedRegex = null;
 
-        private HashSet<char> allLetters = new HashSet<char> { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
+        // Useful for quick population of HashSets
+        private static HashSet<char> allLetters = new HashSet<char> { 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z' };
 
         [XmlIgnore()]
         public int height
@@ -157,38 +166,6 @@ namespace Neverer.UtilityClass
             }
         }
 
-        /// <summary>
-        /// Returns the __refinedLetters variable, blank-populated if null
-        /// </summary>
-        [XmlIgnore]
-        public Dictionary<int, HashSet<char>> refinedLetters
-        {
-            get
-            {
-                // Make sure our private variable is populated
-                if (__refinedLetters == null)
-                {
-                    // Populate a per-character-position lookup of which letters are valid
-                    __refinedLetters = new Dictionary<int, HashSet<char>>();
-                    __externalConstraints = new Dictionary<int, HashSet<char>>();
-                    for (int i = 0; i < clue.length; i++)
-                    {
-                        // TODO - fine to do this now, but what if clue changes length?
-                        if (clue.letters[i] == '?')
-                        {
-                            __refinedLetters.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
-                        }
-                        else
-                        {
-                            __refinedLetters.Add(i, new HashSet<char>()); __refinedLetters[i].Add(Char.ToLower(clue.letters[i]));
-                        }
-                        __externalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
-                    }
-                }
-                // Return the variable
-                return __refinedLetters;
-            }
-        }
 
         public String placeDescriptor
         {
@@ -211,9 +188,9 @@ namespace Neverer.UtilityClass
             }
             set
             {
-                if (__placeNumber != value) { EventHandler<EventArgs> evt = ClueDefinitionChanged; if (evt != null) { evt(this, new EventArgs()); } }
+                if (__placeNumber != value) { EventHandler<EventArgs> evt = ClueSpecificationChanged; if (evt != null) { evt(this, new EventArgs()); } }
                 __placeNumber = value;
-                Changed();
+                Changed(e: new ClueChangedEventArgs(false, ClueChangedEventArgs.ClueChangeType.PositionChanged));
             }
         }
         public String clueText
@@ -224,16 +201,11 @@ namespace Neverer.UtilityClass
             }
         }
 
-        public regex.Regex refinedRegex
+        public Dictionary<int, HashSet<char>> refinedLetters
         {
             get
             {
-                if (__refinedChanges)
-                {
-                    // TODO - rewrite recalculateRefinedRegex();
-                    recalculateRefinedRegex();
-                }
-                return __refinedRegex;
+                return __refinedLetters;
             }
         }
 
@@ -251,53 +223,11 @@ namespace Neverer.UtilityClass
                 if (Matches.Count <= lowMatchesTrigger) { newStatus |= ClueStatus.HasFewMatches; }
             }
 
-            /*if (clue.answer.Contains("?"))
-            {
-                if ((Matches == null) || (Matches.Count == 0))
-                {
-                    __status = ClueStatus.NoMatchingWord;
-                }
-                else if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
-                {
-                    __status = ClueStatus.MatchingWordNoQuestion;
-                }
-                else
-                {
-                    __status = ClueStatus.MatchingWordWithQuestion;
-                }
-            }
-            else
-            {
-                if ((clue.question == "") || (clue.question == Clue.BlankQuestion))
-                {
-                    __status = ClueStatus.MatchingWordNoQuestion;
-                }
-                else
-                {
-                    if ((Matches == null) || (Matches.Count == 0))
-                    {
-                        __status = ClueStatus.NoMatchingWordComplete;
-                    }
-                    else
-                    {
-                        __status = ClueStatus.Complete;
-                    }
-                }
-            }
-            // Handle low-matches
-            if (((__status == ClueStatus.MatchingWordWithQuestion)
-                || (__status == ClueStatus.MatchingWordNoQuestion))
-                && (Matches.Count <= lowMatchesTrigger)
-                && (clue.answer.Contains("?")))
-            {
-                __status = ClueStatus.FewMatchingWords;
-            }
-            */
             // Put the Changed() call in an if(), otherwise we end up in a recursive loop
             if (__status != newStatus)
             {
                 __status = newStatus;
-                Changed();
+                Changed(e: new ClueChangedEventArgs(false, ClueChangedEventArgs.ClueChangeType.NothingSignificant));
             }
         }
 
@@ -317,9 +247,10 @@ namespace Neverer.UtilityClass
                 {
                     if (value == ClueStatus.Unknown) { return; }
                     __status = value;
-                    //EventHandler<ClueStatusChangedEventArgs> evt = ClueStatusChanged;
-                    //if (evt != null) { evt(this, new ClueStatusChangedEventArgs(value)); }
-                    Changed();
+                    // Status changed event
+                    EventHandler<EventArgs> statusChanged = ClueSpecificationChanged; if (statusChanged != null) { statusChanged(this, new EventArgs()); }
+                    // Clue changed event
+                    Changed(e: new ClueChangedEventArgs(false, ClueChangedEventArgs.ClueChangeType.NothingSignificant));
                 }
             }
         }
@@ -346,7 +277,7 @@ namespace Neverer.UtilityClass
 
         // Events
         public event EventHandler<ClueStatusChangedEventArgs> ClueStatusChanged;
-        public event EventHandler<EventArgs> ClueDefinitionChanged;
+        public event EventHandler<EventArgs> ClueSpecificationChanged;
 
         // Constructor
         public PlacedClue()
@@ -362,13 +293,30 @@ namespace Neverer.UtilityClass
             //  and needs to bubble up an event.
             //  this includes when the base text of the clue changes
 
+            if (sender == null) { sender = this.clue; }
+
             // __pauseEvents allows us to make multiple changes without triggering a repaint every time (use with caution!)
             if (this.__pauseEvents) { return; }
 
+            // Reset relevant constraints
+            ConstraintType resetType = ConstraintType.Unset;
+            if (e == null)
+            {
+                resetType = ConstraintType.Internal | ConstraintType.External; // Safest if unknown
+            }
+            else
+            {
+                if ((e.type & ClueChangedEventArgs.ClueChangeType.LengthChanged) != 0) { resetType |= ConstraintType.Internal; resetType |= ConstraintType.External; }
+                if ((e.type & ClueChangedEventArgs.ClueChangeType.LettersChanged) != 0) { resetType |= ConstraintType.Internal; }
+                if ((e.type & ClueChangedEventArgs.ClueChangeType.PositionChanged) != 0) { resetType |= ConstraintType.External; }
+            }
+
+            ResetConstraints(resetType);
+
             // Trigger event, leading to repaint etc.
-            if (e == null) { e = new ClueChangedEventArgs(false); }
+            if (e == null) { e = new ClueChangedEventArgs(false, ClueChangedEventArgs.ClueChangeType.NothingSignificant); }
             if (!e.NoRecheck) { this.__uncheckedChanges = true; }
-            EventHandler<EventArgs> evt = ClueDefinitionChanged;
+            EventHandler<EventArgs> evt = ClueSpecificationChanged;
             if (evt != null) { evt(this, new EventArgs()); }
         }
         public Guid UniqueID
@@ -409,7 +357,7 @@ namespace Neverer.UtilityClass
             target.status = status;
             target.__pauseEvents = false;
             clue.CopyTo(target.clue);
-            target.Changed();
+            target.Changed(e: new ClueChangedEventArgs(false, ClueChangedEventArgs.ClueChangeType.LettersChanged | ClueChangedEventArgs.ClueChangeType.PositionChanged));
         }
 
         /// <summary>
@@ -485,111 +433,327 @@ namespace Neverer.UtilityClass
             return new Point(posX, posY);
         }
 
-        /* RefinePattern functions for rewriting
         /// <summary>
-        /// Filters the list of "refined matches" by a further string-pattern
+        /// Clear the list of matches against the clue
         /// </summary>
-        /// <param name="overlay">String of letters or question marks indicating the character mask</param>
-        /// <returns>True if the operation changed the number of possible matches</returns>
-        public bool RefinePattern(String overlay)
+        public void clearMatches()
         {
-            regex.Regex reStrip = new regex.Regex("[^A-Za-z?]+");
-            overlay = reStrip.Replace(overlay, "");
-
-            char[] overlayLetters = overlay.ToCharArray();
-            char[] rl = refinedLetters.ToCharArray();
-            for (int i = 0; i < overlayLetters.Length; i++)
-            {
-                char c = overlayLetters[i];
-                if (c != '?')
-                {
-                    rl[i] = c;
-                }
-            }
-            refinedLetters = rl.ToString();
-
-            // Now refine the matches further
-            regex.Regex re = Clue.toRegExp(refinedLetters);
-            return RefinePattern(re);
+            __matches = null;
+            __matches = new SerializableDictionary<String, List<String>>();
+            __refinedMatches = null;
+            __refinedMatches = new SerializableDictionary<String, List<String>>();
+            /*
+                        status = ClueStatus.NoMatchingWord;
+                        if (clue.answer.Contains("?"))
+                        {
+                            status = ClueStatus.NoMatchingWord;
+                        }
+                        else if ((clue.question == null) || (clue.question == Clue.BlankQuestion))
+                        {
+                            status = ClueStatus.MatchingWordNoQuestion;
+                        }
+                        else
+                        {
+                            status = ClueStatus.MatchingWordWithQuestion;
+                        }
+            */
         }
 
         /// <summary>
-        /// Filters the list of "refined matches" by limiting the specified cell to a set list of characters
+        /// Resets the specified set of constraints to "all letters"
         /// </summary>
-        /// <param name="x">The x coordinate of the cell</param>
-        /// <param name="y">The y coordinate of the cell</param>
-        /// <param name="possibleLetters">An array of the possible letters for this slot</param>
-        /// <returns>True if the operation changed the number of possible matches</returns>
-        public bool RefinePattern(int x, int y, char[] possibleLetters)
+        /// <param name="type"></param>
+        public void ResetConstraints(ConstraintType type)
         {
-            int pos; // Zero-based position within the clue of the specified cell
-            switch (this.orientation)
+            //TODO - When matches are updated, also update RefinedMatches
+            // Populate a per-character-position lookup of which letters are valid
+            if ((type & ConstraintType.Internal) > 0)
             {
-                case AD.Across:
-                    if (
-                        (y == this.y) &&
-                        (x >= this.x) &&
-                        (x < this.x + this.clue.length)
-                        )
+                __internalConstraints = new Dictionary<int, HashSet<char>>();
+            }
+            if ((type & ConstraintType.External) > 0)
+            {
+                __externalConstraints = new Dictionary<int, HashSet<char>>();
+            }
+            for (int i = 0; i < clue.length; i++)
+            {
+                {
+                    __internalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                }
+                if ((type & ConstraintType.External) > 0)
+                {
+                    __externalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds a match to the list
+        /// </summary>
+        /// <param name="answer">The matching answer</param>
+        /// <param name="question">The suggested question text</param>
+        public void addMatch(String answer, String question = "")
+        {
+            // Ensure there's an entry
+            if (!__matches.ContainsKey(answer))
+            {
+                __matches.Add(answer, new List<String>());
+                //if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
+                __status |= ClueStatus.HasMatches;
+            }
+            if (!__refinedMatches.ContainsKey(answer))
+            {
+                __refinedMatches.Add(answer, new List<String>());
+            }
+            // No duplicate questions (including blank question, which means "answer only")
+            if (!__matches[answer].Contains(question))
+            {
+                __matches[answer].Add(question);
+                //if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
+                //if (question != "") { status = ClueStatus.MatchingWordWithQuestion; }
+                __status |= ClueStatus.HasMatches;
+            }
+            if (!__refinedMatches[answer].Contains(question))
+            {
+                __refinedMatches[answer].Add(question);
+            }
+        }
+
+        /// <summary>
+        /// Refreshes the RefinedLetters structure based on the clue itself and the ExternalConstraints structure
+        /// </summary>
+        /// <returns>A set of integer positions in the clue where the constraints have changed</returns>
+        public HashSet<int> RefreshRefinedLetters()
+        {
+            // Prepare return variable
+            HashSet<int> modifiedList = new HashSet<int>();
+
+            // Make a deep copy of the original
+            Dictionary<int, HashSet<char>> old = __refinedLetters.DeepCopy();
+
+            // Clear out the old structure
+            __refinedLetters.Clear();
+
+            var answerChars = clue.letters.ToCharArray();
+
+            // Loop through clue length, adding in constraints from clue, InternalConstraints and ExternalConstraints
+            for (int pos = 0; pos < clue.length; pos++)
+            {
+                HashSet<char> thisPos;
+
+                // Start with clue constraint
+                if (answerChars[pos] == '?')
+                {
+                    thisPos = new HashSet<char>(allLetters);
+                }
+                else
+                {
+                    thisPos = new HashSet<char>();
+                    thisPos.Add(Char.ToLower(answerChars[pos]));
+                }
+
+                // Then look to ExternalConstraints
+                if (__externalConstraints.ContainsKey(pos))
+                {
+                    // If there's external constraints, apply them (intersect)
+                    __refinedLetters[pos] = new HashSet<char>(__externalConstraints[pos]);
+                    __refinedLetters[pos].IntersectWith(thisPos);
+                    //__refinedLetters[pos] = (HashSet<char>)__externalConstraints[pos].Intersect(thisPos);
+                }
+                else
+                {
+                    // Otherwise just use the clue constraints
+                    __refinedLetters[pos] = thisPos;
+                }
+            }
+
+            // Now compare to the original structure - remembering to loop past end of clueLength if old struct is longer (if, for instance, the clue has been shortened)
+            var oldMax = (from int k in __externalConstraints.Keys select k).Max();
+            for (int pos = 0; pos < Math.Max(clue.length, oldMax); pos++) // TODO - clue.length is 1-based, oldMax is 0-based. Is this a problem?
+            {
+                if ((!old.ContainsKey(pos)) || (!__refinedLetters.ContainsKey(pos)))
+                {
+                    // Mismatch of lengths - must be a difference
+                    modifiedList.Add(pos);
+                }
+                else
+                {
+                    // Both have a value - are they the same?
+                    if (!old[pos].SetEquals(__refinedLetters[pos]))
                     {
-                        pos = x - this.x;
+                        // Lists are different - changes at this position
+                        modifiedList.Add(pos);
                     }
                     else
                     {
-                        // Doesn't intersect
-                        return false;
+                        // No changes here
                     }
-                    break;
-                case AD.Down:
-                    if (
-                        (x == this.x) &&
-                        (y >= this.y) &&
-                        (y < this.y + this.clue.length)
-                        )
-                    {
-                        pos = y - this.y;
-                    }
-                    else
-                    {
-                        // Doesn't intersect
-                        return false;
-                    }
-                    break;
-                default:
-                    return false;
-            }
-            String pattern = "";
-            for (int i = 0; i < pos; i++)
-            {
-                pattern += ".[" + Clue.NonCountingChars_Regex + "]*";
-            }
-            regex.Regex overlay = new regex.Regex(pattern, regex.RegexOptions.IgnoreCase);
-            return RefinePattern(overlay);
-        }
-
-        /// <summary>
-        /// Filters the list of "refined matches" by a regular expression
-        /// </summary>
-        /// <param name="overlay">Regex indicating the character mask</param>
-        /// <returns>True if the operation changed the number of possible matches</returns>
-        public bool RefinePattern(regex.Regex overlay)
-        {
-            bool refinementsMade = false;
-            // Now refine the matches further
-            List<String> keys = new List<String>(__refinedMatches.Keys);
-            foreach (String key in keys)
-            {
-                if (!overlay.IsMatch(key))
-                {
-                    __refinedMatches.Remove(key);
-                    refinementsMade = true;
                 }
             }
-            __refinedChanges = true;
-            return refinementsMade;
-        }
-        */
 
+            return modifiedList;
+        }
+    }
+
+    // TODO - Remove this when new class functional
+    public class PlacedClueOld
+    {
+        /*
+                // Refined properties take into account possible solutions on other clues, and their effect on this clue
+                private Dictionary<int, HashSet<char>> __refinedLetters = null;
+                private regex.Regex __refinedRegex = null;
+
+                /// <summary>
+                /// Returns the __refinedLetters variable, blank-populated if null
+                /// </summary>
+                [XmlIgnore]
+                public Dictionary<int, HashSet<char>> refinedLetters
+                {
+                    get
+                    {
+                        // Make sure our private variable is populated
+                        if (__refinedLetters == null)
+                        {
+                            // Populate a per-character-position lookup of which letters are valid
+                            __refinedLetters = new Dictionary<int, HashSet<char>>();
+                            __internalConstraints = new Dictionary<int, HashSet<char>>();
+                            __externalConstraints = new Dictionary<int, HashSet<char>>();
+                            for (int i = 0; i < clue.length; i++)
+                            {
+                                // TODO - fine to do this now, but what if clue changes length?
+                                if (clue.letters[i] == '?')
+                                {
+                                    __refinedLetters.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                                }
+                                else
+                                {
+                                    __refinedLetters.Add(i, new HashSet<char>()); __refinedLetters[i].Add(Char.ToLower(clue.letters[i]));
+                                }
+                                __externalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                                __internalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                            }
+                        }
+                        // Return the variable
+                        return __refinedLetters;
+                    }
+                }
+                public regex.Regex refinedRegex
+                {
+                    get
+                    {
+                        if (__refinedChanges)
+                        {
+                            // TODO - rewrite recalculateRefinedRegex();
+                            recalculateRefinedRegex();
+                        }
+                        return __refinedRegex;
+                    }
+                }
+
+
+                /// <summary>
+                /// Filters the list of "refined matches" by a further string-pattern
+                /// </summary>
+                /// <param name="overlay">String of letters or question marks indicating the character mask</param>
+                /// <returns>True if the operation changed the number of possible matches</returns>
+                public bool RefinePattern(String overlay)
+                {
+                    regex.Regex reStrip = new regex.Regex("[^A-Za-z?]+");
+                    overlay = reStrip.Replace(overlay, "");
+
+                    char[] overlayLetters = overlay.ToCharArray();
+                    char[] rl = refinedLetters.ToCharArray();
+                    for (int i = 0; i < overlayLetters.Length; i++)
+                    {
+                        char c = overlayLetters[i];
+                        if (c != '?')
+                        {
+                            rl[i] = c;
+                        }
+                    }
+                    refinedLetters = rl.ToString();
+
+                    // Now refine the matches further
+                    regex.Regex re = Clue.toRegExp(refinedLetters);
+                    return RefinePattern(re);
+                }
+
+                /// <summary>
+                /// Filters the list of "refined matches" by limiting the specified cell to a set list of characters
+                /// </summary>
+                /// <param name="x">The x coordinate of the cell</param>
+                /// <param name="y">The y coordinate of the cell</param>
+                /// <param name="possibleLetters">An array of the possible letters for this slot</param>
+                /// <returns>True if the operation changed the number of possible matches</returns>
+                public bool RefinePattern(int x, int y, char[] possibleLetters)
+                {
+                    int pos; // Zero-based position within the clue of the specified cell
+                    switch (this.orientation)
+                    {
+                        case AD.Across:
+                            if (
+                                (y == this.y) &&
+                                (x >= this.x) &&
+                                (x < this.x + this.clue.length)
+                                )
+                            {
+                                pos = x - this.x;
+                            }
+                            else
+                            {
+                                // Doesn't intersect
+                                return false;
+                            }
+                            break;
+                        case AD.Down:
+                            if (
+                                (x == this.x) &&
+                                (y >= this.y) &&
+                                (y < this.y + this.clue.length)
+                                )
+                            {
+                                pos = y - this.y;
+                            }
+                            else
+                            {
+                                // Doesn't intersect
+                                return false;
+                            }
+                            break;
+                        default:
+                            return false;
+                    }
+                    String pattern = "";
+                    for (int i = 0; i < pos; i++)
+                    {
+                        pattern += ".[" + Clue.NonCountingChars_Regex + "]*";
+                    }
+                    regex.Regex overlay = new regex.Regex(pattern, regex.RegexOptions.IgnoreCase);
+                    return RefinePattern(overlay);
+                }
+
+                /// <summary>
+                /// Filters the list of "refined matches" by a regular expression
+                /// </summary>
+                /// <param name="overlay">Regex indicating the character mask</param>
+                /// <returns>True if the operation changed the number of possible matches</returns>
+                public bool RefinePattern(regex.Regex overlay)
+                {
+                    bool refinementsMade = false;
+                    // Now refine the matches further
+                    List<String> keys = new List<String>(__refinedMatches.Keys);
+                    foreach (String key in keys)
+                    {
+                        if (!overlay.IsMatch(key))
+                        {
+                            __refinedMatches.Remove(key);
+                            refinementsMade = true;
+                        }
+                    }
+                    __refinedChanges = true;
+                    return refinementsMade;
+                }
+     
 
         /// <summary>
         /// Recalculates the regex that defines what letters can be where
@@ -658,65 +822,7 @@ namespace Neverer.UtilityClass
 
             // TODO - if changes made, recalculate refinedPatterns of all intersecting clues?
         }
-        */
 
-        /// <summary>
-        /// Clear the list of matches against the clue
-        /// </summary>
-        public void clearMatches()
-        {
-            __matches = null;
-            __matches = new SerializableDictionary<String, List<String>>();
-            __refinedMatches = null;
-            __refinedMatches = new SerializableDictionary<String, List<String>>();
-            /*
-                        status = ClueStatus.NoMatchingWord;
-                        if (clue.answer.Contains("?"))
-                        {
-                            status = ClueStatus.NoMatchingWord;
-                        }
-                        else if ((clue.question == null) || (clue.question == Clue.BlankQuestion))
-                        {
-                            status = ClueStatus.MatchingWordNoQuestion;
-                        }
-                        else
-                        {
-                            status = ClueStatus.MatchingWordWithQuestion;
-                        }
-            */
-        }
-
-        /// <summary>
-        /// Adds a match to the list
-        /// </summary>
-        /// <param name="answer">The matching answer</param>
-        /// <param name="question">The suggested question text</param>
-        public void addMatch(String answer, String question = "")
-        {
-            // Ensure there's an entry
-            if (!__matches.ContainsKey(answer))
-            {
-                __matches.Add(answer, new List<String>());
-                //if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
-                __status |= ClueStatus.HasMatches;
-            }
-            if (!__refinedMatches.ContainsKey(answer))
-            {
-                __refinedMatches.Add(answer, new List<String>());
-            }
-            // No duplicate questions (including blank question, which means "answer only")
-            if (!__matches[answer].Contains(question))
-            {
-                __matches[answer].Add(question);
-                //if (__status != ClueStatus.MatchingWordWithQuestion) { status = ClueStatus.MatchingWordNoQuestion; }
-                //if (question != "") { status = ClueStatus.MatchingWordWithQuestion; }
-                __status |= ClueStatus.HasMatches;
-            }
-            if (!__refinedMatches[answer].Contains(question))
-            {
-                __refinedMatches[answer].Add(question);
-            }
-        }
 
         /// <summary>
         /// Refreshes the RefinedLetters structure based on the clue itself and the ExternalConstraints structure
@@ -792,5 +898,6 @@ namespace Neverer.UtilityClass
 
             return modifiedList;
         }
+   */
     }
 }

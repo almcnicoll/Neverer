@@ -15,6 +15,12 @@ namespace Neverer
 {
     public static class ExtensionMethods
     {
+        public static int SafeLength(this String source)
+        {
+            if (source == null) { return 0; }
+            return source.Length;
+        }
+
         public static int ToOle(this System.Drawing.Color c)
         {
             return System.Drawing.ColorTranslator.ToOle(c);

@@ -37,11 +37,21 @@ namespace Neverer.UtilityClass
 
     public class ClueChangedEventArgs : EventArgs
     {
+        [Flags, Serializable]
+        public enum ClueChangeType
+        {
+            NothingSignificant = 0,
+            LengthChanged = 1,
+            PositionChanged = 2,
+            LettersChanged = 4
+        }
         public bool NoRecheck { get; set; }
+        public ClueChangeType type { get; set; }
 
-        public ClueChangedEventArgs(bool NoRecheck = false)
+        public ClueChangedEventArgs(bool NoRecheck, ClueChangeType type)
         {
             this.NoRecheck = NoRecheck;
+            this.type = type;
         }
     }
     public class ClueStatusChangedEventArgs : EventArgs
