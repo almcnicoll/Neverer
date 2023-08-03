@@ -43,10 +43,13 @@ namespace Neverer.UtilityClass
             }
             set
             {
-                if (value==null) { value = ""; }
+                bool lengthChange = (value.SafeLength() != __answer.SafeLength());
+                if (value == null) { value = ""; }
                 regex.Regex reStrip = new regex.Regex("[^A-Za-z?" + Clue.NonCountingChars_Regex + "]+");
                 __answer = reStrip.Replace(value, "").ToUpper();
-                changed?.Invoke(this, new ClueChangedEventArgs());
+                ClueChangedEventArgs.ClueChangeType changeType = ClueChangedEventArgs.ClueChangeType.NothingSignificant;
+                if (lengthChange) { changeType |= ClueChangedEventArgs.ClueChangeType.LengthChanged; }
+                changed?.Invoke(this, new ClueChangedEventArgs(false, changeType));
             }
         }
         public String letters
