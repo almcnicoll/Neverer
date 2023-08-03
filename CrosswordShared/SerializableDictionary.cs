@@ -5,6 +5,7 @@
     using System.Xml;
     using System.Xml.Serialization;
     using System.Linq;
+    using System.Collections.Concurrent;
 
     // This code copyright (c) Dacris Software Inc. under MIT license
 

@@ -112,13 +112,18 @@ namespace Neverer.UtilityClass
         private ClueStatus __status = ClueStatus.Unknown;
 
         private SerializableDictionary<String, List<String>> __matches = new SerializableDictionary<String, List<String>>();
+        private bool __matchesChanged = true;
         private bool __uncheckedChanges = true;
         private bool __pauseEvents = false;
         private int lowMatchesTrigger = 5;
 
         // Refined properties take into account possible solutions on other clues, and their effect on this clue
+        [XmlIgnore]
         private Dictionary<int, HashSet<char>> __refinedLetters = null;
+        [XmlIgnore]
         private Dictionary<int, HashSet<char>> __externalConstraints = null;
+        [XmlIgnore]
+        private Dictionary<int, HashSet<char>> __internalConstraints = null;
         private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
         private bool __refinedChanges = true;
         private regex.Regex __refinedRegex = null;
@@ -170,6 +175,7 @@ namespace Neverer.UtilityClass
                 {
                     // Populate a per-character-position lookup of which letters are valid
                     __refinedLetters = new Dictionary<int, HashSet<char>>();
+                    __internalConstraints = new Dictionary<int, HashSet<char>>();
                     __externalConstraints = new Dictionary<int, HashSet<char>>();
                     for (int i = 0; i < clue.length; i++)
                     {
@@ -182,6 +188,7 @@ namespace Neverer.UtilityClass
                         {
                             __refinedLetters.Add(i, new HashSet<char>()); __refinedLetters[i].Add(Char.ToLower(clue.letters[i]));
                         }
+                        __internalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
                         __externalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
                     }
                 }
@@ -730,62 +737,100 @@ namespace Neverer.UtilityClass
             // Make a deep copy of the original
             Dictionary<int, HashSet<char>> old = __refinedLetters.DeepCopy();
 
-            // Clear out the old structure
-            refinedLetters.Clear();
+            bool furtherRefiningNeeded = true;
 
-            var answerChars = clue.letters.ToCharArray();
-
-            // Loop through clue length, adding in constraints from clue and ExternalConstraints
-            for (int pos = 0; pos < clue.length; pos++)
+            while (furtherRefiningNeeded)
             {
-                HashSet<char> thisPos;
-
-                // Start with clue constraint
-                if (answerChars[pos] == '?')
+                // If matches have changed, update InternalConstraints
+                if (__matchesChanged)
                 {
-                    thisPos = new HashSet<char>(allLetters);
-                }
-                else
-                {
-                    thisPos = new HashSet<char>();
-                    thisPos.Add(Char.ToLower(answerChars[pos]));
-                }
-
-                // Then look to ExternalConstraints
-                if (__externalConstraints.ContainsKey(pos))
-                {
-                    // If there's external constraints, apply them (intersect)
-                    __refinedLetters[pos] = new HashSet<char>(__externalConstraints[pos]);
-                    __refinedLetters[pos].IntersectWith(thisPos);
-                    //__refinedLetters[pos] = (HashSet<char>)__externalConstraints[pos].Intersect(thisPos);
-                }
-                else
-                {
-                    // Otherwise just use the clue constraints
-                    __refinedLetters[pos] = thisPos;
-                }
-            }
-
-            // Now compare to the original structure - remembering to loop past end of clueLength if old struct is longer (if, for instance, the clue has been shortened)
-            var oldMax = (from int k in __externalConstraints.Keys select k).Max();
-            for (int pos = 0; pos < Math.Max(clue.length, oldMax); pos++) // TODO - clue.length is 1-based, oldMax is 0-based. Is this a problem?
-            {
-                if ((!old.ContainsKey(pos)) || (!__refinedLetters.ContainsKey(pos)))
-                {
-                    // Mismatch of lengths - must be a difference
-                    modifiedList.Add(pos);
-                }
-                else
-                {
-                    // Both have a value - are they the same?
-                    if (!old[pos].SetEquals(__refinedLetters[pos]))
+                    // Remove any constraint keys beyond clue-length
+                    foreach (int k in (from int k in __internalConstraints.Keys where k>=this.clue.length select k))
                     {
-                        // Lists are different - changes at this position
+                        __internalConstraints.Remove(k);
+                    }
+                    // Loop through each character of the word, updating InternalConstraints from matches
+                    for(int pos=0;pos< this.clue.length; pos++)
+                    {
+                        // Populate with a-z if key not present
+                        if (!__internalConstraints.ContainsKey(pos)) { __internalConstraints.Add(pos,new HashSet<char>(allLetters)); }
+                        // Populate with all possible letters found at this position in the string
+                        //HashSet<char> posLetters = new HashSet<char>(from String word in __matches.Keys select Char.ToUpper(word[pos]));
+                        __internalConstraints[pos] = new HashSet<char>(from String word in __matches.Keys select Char.ToUpper(word[pos]));
+                    }
+                }
+                __matchesChanged = false;
+                
+                var answerChars = clue.letters.ToCharArray();
+
+                // Loop through clue length, adding in constraints from clue and ExternalConstraints
+                for (int pos = 0; pos < clue.length; pos++)
+                {
+                    HashSet<char> thisPos;
+
+                    // Start with clue constraint
+                    if (answerChars[pos] == '?')
+                    {
+                        thisPos = new HashSet<char>(allLetters);
+                    }
+                    else
+                    {
+                        thisPos = new HashSet<char>();
+                        thisPos.Add(Char.ToLower(answerChars[pos]));
+                    }
+
+                    // Then look to ExternalConstraints
+                    if (__externalConstraints.ContainsKey(pos))
+                    {
+                        // If there's external constraints, apply them (intersect)
+                        __refinedLetters[pos] = new HashSet<char>(__externalConstraints[pos]);
+                        __refinedLetters[pos].IntersectWith(thisPos);
+                        //__refinedLetters[pos] = (HashSet<char>)__externalConstraints[pos].Intersect(thisPos);
+                    }
+                    else
+                    {
+                        // Otherwise just use the clue constraints
+                        __refinedLetters[pos] = thisPos;
+                    }
+                }
+
+                furtherRefiningNeeded = false;
+
+                // Now compare to the original structure - remembering to loop past end of clueLength if old struct is longer (if, for instance, the clue has been shortened)
+                var oldMax = (from int k in __externalConstraints.Keys select k).Max();
+                for (int pos = 0; pos < Math.Max(clue.length, oldMax); pos++) // TODO - clue.length is 1-based, oldMax is 0-based. Is this a problem?
+                {
+                    if ((!old.ContainsKey(pos)) || (!__refinedLetters.ContainsKey(pos)))
+                    {
+                        // Mismatch of lengths - must be a difference
                         modifiedList.Add(pos);
                     }
                     else
                     {
-                        // No changes here
+                        // Both have a value - are they the same?
+                        if (!old[pos].SetEquals(__refinedLetters[pos]))
+                        {
+                            // Lists are different - changes at this position
+                            modifiedList.Add(pos);
+                        }
+                        else
+                        {
+                            // No changes here
+                        }
+                    }
+                }
+
+                // If we've made changes, refine our list of possible words
+                if (modifiedList.Count > 0)
+                {
+                    // Count current words
+                    int oldMatchCount = this.Matches.Count;
+                    // Refine list
+                    // TODO refineMatches();
+                    // If we've narrowed it down, re-run refining process because refinedLetters will have been updated
+                    if (this.Matches.Count != oldMatchCount)
+                    {
+                        furtherRefiningNeeded = true;
                     }
                 }
             }

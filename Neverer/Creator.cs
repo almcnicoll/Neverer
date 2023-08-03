@@ -902,7 +902,8 @@ namespace Neverer
                 UpdatePreviewGrid();
             }
             if (added.Count == 0) { added = null; }
-            ClueChanged("", new PlacedClueChangedEventArgs(added, true));
+            unsavedChanges = true;
+            ClueChanged("", new PlacedClueChangedEventArgs(added, true)); // TODO - why run this with null argument if no clues added?
         }
 
         private ClueDisplay GetSelectedClue()
@@ -1901,7 +1902,7 @@ namespace Neverer
         private void bwDictionaryChecker_DoWork(object sender, DoWorkEventArgs e)
         {
             CheckClues();
-            RefineClues(); // TODO - see if it's this RefineClues code that's messing with dictionary-loading
+            RefineClues(); // TODO - see if it's this RefineClues code that's messing with dictionary-loading (subsequent note - may have been infinite loop issue, now fixed)
         }
 
         private void regularExpressionSearchToolStripMenuItem_Click(object sender, EventArgs e)
