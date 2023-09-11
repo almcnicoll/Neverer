@@ -1628,7 +1628,7 @@ namespace Neverer
                 writer.AddStyleAttribute(WebUI.HtmlTextWriterStyle.Margin, "auto");
                 writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Table); // table
                 int clueTableRows = Math.Max(clues[AD.Across].Count - 1, clues[AD.Down].Count - 1);
-                for (int rr = 0; rr < clueTableRows; rr++)
+                for (int rr = 0; rr <= clueTableRows; rr++)
                 {
                     // Across
                     writer.RenderBeginTag(WebUI.HtmlTextWriterTag.Tr); // tr
