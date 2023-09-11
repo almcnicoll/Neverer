@@ -121,22 +121,20 @@ namespace Neverer.UtilityClass
 
         private SerializableDictionary<String, List<String>> __matches = new SerializableDictionary<String, List<String>>();
         // Refined properties take into account possible solutions on other clues, and their effect on this clue
+        [XmlIgnore]
         private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
         private bool __uncheckedChanges = true;
         private bool __uncheckedRefinedChanges = true;
         private bool __pauseEvents = false;
         private int lowMatchesTrigger = 5;
 
+        [XmlIgnore]
         private Dictionary<int, HashSet<char>> __internalConstraints = null; // Constraints of which letters can go in each place based on refinedMatches
+        [XmlIgnore]
         private Dictionary<int, HashSet<char>> __externalConstraints = null; // Constraints of which letters can go in each place based on intersecting clues
         // Refined properties take into account possible solutions on other clues, and their effect on this clue
         [XmlIgnore]
         private Dictionary<int, HashSet<char>> __refinedLetters = null;
-        [XmlIgnore]
-        private Dictionary<int, HashSet<char>> __externalConstraints = null;
-        [XmlIgnore]
-        private Dictionary<int, HashSet<char>> __internalConstraints = null;
-        private SerializableDictionary<String, List<String>> __refinedMatches = new SerializableDictionary<String, List<String>>();
         private bool __refinedChanges = true;
         private regex.Regex __refinedRegex = null;
 
@@ -241,14 +239,6 @@ namespace Neverer.UtilityClass
             get
             {
                 return clue.ToString();
-            }
-        }
-
-        public Dictionary<int, HashSet<char>> refinedLetters
-        {
-            get
-            {
-                return __refinedLetters;
             }
         }
 
@@ -520,12 +510,13 @@ namespace Neverer.UtilityClass
             }
             for (int i = 0; i < clue.length; i++)
             {
+                if ((type & ConstraintType.Internal) > 0)
                 {
-                    __internalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                    __internalConstraints.AddOrUpdate(i, new HashSet<char>(allLetters)); // Create this pre-populated
                 }
                 if ((type & ConstraintType.External) > 0)
                 {
-                    __externalConstraints.Add(i, new HashSet<char>(allLetters)); // Create this pre-populated
+                    __externalConstraints.AddOrUpdate(i, new HashSet<char>(allLetters)); // Create this pre-populated
                 }
             }
         }
