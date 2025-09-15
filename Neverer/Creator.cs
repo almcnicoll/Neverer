@@ -1532,15 +1532,20 @@ namespace Neverer
                 switch (Path.GetExtension(dlgDictOpen.FileName))
                 {
                     case ".dic":
+                        if (!AllDictionaries.ContainsKey(DictType.Custom)) { AllDictionaries.Add(DictType.Custom, new List<IWordSource>()); }
                         AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.XML));
 
+                        if (!currentSettings.DictionaryFiles.ContainsKey(DictType.Custom)) { currentSettings.DictionaryFiles.Add(DictType.Custom, new List<String>()); }
                         //currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
                         currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
                         currentSettings.Save();
                         break;
                     default:
+                        if (!AllDictionaries.ContainsKey(DictType.Custom)) { AllDictionaries.Add(DictType.Custom, new List<IWordSource>()); }
                         AllDictionaries[DictType.Custom].Add(CrosswordDictionary.Load(dlgDictOpen.FileName, DictFileType.Plaintext));
                         dlgDictOpen.FileName += CrosswordDictionary.importSuffix;
+
+                        if (!currentSettings.DictionaryFiles.ContainsKey(DictType.Custom)) { currentSettings.DictionaryFiles.Add(DictType.Custom, new List<String>()); }
                         //currentSettings.AddDictionaryFile(DictType.Custom, dlgDictOpen.FileName);
                         currentSettings.DictionaryFiles[DictType.Custom].Add(dlgDictOpen.FileName);
                         currentSettings.Save();

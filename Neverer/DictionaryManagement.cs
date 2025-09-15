@@ -64,6 +64,7 @@ namespace Neverer
                         CrosswordDictionary cd = CrosswordDictionary.Load(fileName, DictFileType.XML);
                         cd.enabled = true;
                         clbDictionaries.Items.Add(cd);
+                        if (!caller.currentSettings.DictionaryFiles.ContainsKey(DictType.Custom)) { caller.currentSettings.DictionaryFiles.Add(DictType.Custom, new List<String>()); }
                         caller.currentSettings.DictionaryFiles[DictType.Custom].Add(fileName);
                         caller.currentSettings.Save();
                         caller.AllDictionaries[DictType.Custom].Add(cd);

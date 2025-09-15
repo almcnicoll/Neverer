@@ -193,6 +193,7 @@ namespace Neverer
                     returnVal = new SerializableDictionary<DictType, List<String>>();
                     if (this.DictionaryFiles == null) { this.DictionaryFiles = new SerializableDictionary<DictType, List<String>>(); }
                     this.DictionaryFiles.Add(DictType.Default, new List<String>());
+                    this.DictionaryFiles.Add(DictType.Custom, new List<String>());
                 }
                 return returnVal;
             }
